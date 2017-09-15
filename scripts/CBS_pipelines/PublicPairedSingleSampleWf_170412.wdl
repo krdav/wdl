@@ -569,7 +569,7 @@ task BaseRecalibrator {
       -R ${ref_fasta} \
       -I ${input_bam} \
       --useOriginalQualities \
-      -O ${recalibration_report_filename} \
+      -o ${recalibration_report_filename} \
       -knownSites ${dbSNP_vcf} \
       -knownSites ${sep=" -knownSites " known_indels_sites_VCFs} \
       -L ${sep=" -L " sequence_group_interval}
@@ -610,7 +610,7 @@ task ApplyBQSR {
       -R ${ref_fasta} \
       -I ${input_bam} \
       --useOriginalQualities \
-      -O ${output_bam_basename}.bam \
+      -o ${output_bam_basename}.bam \
       -bqsr ${recalibration_report} \
       -SQQ 10 -SQQ 20 -SQQ 30 \
       -L ${sep=" -L " sequence_group_interval}
@@ -640,7 +640,7 @@ task GatherBqsrReports {
       -jar ${GATK} \
       -T GatherBQSRReports \
       -I ${sep=' -I ' input_bqsr_reports} \
-      -O ${output_report_filename}
+      -o ${output_report_filename}
     }
   runtime {
     cpu: cpu
