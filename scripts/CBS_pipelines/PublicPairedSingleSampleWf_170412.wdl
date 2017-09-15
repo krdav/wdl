@@ -1409,6 +1409,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Check the sample BAM fingerprint against the sample array 
   call CheckFingerprint {
     input:
+      PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
       haplotype_database_file = haplotype_database_file,
