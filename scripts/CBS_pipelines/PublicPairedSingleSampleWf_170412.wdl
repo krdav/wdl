@@ -565,7 +565,7 @@ task BaseRecalibrator {
       -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintGCDetails \
       -Xloggc:gc_log.log -Dsamjdk.use_async_io=false -Xmx4000m \
       -jar ${GATK} \
-      BaseRecalibrator \
+      -T BaseRecalibrator \
       -R ${ref_fasta} \
       -I ${input_bam} \
       --useOriginalQualities \
@@ -604,7 +604,7 @@ task ApplyBQSR {
       -XX:+PrintGCDetails -Xloggc:gc_log.log -Dsamjdk.use_async_io=false \
       -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3000m \
       -jar ${GATK} \
-      ApplyBQSR \
+      -T ApplyBQSR \
       --createOutputBamMD5 \
       --addOutputSAMProgramRecord \
       -R ${ref_fasta} \
@@ -638,7 +638,7 @@ task GatherBqsrReports {
   command {
     java -Xmx3000m \
       -jar ${GATK} \
-      GatherBQSRReports \
+      -T GatherBQSRReports \
       -I ${sep=' -I ' input_bqsr_reports} \
       -O ${output_report_filename}
     }
