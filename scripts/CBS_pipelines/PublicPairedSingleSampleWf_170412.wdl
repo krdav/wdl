@@ -561,7 +561,7 @@ task BaseRecalibrator {
   File GATK
 
   command {
-    rand=´shuf -i 1-10000000 -n 1´
+    rand=`shuf -i 1-10000000 -n 1`
     mv ${write_lines(sequence_group_interval)} $rand.intervals
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -XX:+PrintFlagsFinal \
       -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintGCDetails \
@@ -639,9 +639,8 @@ task GatherBqsrReports {
 
   command {
     java -Xmx3000m \
-      -jar ${GATK} \
-      -T GatherBQSRReports \
-      -I ${sep=' -I ' input_bqsr_reports} \
+      -cp ${GATK} org.broadinstitute.gatk.tools.GatherBqsrReports \
+      -I ${sep=' I=' input_bqsr_reports} \
       -o ${output_report_filename}
     }
   runtime {
