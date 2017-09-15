@@ -561,6 +561,9 @@ task BaseRecalibrator {
   File GATK
 
   command {
+    rand=`shuf -i 1-10000000 -n 1`
+    echo ${sep=" -L " sequence_group_interval} > ${rand}.intervals
+
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -XX:+PrintFlagsFinal \
       -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintGCDetails \
       -Xloggc:gc_log.log -Dsamjdk.use_async_io=false -Xmx4000m \
@@ -572,7 +575,8 @@ task BaseRecalibrator {
       -o ${recalibration_report_filename} \
       -knownSites ${dbSNP_vcf} \
       -knownSites ${sep=" -knownSites " known_indels_sites_VCFs} \
-      -L ${sep=" -L " sequence_group_interval}
+      -L ${rand}.intervals
+#      -L ${sep=" -L " sequence_group_interval}
   }
   runtime {
     cpu: cpu
