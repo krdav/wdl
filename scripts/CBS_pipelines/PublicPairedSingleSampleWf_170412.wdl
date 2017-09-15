@@ -565,11 +565,11 @@ task BaseRecalibrator {
       -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintGCDetails \
       -Xloggc:gc_log.log -Dsamjdk.use_async_io=false -Xmx4000m \
       -jar ${GATK} \
-      BaseRecalibrator \
+      -T BaseRecalibrator \
       -R ${ref_fasta} \
       -I ${input_bam} \
       --useOriginalQualities \
-      -O ${recalibration_report_filename} \
+      -o ${recalibration_report_filename} \
       -knownSites ${dbSNP_vcf} \
       -knownSites ${sep=" -knownSites " known_indels_sites_VCFs} \
       -L ${sep=" -L " sequence_group_interval}
@@ -604,13 +604,13 @@ task ApplyBQSR {
       -XX:+PrintGCDetails -Xloggc:gc_log.log -Dsamjdk.use_async_io=false \
       -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3000m \
       -jar ${GATK} \
-      ApplyBQSR \
+      -T ApplyBQSR \
       --createOutputBamMD5 \
       --addOutputSAMProgramRecord \
       -R ${ref_fasta} \
       -I ${input_bam} \
       --useOriginalQualities \
-      -O ${output_bam_basename}.bam \
+      -o ${output_bam_basename}.bam \
       -bqsr ${recalibration_report} \
       -SQQ 10 -SQQ 20 -SQQ 30 \
       -L ${sep=" -L " sequence_group_interval}
@@ -638,9 +638,9 @@ task GatherBqsrReports {
   command {
     java -Xmx3000m \
       -jar ${GATK} \
-      GatherBQSRReports \
+      -T GatherBQSRReports \
       -I ${sep=' -I ' input_bqsr_reports} \
-      -O ${output_report_filename}
+      -o ${output_report_filename}
     }
   runtime {
     cpu: cpu
