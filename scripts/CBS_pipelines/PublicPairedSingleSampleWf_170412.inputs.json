@@ -19,6 +19,7 @@
   "PairedEndSingleSampleWorkflow.bwa": "/services/tools/bwa/0.7.15/bwa",
   "PairedEndSingleSampleWorkflow.python3": "/services/tools/anaconda3/4.0.0/bin/python",
   "PairedEndSingleSampleWorkflow.python2": "/services/tools/anaconda2/4.0.0/bin/python",
+  "PairedEndSingleSampleWorkflow.gatk4": "/home/projects/dp_00005/apps/src/gatk-4.beta.3/gatk-package-4.beta.3-local.jar",
 
   "##_COMMENT2": "INTERVALS",  
   "PairedEndSingleSampleWorkflow.scattered_calling_intervals": [

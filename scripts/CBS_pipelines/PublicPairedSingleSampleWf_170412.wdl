@@ -600,26 +600,26 @@ task ApplyBQSR {
   Int disk_size
   Int preemptible_tries
   Int cpu=1
-  File GATK
+  File GATK4
 
   command {
-    rand=`shuf -i 1-10000000 -n 1`
-    mv ${write_lines(sequence_group_interval)} $rand.intervals
+#    rand=`shuf -i 1-10000000 -n 1`
+#    mv ${write_lines(sequence_group_interval)} $rand.intervals
 
     java -XX:+PrintFlagsFinal -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps \
       -XX:+PrintGCDetails -Xloggc:gc_log.log -Dsamjdk.use_async_io=false \
       -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3000m \
-      -jar ${GATK} \
-      -T ApplyBQSR \
+      -jar ${GATK4} ApplyBQSR \
       --createOutputBamMD5 \
       --addOutputSAMProgramRecord \
       -R ${ref_fasta} \
       -I ${input_bam} \
       --useOriginalQualities \
-      -o ${output_bam_basename}.bam \
+      -I ${output_bam_basename}.bam \
       -bqsr ${recalibration_report} \
       -SQQ 10 -SQQ 20 -SQQ 30 \
-      -L $rand.intervals
+      -L ${sep=" -L " sequence_group_interval}
+#      -L $rand.intervals
   }
   runtime {
     cpu: cpu
@@ -1138,6 +1138,7 @@ workflow PairedEndSingleSampleWorkflow {
 
   File picard
   File gatk
+  File gatk4
   File python2
   File python3
   File samtools
@@ -1353,7 +1354,7 @@ workflow PairedEndSingleSampleWorkflow {
     # Apply the recalibration model by interval
     call ApplyBQSR {
       input:
-        GATK=gatk,
+        GATK4=gatk4,
         input_bam = SortAndFixSampleBam.output_bam,
         input_bam_index = SortAndFixSampleBam.output_bam_index,
         output_bam_basename = recalibrated_bam_basename,
