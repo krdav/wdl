@@ -563,6 +563,7 @@ task BaseRecalibrator {
   command {
     rand=`shuf -i 1-10000000 -n 1`
     mv ${write_lines(sequence_group_interval)} $rand.intervals
+
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -XX:+PrintFlagsFinal \
       -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintGCDetails \
       -Xloggc:gc_log.log -Dsamjdk.use_async_io=false -Xmx4000m \
@@ -602,6 +603,9 @@ task ApplyBQSR {
   File GATK
 
   command {
+    rand=`shuf -i 1-10000000 -n 1`
+    mv ${write_lines(sequence_group_interval)} $rand.intervals
+
     java -XX:+PrintFlagsFinal -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps \
       -XX:+PrintGCDetails -Xloggc:gc_log.log -Dsamjdk.use_async_io=false \
       -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3000m \
@@ -615,7 +619,7 @@ task ApplyBQSR {
       -o ${output_bam_basename}.bam \
       -bqsr ${recalibration_report} \
       -SQQ 10 -SQQ 20 -SQQ 30 \
-      -L ${sep=" -L " sequence_group_interval}
+      -L $rand.intervals
   }
   runtime {
     cpu: cpu
@@ -895,19 +899,22 @@ task HaplotypeCaller {
   File GATK
 
   command {
+    rand=`shuf -i 1-10000000 -n 1`
+    mv ${write_lines(interval_list)} $rand.intervals
+
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
       -jar ${GATK} \
       -T HaplotypeCaller \
       -R ${ref_fasta} \
       -o ${gvcf_basename}.vcf.gz \
       -I ${input_bam} \
-      -L ${interval_list} \
       -ERC GVCF \
       --max_alternate_alleles 3 \
       -variant_index_parameter 128000 \
       -variant_index_type LINEAR \
       -contamination ${default=0 contamination} \
-      --read_filter OverclippedRead
+      --read_filter OverclippedRead \
+      -L $rand.intervals
   }
   runtime {
     cpu: cpu
@@ -962,16 +969,19 @@ task ValidateGVCF {
   File GATK
 
   command {
+    rand=`shuf -i 1-10000000 -n 1`
+    mv ${write_lines(wgs_calling_interval_list)} $rand.intervals
+
     java -Xmx8g \
       -jar ${GATK} \
       -T ValidateVariants \
       -V ${input_vcf} \
       -R ${ref_fasta} \
-      -L ${wgs_calling_interval_list} \
       -gvcf \
       --validationTypeToExclude ALLELES \
       --reference_window_stop 208 -U  \
-      --dbsnp ${dbSNP_vcf}
+      --dbsnp ${dbSNP_vcf} \
+      -L $rand.intervals
   }
   runtime {
     cpu: cpu
