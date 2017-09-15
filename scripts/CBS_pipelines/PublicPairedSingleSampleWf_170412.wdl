@@ -603,8 +603,8 @@ task ApplyBQSR {
   File GATK4
 
   command {
-#    rand=`shuf -i 1-10000000 -n 1`
-#    mv ${write_lines(sequence_group_interval)} $rand.intervals
+    rand=`shuf -i 1-10000000 -n 1`
+    mv ${write_lines(sequence_group_interval)} $rand.intervals
 
     java -XX:+PrintFlagsFinal -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps \
       -XX:+PrintGCDetails -Xloggc:gc_log.log -Dsamjdk.use_async_io=false \
@@ -615,11 +615,10 @@ task ApplyBQSR {
       -R ${ref_fasta} \
       -I ${input_bam} \
       --useOriginalQualities \
-      -I ${output_bam_basename}.bam \
+      -O ${output_bam_basename}.bam \
       -bqsr ${recalibration_report} \
       -SQQ 10 -SQQ 20 -SQQ 30 \
-      -L ${sep=" -L " sequence_group_interval}
-#      -L $rand.intervals
+      -L $rand.intervals
   }
   runtime {
     cpu: cpu
@@ -899,9 +898,6 @@ task HaplotypeCaller {
   File GATK
 
   command {
-    rand=`shuf -i 1-10000000 -n 1`
-    mv ${write_lines(interval_list)} $rand.intervals
-
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
       -jar ${GATK} \
       -T HaplotypeCaller \
@@ -914,7 +910,7 @@ task HaplotypeCaller {
       -variant_index_type LINEAR \
       -contamination ${default=0 contamination} \
       --read_filter OverclippedRead \
-      -L $rand.intervals
+      -L ${interval_list
   }
   runtime {
     cpu: cpu
