@@ -640,8 +640,8 @@ task GatherBqsrReports {
   command {
     java -Xmx3000m \
       -cp ${GATK} org.broadinstitute.gatk.tools.GatherBqsrReports \
-      -I ${sep=' I=' input_bqsr_reports} \
-      -o ${output_report_filename}
+      I=${sep=' I=' input_bqsr_reports} \
+      O=${output_report_filename}
     }
   runtime {
     cpu: cpu
