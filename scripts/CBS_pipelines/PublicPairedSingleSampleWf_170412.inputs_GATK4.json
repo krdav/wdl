@@ -12,6 +12,7 @@
 
   "KRISTIAN_COMMENT:": "TOOL_PATHS",
   "PairedEndSingleSampleWorkflow.seq_cache_populate": "/home/projects/dp_00005/apps/src/samtools-1.5/misc/seq_cache_populate.pl",
+  "PairedEndSingleSampleWorkflow.gatk3": "/home/projects/dp_00005/apps/src/GenomeAnalysisTK-3.8-0-ge9d806836/GenomeAnalysisTK.jar",
   "PairedEndSingleSampleWorkflow.gatk": "/home/projects/dp_00005/apps/src/gatk-4.beta.5/gatk-package-4.beta.5-local.jar",
   "PairedEndSingleSampleWorkflow.picard": "/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar",
   "PairedEndSingleSampleWorkflow.samtools": "/home/projects/dp_00005/apps/src/samtools-1.5/samtools",

@@ -894,13 +894,14 @@ task HaplotypeCaller {
   Int disk_size
   Int preemptible_tries
   Int cpu=1
-  File GATK
+  File GATK3
 
   command {
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
-      -jar ${GATK} HaplotypeCaller \
+      -jar ${GATK3} \
+      -T HaplotypeCaller \
       -R ${ref_fasta} \
-      -O ${gvcf_basename}.vcf.gz \
+      -o ${gvcf_basename}.vcf.gz \
       -I ${input_bam} \
       -ERC GVCF \
       --max_alternate_alleles 3 \
@@ -960,21 +961,19 @@ task ValidateGVCF {
   Int disk_size
   Int preemptible_tries
   Int cpu=1
-  File GATK
+  File GATK3
 
   command {
-    rand=`shuf -i 1-10000000 -n 1`
-    mv ${write_lines(wgs_calling_interval_list)} $rand.intervals
-
     java -Xmx8g \
-      -jar ${GATK} ValidateVariants \
+      -jar ${GATK3} \
+      -T ValidateVariants \
       -V ${input_vcf} \
       -R ${ref_fasta} \
       -gvcf \
       --validationTypeToExclude ALLELES \
       --reference_window_stop 208 -U  \
       --dbsnp ${dbSNP_vcf} \
-      -L $rand.intervals
+      -L ${wgs_calling_interval_list}
   }
   runtime {
     cpu: cpu
@@ -1131,6 +1130,7 @@ workflow PairedEndSingleSampleWorkflow {
 
   File picard
   File gatk
+  File gatk3
   File python2
   File python3
   File samtools
@@ -1508,7 +1508,7 @@ workflow PairedEndSingleSampleWorkflow {
     # Generate GVCF by interval
     call HaplotypeCaller {
       input:
-        GATK=gatk,
+        GATK3=gatk3,
         contamination = CheckContamination.contamination,
         input_bam = GatherBamFiles.output_bam,
         input_bam_index = GatherBamFiles.output_bam_index,
@@ -1536,7 +1536,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Validate the GVCF output of HaplotypeCaller
   call ValidateGVCF {
     input:
-      GATK=gatk,
+      GATK3=gatk3,
       input_vcf = MergeVCFs.output_vcf,
       input_vcf_index = MergeVCFs.output_vcf_index,
       dbSNP_vcf = dbSNP_vcf,

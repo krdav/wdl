@@ -910,7 +910,7 @@ task HaplotypeCaller {
       -variant_index_type LINEAR \
       -contamination ${default=0 contamination} \
       --read_filter OverclippedRead \
-      -L ${interval_list
+      -L ${interval_list}
   }
   runtime {
     cpu: cpu
@@ -965,9 +965,6 @@ task ValidateGVCF {
   File GATK
 
   command {
-    rand=`shuf -i 1-10000000 -n 1`
-    mv ${write_lines(wgs_calling_interval_list)} $rand.intervals
-
     java -Xmx8g \
       -jar ${GATK} \
       -T ValidateVariants \
@@ -977,7 +974,7 @@ task ValidateGVCF {
       --validationTypeToExclude ALLELES \
       --reference_window_stop 208 -U  \
       --dbsnp ${dbSNP_vcf} \
-      -L $rand.intervals
+      -L ${wgs_calling_interval_list}
   }
   runtime {
     cpu: cpu
