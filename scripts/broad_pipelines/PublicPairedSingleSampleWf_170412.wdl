@@ -34,19 +34,19 @@ task CollectQualityYieldMetrics {
   String metrics_filename
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File PICARD
 
   command {
-    java -Xmx128m -jar /usr/gitc/picard.jar \
+    java -Xmx128m \
+      -jar ${PICARD} \
       CollectQualityYieldMetrics \
       INPUT=${input_bam} \
       OQ=true \
       OUTPUT=${metrics_filename}
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    disks: "local-disk " + disk_size + " HDD"
-    memory: "2 GB"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File metrics = "${metrics_filename}"
@@ -56,9 +56,11 @@ task CollectQualityYieldMetrics {
 ## Check the assumption that the final GVCF filename that is going to be used ends with .g.vcf.gz 
 task CheckFinalVcfExtension {
   String vcf_filename
+  Int cpu=1
+  File PYTHON2
 
   command <<<
-    python <<CODE
+    ${PYTHON2} <<CODE
     import os
     import sys
     filename="${vcf_filename}"
@@ -68,8 +70,7 @@ task CheckFinalVcfExtension {
     CODE
   >>>
   runtime {
-    docker: "python:2.7"
-    memory: "2 GB"
+    cpu: cpu
   }
   output {
     String common_suffix=read_string(stdout())
@@ -78,16 +79,17 @@ task CheckFinalVcfExtension {
 
 # Get version of BWA
 task GetBwaVersion {
+  Int cpu=1
+  File BWA
   command {
     # Not setting "set -o pipefail" here because /bwa has a rc=1 and we don't want to allow rc=1 to succeed 
     # because the sed may also fail with that error and that is something we actually want to fail on.
-    /usr/gitc/bwa 2>&1 | \
+    ${BWA} 2>&1 | \
     grep -e '^Version' | \
     sed 's/Version: //'
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "1 GB"
+    cpu: cpu
   }
   output {
     String version = read_string(stdout())
@@ -114,6 +116,9 @@ task SamToFastqAndBwaMem {
   File ref_sa
   Int disk_size
   Int preemptible_tries
+  Int cpu=28
+  File PICARD
+  File SAMTOOLS
 
   command <<<
     set -o pipefail
@@ -123,14 +128,15 @@ task SamToFastqAndBwaMem {
     bash_ref_fasta=${ref_fasta}
     # if ref_alt has data in it, we proceed
     if [ -s ${ref_alt} ]; then
-      java -Xmx3000m -jar /usr/gitc/picard.jar \
+      java -Xmx3000m \
+        -jar ${PICARD} \
         SamToFastq \
         INPUT=${input_bam} \
         FASTQ=/dev/stdout \
         INTERLEAVE=true \
         NON_PF=true | \
-      /usr/gitc/${bwa_commandline} /dev/stdin -  2> >(tee ${output_bam_basename}.bwa.stderr.log >&2) | \
-      samtools view -1 - > ${output_bam_basename}.bam
+      ${bwa_commandline} /dev/stdin -  2> >(tee ${output_bam_basename}.bwa.stderr.log >&2) | \
+      ${SAMTOOLS} view -1 - > ${output_bam_basename}.bam
 
       grep -m1 "read .* ALT contigs" ${output_bam_basename}.bwa.stderr.log | \
       grep -v "read 0 ALT contigs"
@@ -141,11 +147,7 @@ task SamToFastqAndBwaMem {
     fi
   >>>
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "14 GB"
-    cpu: "16"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File output_bam = "${output_bam_basename}.bam"
@@ -165,11 +167,14 @@ task MergeBamAlignment {
   File ref_dict
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File PICARD
 
   command {
     # set the bash variable needed for the command-line
     bash_ref_fasta=${ref_fasta}
-    java -Xmx2500m -jar /usr/gitc/picard.jar \
+    java -Xmx2500m \
+      -jar ${PICARD} \
       MergeBamAlignment \
       VALIDATION_STRINGENCY=SILENT \
       EXPECTED_ORIENTATIONS=FR \
@@ -196,11 +201,7 @@ task MergeBamAlignment {
       UNMAP_CONTAMINANT_READS=true
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "3500 MB"
-    cpu: "1"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File output_bam = "${output_bam_basename}.bam"
@@ -216,31 +217,31 @@ task SortAndFixTags {
   File ref_fasta_index
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File PICARD
 
   command {
     set -o pipefail
 
-    java -Xmx4000m -jar /usr/gitc/picard.jar \
-    SortSam \
-    INPUT=${input_bam} \
-    OUTPUT=/dev/stdout \
-    SORT_ORDER="coordinate" \
-    CREATE_INDEX=false \
-    CREATE_MD5_FILE=false | \
-    java -Xmx500m -jar /usr/gitc/picard.jar \
-    SetNmAndUqTags \
-    INPUT=/dev/stdin \
-    OUTPUT=${output_bam_basename}.bam \
-    CREATE_INDEX=true \
-    CREATE_MD5_FILE=true \
-    REFERENCE_SEQUENCE=${ref_fasta}
+    java -Xmx4000m \
+      -jar ${PICARD} \
+      SortSam \
+      INPUT=${input_bam} \
+      OUTPUT=/dev/stdout \
+      SORT_ORDER="coordinate" \
+      CREATE_INDEX=false \
+      CREATE_MD5_FILE=false | \
+    java -Xmx500m \
+      -jar ${PICARD} \
+      SetNmAndUqTags \
+      INPUT=/dev/stdin \
+      OUTPUT=${output_bam_basename}.bam \
+      CREATE_INDEX=true \
+      CREATE_MD5_FILE=true \
+      REFERENCE_SEQUENCE=${ref_fasta}
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    disks: "local-disk " + disk_size + " HDD"
-    cpu: "1"
-    memory: "5000 MB"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File output_bam = "${output_bam_basename}.bam"
@@ -254,9 +255,12 @@ task CollectUnsortedReadgroupBamQualityMetrics {
   File input_bam
   String output_bam_prefix
   Int disk_size
+  Int cpu=1
+  File PICARD
 
   command {
-    java -Xmx5000m -jar /usr/gitc/picard.jar \
+    java -Xmx5000m \
+      -jar ${PICARD} \
       CollectMultipleMetrics \
       INPUT=${input_bam} \
       OUTPUT=${output_bam_prefix} \
@@ -271,12 +275,9 @@ task CollectUnsortedReadgroupBamQualityMetrics {
 
     touch ${output_bam_prefix}.insert_size_metrics
     touch ${output_bam_prefix}.insert_size_histogram.pdf
-
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "7 GB"
-    disks: "local-disk " + disk_size + " HDD"
+    cpu: cpu
   }
   output {
     File base_distribution_by_cycle_pdf = "${output_bam_prefix}.base_distribution_by_cycle.pdf"
@@ -299,9 +300,12 @@ task CollectReadgroupBamQualityMetrics {
   File ref_fasta
   File ref_fasta_index
   Int disk_size
+  Int cpu=1
+  File PICARD
 
   command {
-    java -Xmx5000m -jar /usr/gitc/picard.jar \
+    java -Xmx5000m \
+      -jar ${PICARD} \
       CollectMultipleMetrics \
       INPUT=${input_bam} \
       REFERENCE_SEQUENCE=${ref_fasta} \
@@ -314,9 +318,7 @@ task CollectReadgroupBamQualityMetrics {
       METRIC_ACCUMULATION_LEVEL="READ_GROUP"
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "7 GB"
-    disks: "local-disk " + disk_size + " HDD"
+    cpu: cpu
   }
   output {
     File alignment_summary_metrics = "${output_bam_prefix}.alignment_summary_metrics"
@@ -335,9 +337,12 @@ task CollectAggregationMetrics {
   File ref_fasta
   File ref_fasta_index
   Int disk_size
+  Int cpu=1
+  File PICARD
 
   command {
-    java -Xmx5000m -jar /usr/gitc/picard.jar \
+    java -Xmx5000m \
+      -jar ${PICARD} \
       CollectMultipleMetrics \
       INPUT=${input_bam} \
       REFERENCE_SEQUENCE=${ref_fasta} \
@@ -357,9 +362,7 @@ task CollectAggregationMetrics {
     touch ${output_bam_prefix}.insert_size_histogram.pdf
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "7 GB"
-    disks: "local-disk " + disk_size + " HDD"
+    cpu: cpu
   }
   output {
     File alignment_summary_metrics = "${output_bam_prefix}.alignment_summary_metrics"
@@ -385,11 +388,13 @@ task CrossCheckFingerprints {
   String metrics_filename
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File PICARD
 
   command <<<
     if [ -s ${haplotype_database_file} ]; then
       java -Dsamjdk.buffer_size=131072 -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx2000m \
-       -jar /usr/gitc/picard.jar \
+       -jar ${PICARD} \
        CrosscheckReadGroupFingerprints \
        OUTPUT=${metrics_filename} \
        HAPLOTYPE_MAP=${haplotype_database_file} \
@@ -402,10 +407,7 @@ task CrossCheckFingerprints {
     fi
   >>>
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "2 GB"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File metrics = "${metrics_filename}"
@@ -422,11 +424,13 @@ task CheckFingerprint {
   String sample
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File PICARD
 
   command <<<
   if [ -s ${genotypes} ]; then
     java -Dsamjdk.buffer_size=131072 -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx1024m  \
-    -jar /usr/gitc/picard.jar \
+    -jar ${PICARD} \
     CheckFingerprint \
     INPUT=${input_bam} \
     OUTPUT=${output_basename} \
@@ -442,11 +446,8 @@ task CheckFingerprint {
     touch ${output_basename}.fingerprinting_detail_metrics
   fi
   >>>
- runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "1 GB"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+  runtime {
+    cpu: cpu
   }
   output {
     File summary_metrics = "${output_basename}.fingerprinting_summary_metrics"
@@ -460,12 +461,15 @@ task MarkDuplicates {
   String output_bam_basename
   String metrics_filename
   Int disk_size
+  Int cpu=1
+  File PICARD
 
  # Task is assuming query-sorted input so that the Secondary and Supplementary reads get marked correctly.
  # This works because the output of BWA is query-grouped and therefore, so is the output of MergeBamAlignment.
  # While query-grouped isn't actually query-sorted, it's good enough for MarkDuplicates with ASSUME_SORT_ORDER="queryname"
   command {
-    java -Xmx4000m -jar /usr/gitc/picard.jar \
+    java -Xmx4000m \
+      -jar ${PICARD} \
       MarkDuplicates \
       INPUT=${sep=' INPUT=' input_bams} \
       OUTPUT=${output_bam_basename}.bam \
@@ -476,9 +480,7 @@ task MarkDuplicates {
       CREATE_MD5_FILE=true
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "7 GB"
-    disks: "local-disk " + disk_size + " HDD"
+    cpu: cpu
   }
   output {
     File output_bam = "${output_bam_basename}.bam"
@@ -490,6 +492,7 @@ task MarkDuplicates {
 task CreateSequenceGroupingTSV {
   File ref_dict
   Int preemptible_tries
+  Int cpu=1
 
   # Use python to create the Sequencing Groupings used for BQSR and PrintReads Scatter. 
   # It outputs to stdout where it is parsed into a wdl Array[Array[String]]
@@ -531,9 +534,7 @@ task CreateSequenceGroupingTSV {
     CODE
   >>>
   runtime {
-    docker: "python:2.7"
-    memory: "2 GB"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     Array[Array[String]] sequence_grouping = read_tsv("sequence_grouping.txt")
@@ -556,12 +557,14 @@ task BaseRecalibrator {
   File ref_fasta_index
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File GATK
 
   command {
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -XX:+PrintFlagsFinal \
       -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintGCDetails \
       -Xloggc:gc_log.log -Dsamjdk.use_async_io=false -Xmx4000m \
-      -jar /usr/gitc/GATK4.jar \
+      -jar ${GATK} \
       BaseRecalibrator \
       -R ${ref_fasta} \
       -I ${input_bam} \
@@ -572,10 +575,7 @@ task BaseRecalibrator {
       -L ${sep=" -L " sequence_group_interval}
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "6 GB"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File recalibration_report = "${recalibration_report_filename}"
@@ -596,12 +596,14 @@ task ApplyBQSR {
   File ref_fasta_index
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File GATK
 
   command {
     java -XX:+PrintFlagsFinal -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps \
       -XX:+PrintGCDetails -Xloggc:gc_log.log -Dsamjdk.use_async_io=false \
       -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3000m \
-      -jar /usr/gitc/GATK4.jar \
+      -jar ${GATK} \
       ApplyBQSR \
       --createOutputBamMD5 \
       --addOutputSAMProgramRecord \
@@ -614,10 +616,7 @@ task ApplyBQSR {
       -L ${sep=" -L " sequence_group_interval}
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "3500 MB"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File recalibrated_bam = "${output_bam_basename}.bam"
@@ -633,18 +632,18 @@ task GatherBqsrReports {
   String output_report_filename
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File GATK
 
   command {
-    java -Xmx3000m -jar /usr/gitc/GATK4.jar \
+    java -Xmx3000m \
+      -jar ${GATK} \
       GatherBQSRReports \
       -I ${sep=' -I ' input_bqsr_reports} \
       -O ${output_report_filename}
     }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "3500 MB"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File output_bqsr_report = "${output_report_filename}"
@@ -657,9 +656,12 @@ task GatherBamFiles {
   String output_bam_basename
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File PICARD
 
   command {
-    java -Xmx2000m -jar /usr/gitc/picard.jar \
+    java -Xmx2000m \
+      -jar ${PICARD} \
       GatherBamFiles \
       INPUT=${sep=' INPUT=' input_bams} \
       OUTPUT=${output_bam_basename}.bam \
@@ -667,10 +669,7 @@ task GatherBamFiles {
       CREATE_MD5_FILE=true
     }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "3 GB"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File output_bam = "${output_bam_basename}.bam"
@@ -691,9 +690,12 @@ task ValidateSamFile {
   Array[String]? ignore
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File PICARD
 
   command {
-    java -Xmx4000m -jar /usr/gitc/picard.jar \
+    java -Xmx4000m \
+      -jar ${PICARD} \
       ValidateSamFile \
       INPUT=${input_bam} \
       OUTPUT=${report_filename} \
@@ -704,10 +706,7 @@ task ValidateSamFile {
       IS_BISULFITE_SEQUENCED=false
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "7 GB"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File report = "${report_filename}"
@@ -723,9 +722,12 @@ task CollectWgsMetrics {
   File ref_fasta
   File ref_fasta_index
   Int disk_size
+  Int cpu=1
+  File PICARD
 
   command {
-    java -Xmx2000m -jar /usr/gitc/picard.jar \
+    java -Xmx2000m \
+      -jar ${PICARD} \
       CollectWgsMetrics \
       INPUT=${input_bam} \
       VALIDATION_STRINGENCY=SILENT \
@@ -734,9 +736,7 @@ task CollectWgsMetrics {
       OUTPUT=${metrics_filename}
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "3 GB"
-    disks: "local-disk " + disk_size + " HDD"
+    cpu: cpu
   }
   output {
     File metrics = "${metrics_filename}"
@@ -752,9 +752,12 @@ task CollectRawWgsMetrics {
   File ref_fasta
   File ref_fasta_index
   Int disk_size
+  Int cpu=1
+  File PICARD
 
   command {
-    java -Xmx2000m -jar /usr/gitc/picard.jar \
+    java -Xmx2000m \
+      -jar ${PICARD} \
       CollectRawWgsMetrics \
       INPUT=${input_bam} \
       VALIDATION_STRINGENCY=SILENT \
@@ -763,9 +766,7 @@ task CollectRawWgsMetrics {
       OUTPUT=${metrics_filename}
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "3 GB"
-    disks: "local-disk " + disk_size + " HDD"
+    cpu: cpu
   }
   output {
     File metrics = "${metrics_filename}"
@@ -779,18 +780,18 @@ task CalculateReadGroupChecksum {
   String read_group_md5_filename
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File PICARD
 
   command {
-    java -Xmx1000m -jar /usr/gitc/picard.jar \
+    java -Xmx1000m \
+      -jar ${PICARD} \
       CalculateReadGroupChecksum \
       INPUT=${input_bam} \
       OUTPUT=${read_group_md5_filename}
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "2 GB"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File md5_file = "${read_group_md5_filename}"
@@ -818,6 +819,8 @@ task CheckContamination {
   String output_prefix
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File verifyBamID
 
   # Having to do this as a 2-step command in heredoc syntax, adding a python step to read the metrics
   # This is a hack until read_object() is supported by Cromwell.
@@ -826,7 +829,7 @@ task CheckContamination {
   command <<<
     set -e
 
-    /usr/gitc/verifyBamID \
+    ./${verifyBamID} \
     --verbose \
     --ignoreRG \
     --vcf ${contamination_sites_vcf} \
@@ -857,10 +860,7 @@ task CheckContamination {
     CODE
   >>>
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "2 GB"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File selfSM = "${output_prefix}.selfSM"
@@ -890,10 +890,12 @@ task HaplotypeCaller {
   Float? contamination
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File GATK
 
   command {
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
-      -jar /usr/gitc/GATK35.jar \
+      -jar ${GATK} \
       -T HaplotypeCaller \
       -R ${ref_fasta} \
       -o ${gvcf_basename}.vcf.gz \
@@ -907,11 +909,7 @@ task HaplotypeCaller {
       --read_filter OverclippedRead
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "10 GB"
-    cpu: "1"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File output_gvcf = "${gvcf_basename}.vcf.gz"
@@ -926,24 +924,24 @@ task MergeVCFs {
   String output_vcf_name
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File PICARD
 
   # Using MergeVcfs instead of GatherVcfs so we can create indices
   # See https://github.com/broadinstitute/picard/issues/789 for relevant GatherVcfs ticket
   command {
-    java -Xmx2g -jar /usr/gitc/picard.jar \
-    MergeVcfs \
-    INPUT=${sep=' INPUT=' input_vcfs} \
-    OUTPUT=${output_vcf_name}
+    java -Xmx2g \
+      -jar ${PICARD} \
+      MergeVcfs \
+      INPUT=${sep=' INPUT=' input_vcfs} \
+      OUTPUT=${output_vcf_name}
   }
   output {
     File output_vcf = "${output_vcf_name}"
     File output_vcf_index = "${output_vcf_name}.tbi"
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "3 GB"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
 }
 
@@ -959,23 +957,23 @@ task ValidateGVCF {
   File wgs_calling_interval_list
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File GATK
 
   command {
-    java -Xmx8g -jar /usr/gitc/GATK36.jar \
-    -T ValidateVariants \
-    -V ${input_vcf} \
-    -R ${ref_fasta} \
-    -L ${wgs_calling_interval_list} \
-    -gvcf \
-    --validationTypeToExclude ALLELES \
-    --reference_window_stop 208 -U  \
-    --dbsnp ${dbSNP_vcf}
+    java -Xmx8g \
+      -jar ${GATK} \
+      -T ValidateVariants \
+      -V ${input_vcf} \
+      -R ${ref_fasta} \
+      -L ${wgs_calling_interval_list} \
+      -gvcf \
+      --validationTypeToExclude ALLELES \
+      --reference_window_stop 208 -U  \
+      --dbsnp ${dbSNP_vcf}
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "10 GB"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
 }
 
@@ -990,9 +988,12 @@ task CollectGvcfCallingMetrics {
   Int disk_size
   File wgs_evaluation_interval_list
   Int preemptible_tries
+  Int cpu=1
+  File PICARD
 
   command {
-    java -Xmx2000m -jar /usr/gitc/picard.jar \
+    java -Xmx2000m \
+      -jar ${PICARD} \
       CollectVariantCallingMetrics \
       INPUT=${input_vcf} \
       OUTPUT=${metrics_basename} \
@@ -1002,10 +1003,7 @@ task CollectGvcfCallingMetrics {
       GVCF_INPUT=true
   }
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "3 GB"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File summary_metrics = "${metrics_basename}.variant_calling_summary_metrics"
@@ -1022,29 +1020,28 @@ task ConvertToCram {
   String output_basename
   Int disk_size
   Int preemptible_tries
+  Int cpu=1
+  File SAMTOOLS
+  File seq_cache_populate
 
   command <<<
     set -e
     set -o pipefail
 
-    samtools view -C -T ${ref_fasta} ${input_bam} | \
+    ${SAMTOOLS} view -C -T ${ref_fasta} ${input_bam} | \
     tee ${output_basename}.cram | \
     md5sum | awk '{print $1}' > ${output_basename}.cram.md5
 
     # Create REF_CACHE. Used when indexing a CRAM
-    seq_cache_populate.pl -root ./ref/cache ${ref_fasta}
+    ${seq_cache_populate} -root ./ref/cache ${ref_fasta}
     export REF_PATH=:
     export REF_CACHE=./ref/cache/%2s/%2s/%s
 
-    samtools index ${output_basename}.cram
+    ${SAMTOOLS} index ${output_basename}.cram
     mv ${output_basename}.cram.crai ${output_basename}.crai
   >>>
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "3 GB"
-    cpu: "1"
-    disks: "local-disk " + disk_size + " HDD"
-    preemptible: preemptible_tries
+    cpu: cpu
   }
   output {
     File output_cram = "${output_basename}.cram"
@@ -1062,20 +1059,20 @@ task CramToBam {
   String output_basename
 
   Int disk_size
+  Int cpu=1
+  File SAMTOOLS
 
 command <<<
   set -e
   set -o pipefail
 
-  samtools view -h -T ${ref_fasta} ${cram_file} |
-  samtools view -b -o ${output_basename}.bam -
-  samtools index -b ${output_basename}.bam
+  ${SAMTOOLS} view -h -T ${ref_fasta} ${cram_file} |
+  ${SAMTOOLS} view -b -o ${output_basename}.bam -
+  ${SAMTOOLS} index -b ${output_basename}.bam
   mv ${output_basename}.bam.bai ${output_basename}.bai 
   >>>
   runtime {
-    docker: "broadinstitute/genomes-in-the-cloud:2.2.5-1486412288"
-    memory: "3 GB"
-    disks: "local-disk " + disk_size + " HDD"
+    cpu: cpu
   }
   output {
     File output_bam = "${output_basename}.bam"
@@ -1125,18 +1122,33 @@ workflow PairedEndSingleSampleWorkflow {
   Int preemptible_tries
   Int agg_preemptible_tries
 
-  String bwa_commandline="bwa mem -K 100000000 -p -v 3 -t 16 -Y $bash_ref_fasta"
 
   String recalibrated_bam_basename = base_file_name + ".aligned.duplicates_marked.recalibrated"
 
+  File picard
+  File gatk
+  File python2
+  File python3
+  File samtools
+  File bwa
+  File verifyBamID
+  File seq_cache_populate
+
+  String bwa_commandline = bwa + " mem -K 100000000 -p -v 3 -t 16 -Y $bash_ref_fasta"
+
+
   # Get the version of BWA to include in the PG record in the header of the BAM produced 
   # by MergeBamAlignment. 
-  call GetBwaVersion
+  call GetBwaVersion {
+    input:
+      BWA=bwa
+  }
 
   # Check that the GVCF output name follows convention
   call CheckFinalVcfExtension {
-     input:
-        vcf_filename = final_gvcf_name
+    input:
+      PYTHON2=python2,
+      vcf_filename = final_gvcf_name
    }
  
   # Align flowcell-level unmapped input bams in parallel
@@ -1145,12 +1157,13 @@ workflow PairedEndSingleSampleWorkflow {
     # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
     # String base_name = sub(sub(unmapped_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
 
-    String sub_strip_path = "gs://.*/"
+    String sub_strip_path = "/home/projects/dp_00005/data/cromwell_test/.*/"
     String sub_strip_unmapped = unmapped_bam_suffix + "$"
 
     # QC the unmapped BAM 
     call CollectQualityYieldMetrics {
       input:
+        PICARD=picard,
         input_bam = unmapped_bam,
         metrics_filename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics",
         disk_size = flowcell_small_disk,
@@ -1160,6 +1173,8 @@ workflow PairedEndSingleSampleWorkflow {
     # Map reads to reference
     call SamToFastqAndBwaMem {
       input:
+        SAMTOOLS=samtools,
+        PICARD=picard,
         input_bam = unmapped_bam,
         bwa_commandline = bwa_commandline,
         output_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmerged",
@@ -1179,6 +1194,7 @@ workflow PairedEndSingleSampleWorkflow {
     # Merge original uBAM and BWA-aligned BAM 
     call MergeBamAlignment {
       input:
+        PICARD=picard,
         unmapped_bam = unmapped_bam,
         bwa_commandline = bwa_commandline,
         bwa_version = GetBwaVersion.version,
@@ -1195,6 +1211,7 @@ workflow PairedEndSingleSampleWorkflow {
     # No reference needed as the input here is unsorted; providing a reference would cause an error
     call CollectUnsortedReadgroupBamQualityMetrics {
       input:
+        PICARD=picard,
         input_bam = MergeBamAlignment.output_bam,
         output_bam_prefix = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".readgroup",
         disk_size = flowcell_medium_disk
@@ -1203,13 +1220,14 @@ workflow PairedEndSingleSampleWorkflow {
     # Sort and fix tags in the merged BAM
     call SortAndFixTags as SortAndFixReadGroupBam {
       input:
-      input_bam = MergeBamAlignment.output_bam,
-      output_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".sorted",
-      ref_dict = ref_dict,
-      ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      disk_size = flowcell_medium_disk,
-      preemptible_tries = preemptible_tries
+        PICARD=picard,
+        input_bam = MergeBamAlignment.output_bam,
+        output_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".sorted",
+        ref_dict = ref_dict,
+        ref_fasta = ref_fasta,
+        ref_fasta_index = ref_fasta_index,
+        disk_size = flowcell_medium_disk,
+        preemptible_tries = preemptible_tries
     }
     
     # Validate the aligned and sorted readgroup BAM
@@ -1217,6 +1235,7 @@ workflow PairedEndSingleSampleWorkflow {
     # If considered too time consuming and not helpful, can be removed.
     call ValidateSamFile as ValidateReadGroupSamFile {
       input:
+        PICARD=picard,
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict,
@@ -1234,6 +1253,7 @@ workflow PairedEndSingleSampleWorkflow {
   # to avoid having to spend time just merging BAM files.
   call MarkDuplicates {
     input:
+      PICARD=picard,
       input_bams = MergeBamAlignment.output_bam,
       output_bam_basename = base_file_name + ".aligned.unsorted.duplicates_marked",
       metrics_filename = base_file_name + ".duplicate_metrics",
@@ -1243,6 +1263,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Sort aggregated+deduped BAM file and fix tags
   call SortAndFixTags as SortAndFixSampleBam {
     input:
+      PICARD=picard,
       input_bam = MarkDuplicates.output_bam,
       output_bam_basename = base_file_name + ".aligned.duplicate_marked.sorted",
       ref_dict = ref_dict,
@@ -1255,6 +1276,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Check identity of fingerprints across readgroups
   call CrossCheckFingerprints {
     input:
+      PICARD=picard,
       input_bams = SortAndFixSampleBam.output_bam,
       input_bam_indexes = SortAndFixSampleBam.output_bam_index,
       haplotype_database_file = haplotype_database_file,
@@ -1273,6 +1295,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Estimate level of cross-sample contamination
   call CheckContamination {
     input:
+      verifyBamID=verifyBamID,
       input_bam = SortAndFixSampleBam.output_bam,
       input_bam_index = SortAndFixSampleBam.output_bam_index,
       contamination_sites_vcf = contamination_sites_vcf,
@@ -1287,6 +1310,7 @@ workflow PairedEndSingleSampleWorkflow {
     # Generate the recalibration model by interval
     call BaseRecalibrator {
       input:
+        GATK=gatk,
         input_bam = SortAndFixSampleBam.output_bam,
         input_bam_index = SortAndFixSampleBam.output_bam_index,
         recalibration_report_filename = base_file_name + ".recal_data.csv",
@@ -1306,6 +1330,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Merge the recalibration reports resulting from by-interval recalibration
   call GatherBqsrReports {
     input:
+      GATK=gatk,
       input_bqsr_reports = BaseRecalibrator.recalibration_report,
       output_report_filename = base_file_name + ".recal_data.csv",
       disk_size = flowcell_small_disk,
@@ -1317,6 +1342,7 @@ workflow PairedEndSingleSampleWorkflow {
     # Apply the recalibration model by interval
     call ApplyBQSR {
       input:
+        GATK=gatk,
         input_bam = SortAndFixSampleBam.output_bam,
         input_bam_index = SortAndFixSampleBam.output_bam_index,
         output_bam_basename = recalibrated_bam_basename,
@@ -1333,6 +1359,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Merge the recalibrated BAM files resulting from by-interval recalibration
   call GatherBamFiles {
     input:
+      PICARD=picard,
       input_bams = ApplyBQSR.recalibrated_bam,
       output_bam_basename = base_file_name,
       disk_size = agg_large_disk,
@@ -1342,6 +1369,7 @@ workflow PairedEndSingleSampleWorkflow {
   # QC the final BAM (consolidated after scattered BQSR)
   call CollectReadgroupBamQualityMetrics {
     input:
+      PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
       output_bam_prefix = base_file_name + ".readgroup",
@@ -1354,6 +1382,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Validate the final BAM 
   call ValidateSamFile as ValidateAggregatedSamFile {
     input:
+      PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
       report_filename = base_file_name + ".validation_report",
@@ -1367,6 +1396,7 @@ workflow PairedEndSingleSampleWorkflow {
   # QC the final BAM some more (no such thing as too much QC)
   call CollectAggregationMetrics {
     input:
+      PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
       output_bam_prefix = base_file_name,
@@ -1392,6 +1422,7 @@ workflow PairedEndSingleSampleWorkflow {
   # QC the sample WGS metrics (stringent thresholds)
   call CollectWgsMetrics {
     input:
+      PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
       metrics_filename = base_file_name + ".wgs_metrics",
@@ -1404,6 +1435,7 @@ workflow PairedEndSingleSampleWorkflow {
   # QC the sample raw WGS metrics (common thresholds)
   call CollectRawWgsMetrics {
     input:
+      PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
       metrics_filename = base_file_name + ".raw_wgs_metrics",
@@ -1416,6 +1448,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Generate a checksum per readgroup in the final BAM
   call CalculateReadGroupChecksum {
     input:
+      PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
       read_group_md5_filename = recalibrated_bam_basename + ".bam.read_group_md5",
@@ -1426,6 +1459,8 @@ workflow PairedEndSingleSampleWorkflow {
   # Convert the final merged recalibrated BAM file to CRAM format
   call ConvertToCram {
     input:
+      seq_cache_populate=seq_cache_populate,
+      SAMTOOLS=samtools,
       input_bam = GatherBamFiles.output_bam,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -1437,6 +1472,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Convert the CRAM back to BAM to check that the conversions do not introduce errors
   call CramToBam {
     input:
+      SAMTOOLS=samtools,
       ref_fasta = ref_fasta,
       ref_dict = ref_dict,
       ref_fasta_index = ref_fasta_index,
@@ -1448,6 +1484,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Validate the roundtripped BAM
   call ValidateSamFile as ValidateBamFromCram {
     input:
+      PICARD=picard,
       input_bam = CramToBam.output_bam,
       input_bam_index = CramToBam.output_bam_index,
       report_filename = base_file_name + ".bam.roundtrip.validation_report",
@@ -1466,6 +1503,7 @@ workflow PairedEndSingleSampleWorkflow {
     # Generate GVCF by interval
     call HaplotypeCaller {
       input:
+        GATK=gatk,
         contamination = CheckContamination.contamination,
         input_bam = GatherBamFiles.output_bam,
         input_bam_index = GatherBamFiles.output_bam_index,
@@ -1482,6 +1520,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Combine by-interval GVCFs into a single sample GVCF file
   call MergeVCFs {
     input:
+      PICARD=picard,
       input_vcfs = HaplotypeCaller.output_gvcf,
       input_vcfs_indexes = HaplotypeCaller.output_gvcf_index,
       output_vcf_name = final_gvcf_name,
@@ -1492,6 +1531,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Validate the GVCF output of HaplotypeCaller
   call ValidateGVCF {
     input:
+      GATK=gatk,
       input_vcf = MergeVCFs.output_vcf,
       input_vcf_index = MergeVCFs.output_vcf_index,
       dbSNP_vcf = dbSNP_vcf,
@@ -1507,6 +1547,7 @@ workflow PairedEndSingleSampleWorkflow {
   # QC the GVCF
   call CollectGvcfCallingMetrics {
     input:
+      PICARD=picard,
       input_vcf = MergeVCFs.output_vcf,
       input_vcf_index = MergeVCFs.output_vcf_index,
       metrics_basename = base_file_name,
