@@ -1,0 +1,85 @@
+[2017-09-16 14:52:12,83] [info] Running with database db.url = jdbc:mysql://localhost:2801/cromwell_db?useSSL=false&rewriteBatchedStatements=true
+[2017-09-16 14:52:17,88] [info] Running with database db.url = jdbc:mysql://localhost:2801/cromwell_db?useSSL=false&rewriteBatchedStatements=true
+[2017-09-16 14:52:18,39] [info] Slf4jLogger started
+[2017-09-16 14:52:18,59] [info] Metadata summary refreshing every 2 seconds.
+[2017-09-16 14:52:18,61] [info] WriteMetadataActor configured to write to the database with batch size 200 and flush rate 5 seconds.
+[2017-09-16 14:52:18,65] [info] CallCacheWriteActor configured to write to the database with batch size 100 and flush rate 3 seconds.
+[2017-09-16 14:52:19,38] [info] SingleWorkflowRunnerActor: Submitting workflow
+[2017-09-16 14:52:19,42] [info] Workflow bfc8054b-6441-41d3-a672-a70f84fd6520 submitted.
+[2017-09-16 14:52:19,42] [info] SingleWorkflowRunnerActor: Workflow submitted [38;5;2mbfc8054b-6441-41d3-a672-a70f84fd6520[0m
+[2017-09-16 14:52:19,43] [info] 1 new workflows fetched
+[2017-09-16 14:52:19,43] [info] WorkflowManagerActor Starting workflow [38;5;2mbfc8054b-6441-41d3-a672-a70f84fd6520[0m
+[2017-09-16 14:52:19,43] [info] WorkflowManagerActor Successfully started WorkflowActor-bfc8054b-6441-41d3-a672-a70f84fd6520
+[2017-09-16 14:52:19,43] [info] Retrieved 1 workflows from the WorkflowStoreActor
+[2017-09-16 14:52:20,39] [info] MaterializeWorkflowDescriptorActor [[38;5;2mbfc8054b[0m]: Call-to-Backend assignments: PairedEndSingleSampleWorkflow.ValidateGVCF -> SGE, PairedEndSingleSampleWorkflow.CramToBam -> SGE, PairedEndSingleSampleWorkflow.ValidateAggregatedSamFile -> SGE, PairedEndSingleSampleWorkflow.MergeBamAlignment -> SGE, PairedEndSingleSampleWorkflow.CheckFinalVcfExtension -> SGE, PairedEndSingleSampleWorkflow.ConvertToCram -> SGE, PairedEndSingleSampleWorkflow.ValidateBamFromCram -> SGE, PairedEndSingleSampleWorkflow.GatherBqsrReports -> SGE, PairedEndSingleSampleWorkflow.MarkDuplicates -> SGE, PairedEndSingleSampleWorkflow.CollectAggregationMetrics -> SGE, PairedEndSingleSampleWorkflow.CalculateReadGroupChecksum -> SGE, PairedEndSingleSampleWorkflow.CollectRawWgsMetrics -> SGE, PairedEndSingleSampleWorkflow.CheckFingerprint -> SGE, PairedEndSingleSampleWorkflow.HaplotypeCaller -> SGE, PairedEndSingleSampleWorkflow.CollectReadgroupBamQualityMetrics -> SGE, PairedEndSingleSampleWorkflow.CollectGvcfCallingMetrics -> SGE, PairedEndSingleSampleWorkflow.GetBwaVersion -> SGE, PairedEndSingleSampleWorkflow.CheckContamination -> SGE, PairedEndSingleSampleWorkflow.CrossCheckFingerprints -> SGE, PairedEndSingleSampleWorkflow.SamToFastqAndBwaMem -> SGE, PairedEndSingleSampleWorkflow.CollectWgsMetrics -> SGE, PairedEndSingleSampleWorkflow.ValidateReadGroupSamFile -> SGE, PairedEndSingleSampleWorkflow.SortAndFixSampleBam -> SGE, PairedEndSingleSampleWorkflow.GatherBamFiles -> SGE, PairedEndSingleSampleWorkflow.CreateSequenceGroupingTSV -> SGE, PairedEndSingleSampleWorkflow.CollectQualityYieldMetrics -> SGE, PairedEndSingleSampleWorkflow.MergeVCFs -> SGE, PairedEndSingleSampleWorkflow.BaseRecalibrator -> SGE, PairedEndSingleSampleWorkflow.SortAndFixReadGroupBam -> SGE, PairedEndSingleSampleWorkflow.ApplyBQSR -> SGE, PairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics -> SGE
+[2017-09-16 14:52:22,78] [info] WorkflowExecutionActor-bfc8054b-6441-41d3-a672-a70f84fd6520 [[38;5;2mbfc8054b[0m]: Starting calls: PairedEndSingleSampleWorkflow.CheckFinalVcfExtension:NA:1, PairedEndSingleSampleWorkflow.CreateSequenceGroupingTSV:NA:1, PairedEndSingleSampleWorkflow.GetBwaVersion:NA:1
+[2017-09-16 14:52:23,17] [[38;5;220mwarn[0m] Localization via hard link has failed: /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-CheckFinalVcfExtension/inputs/services/tools/anaconda2/4.0.0/bin/python -> /services/tools/anaconda2/4.0.0/bin/python2.7: Invalid cross-device link
+[2017-09-16 14:52:23,17] [[38;5;220mwarn[0m] Couldn't find a suitable DSN, defaulting to a Noop one.
+[2017-09-16 14:52:23,18] [info] Using noop to send events.
+[2017-09-16 14:52:23,21] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.CheckFinalVcfExtension:NA:1]: [38;5;5m/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-CheckFinalVcfExtension/inputs/services/tools/anaconda2/4.0.0/bin/python <<CODE
+import os
+import sys
+filename="36PGF.g.vcf.gz"
+if not filename.endswith(".g.vcf.gz"):
+  raise Exception("input","output GVCF filename must end with '.g.vcf.gz', found %s"%(filename))
+  sys.exit(1) 
+CODE[0m
+[2017-09-16 14:52:23,23] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.CheckFinalVcfExtension:NA:1]: executing: qsub \
+-V \
+-N cromwell_bfc8054b_CheckFinalVcfExtension \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-CheckFinalVcfExtension \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-CheckFinalVcfExtension/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-CheckFinalVcfExtension/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-CheckFinalVcfExtension/execution/script
+[2017-09-16 14:52:24,37] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.CheckFinalVcfExtension:NA:1]: job id: 18367982.risoe-r04-sn064.cm.cluster
+[2017-09-16 14:52:24,38] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.CheckFinalVcfExtension:NA:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-16 14:52:24,83] [info] WorkflowExecutionActor-bfc8054b-6441-41d3-a672-a70f84fd6520 [[38;5;2mbfc8054b[0m]: Starting calls: PairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1, PairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1
+[2017-09-16 14:52:29,03] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: [38;5;5mjava -Xmx128m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-CollectQualityYieldMetrics/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  CollectQualityYieldMetrics \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-CollectQualityYieldMetrics/shard-0/inputs/home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.bam \
+  OQ=true \
+  OUTPUT=/home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics[0m
+[2017-09-16 14:52:29,06] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: executing: qsub \
+-V \
+-N cromwell_bfc8054b_CollectQualityYieldMetrics \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-CollectQualityYieldMetrics/shard-0 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-CollectQualityYieldMetrics/shard-0/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-CollectQualityYieldMetrics/shard-0/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-CollectQualityYieldMetrics/shard-0/execution/script
+[2017-09-16 14:52:29,32] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1]: [38;5;5mset -o pipefail
+set -e
+# set the bash variable needed for the command-line
+bash_ref_fasta=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-SamToFastqAndBwaMem/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta
+# if ref_alt has data in it, we proceed
+if [ -s /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-SamToFastqAndBwaMem/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta.64.alt ]; then
+  java -Xmx3000m \
+    -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-SamToFastqAndBwaMem/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+    SamToFastq \
+    INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-SamToFastqAndBwaMem/shard-0/inputs/home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.bam \
+    FASTQ=/dev/stdout \
+    INTERLEAVE=true \
+    NON_PF=true | \
+  /services/tools/bwa/0.7.15/bwa mem -K 100000000 -p -v 3 -t 16 -Y $bash_ref_fasta /dev/stdin -  2> >(tee /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmerged.bwa.stderr.log >&2) | \
+  /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-SamToFastqAndBwaMem/shard-0/inputs/home/projects/dp_00005/apps/src/samtools-1.5/samtools view -1 - > /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmerged.bam
+  grep -m1 "read .* ALT contigs" /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmerged.bwa.stderr.log | \
+  grep -v "read 0 ALT contigs"
+# else ref_alt is empty or could not be found, so we bail out
+else
+  exit 1;
+fi[0m
+[2017-09-16 14:52:29,32] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1]: executing: qsub \
+-V \
+-N cromwell_bfc8054b_SamToFastqAndBwaMem \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-SamToFastqAndBwaMem/shard-0 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-SamToFastqAndBwaMem/shard-0/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-SamToFastqAndBwaMem/shard-0/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=28,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/bfc8054b-6441-41d3-a672-a70f84fd6520/call-SamToFastqAndBwaMem/shard-0/execution/script
+[2017-09-16 14:52:30,16] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: job id: 18367983.risoe-r04-sn064.cm.cluster
+[2017-09-16 14:52:30,16] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-16 14:52:30,41] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1]: job id: 18367984.risoe-r04-sn064.cm.cluster
+[2017-09-16 14:52:30,41] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-16 14:53:03,53] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mbfc8054b[0mPairedEndSingleSampleWorkflow.CheckFinalVcfExtension:NA:1]: Status change from WaitingForReturnCodeFile to Done

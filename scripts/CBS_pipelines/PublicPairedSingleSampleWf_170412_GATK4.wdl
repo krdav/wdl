@@ -1138,7 +1138,7 @@ workflow PairedEndSingleSampleWorkflow {
   File verifyBamID
   File seq_cache_populate
 
-  String bwa_commandline = bwa + " mem -K 100000000 -p -v 3 -t 16 -Y $bash_ref_fasta"
+  String bwa_commandline = bwa + " mem -K 100000000 -p -v 3 -t 28 -Y $bash_ref_fasta"
 
 
   # Get the version of BWA to include in the PG record in the header of the BAM produced 

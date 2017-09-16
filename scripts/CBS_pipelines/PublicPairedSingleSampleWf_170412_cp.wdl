@@ -1125,7 +1125,7 @@ workflow PairedEndSingleSampleWorkflow {
   Int preemptible_tries
   Int agg_preemptible_tries
 
-  String bwa_commandline="bwa mem -K 100000000 -p -v 3 -t 16 -Y $bash_ref_fasta"
+  String bwa_commandline="bwa mem -K 100000000 -p -v 3 -t 28 -Y $bash_ref_fasta"
 
   String recalibrated_bam_basename = base_file_name + ".aligned.duplicates_marked.recalibrated"
 
