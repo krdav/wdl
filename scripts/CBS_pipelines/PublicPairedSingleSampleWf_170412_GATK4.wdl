@@ -167,7 +167,7 @@ task MergeBamAlignment {
   File ref_dict
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command {
@@ -217,7 +217,7 @@ task SortAndFixTags {
   File ref_fasta_index
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command {
@@ -255,7 +255,7 @@ task CollectUnsortedReadgroupBamQualityMetrics {
   File input_bam
   String output_bam_prefix
   Int disk_size
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command {
@@ -300,7 +300,7 @@ task CollectReadgroupBamQualityMetrics {
   File ref_fasta
   File ref_fasta_index
   Int disk_size
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command {
@@ -337,7 +337,7 @@ task CollectAggregationMetrics {
   File ref_fasta
   File ref_fasta_index
   Int disk_size
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command {
@@ -388,7 +388,7 @@ task CrossCheckFingerprints {
   String metrics_filename
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command <<<
@@ -424,7 +424,7 @@ task CheckFingerprint {
   String sample
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command <<<
@@ -461,7 +461,7 @@ task MarkDuplicates {
   String output_bam_basename
   String metrics_filename
   Int disk_size
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
  # Task is assuming query-sorted input so that the Secondary and Supplementary reads get marked correctly.
@@ -557,7 +557,7 @@ task BaseRecalibrator {
   File ref_fasta_index
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File GATK
 
   command {
@@ -598,7 +598,7 @@ task ApplyBQSR {
   File ref_fasta_index
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File GATK
 
   command {
@@ -636,7 +636,7 @@ task GatherBqsrReports {
   String output_report_filename
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File GATK
 
   command {
@@ -659,7 +659,7 @@ task GatherBamFiles {
   String output_bam_basename
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command {
@@ -693,7 +693,7 @@ task ValidateSamFile {
   Array[String]? ignore
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command {
@@ -725,7 +725,7 @@ task CollectWgsMetrics {
   File ref_fasta
   File ref_fasta_index
   Int disk_size
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command {
@@ -755,7 +755,7 @@ task CollectRawWgsMetrics {
   File ref_fasta
   File ref_fasta_index
   Int disk_size
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command {
@@ -783,7 +783,7 @@ task CalculateReadGroupChecksum {
   String read_group_md5_filename
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command {
@@ -893,7 +893,7 @@ task HaplotypeCaller {
   Float? contamination
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=4
   File GATK3
 
   command {
@@ -909,6 +909,7 @@ task HaplotypeCaller {
       -variant_index_type LINEAR \
       -contamination ${default=0 contamination} \
       --read_filter OverclippedRead \
+      -nct ${cpu} \
       -L ${interval_list}
   }
   runtime {
@@ -927,7 +928,7 @@ task MergeVCFs {
   String output_vcf_name
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   # Using MergeVcfs instead of GatherVcfs so we can create indices
@@ -960,7 +961,7 @@ task ValidateGVCF {
   File wgs_calling_interval_list
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File GATK3
 
   command {
@@ -991,7 +992,7 @@ task CollectGvcfCallingMetrics {
   Int disk_size
   File wgs_evaluation_interval_list
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command {
@@ -1023,7 +1024,7 @@ task ConvertToCram {
   String output_basename
   Int disk_size
   Int preemptible_tries
-  Int cpu=1
+  Int cpu=2
   File SAMTOOLS
   File seq_cache_populate
 
@@ -1062,7 +1063,7 @@ task CramToBam {
   String output_basename
 
   Int disk_size
-  Int cpu=1
+  Int cpu=2
   File SAMTOOLS
 
 command <<<
