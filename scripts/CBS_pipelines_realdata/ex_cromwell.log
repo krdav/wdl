@@ -1,0 +1,372 @@
+[2017-09-15 23:02:55,01] [info] Running with database db.url = jdbc:mysql://localhost:2801/cromwell_db?useSSL=false&rewriteBatchedStatements=true
+[2017-09-15 23:03:00,07] [info] Running with database db.url = jdbc:mysql://localhost:2801/cromwell_db?useSSL=false&rewriteBatchedStatements=true
+[2017-09-15 23:03:00,55] [info] Slf4jLogger started
+[2017-09-15 23:03:00,76] [info] Metadata summary refreshing every 2 seconds.
+[2017-09-15 23:03:00,77] [info] WriteMetadataActor configured to write to the database with batch size 200 and flush rate 5 seconds.
+[2017-09-15 23:03:00,82] [info] CallCacheWriteActor configured to write to the database with batch size 100 and flush rate 3 seconds.
+[2017-09-15 23:03:01,55] [info] SingleWorkflowRunnerActor: Submitting workflow
+[2017-09-15 23:03:01,59] [info] Workflow e641607e-6ca0-41bd-98a0-ec0af7941147 submitted.
+[2017-09-15 23:03:01,59] [info] SingleWorkflowRunnerActor: Workflow submitted [38;5;2me641607e-6ca0-41bd-98a0-ec0af7941147[0m
+[2017-09-15 23:03:01,59] [info] 1 new workflows fetched
+[2017-09-15 23:03:01,59] [info] WorkflowManagerActor Starting workflow [38;5;2me641607e-6ca0-41bd-98a0-ec0af7941147[0m
+[2017-09-15 23:03:01,60] [info] WorkflowManagerActor Successfully started WorkflowActor-e641607e-6ca0-41bd-98a0-ec0af7941147
+[2017-09-15 23:03:01,60] [info] Retrieved 1 workflows from the WorkflowStoreActor
+[2017-09-15 23:03:02,61] [info] MaterializeWorkflowDescriptorActor [[38;5;2me641607e[0m]: Call-to-Backend assignments: PairedEndSingleSampleWorkflow.GetBwaVersion -> SGE, PairedEndSingleSampleWorkflow.CheckFingerprint -> SGE, PairedEndSingleSampleWorkflow.ValidateBamFromCram -> SGE, PairedEndSingleSampleWorkflow.ApplyBQSR -> SGE, PairedEndSingleSampleWorkflow.HaplotypeCaller -> SGE, PairedEndSingleSampleWorkflow.SamToFastqAndBwaMem -> SGE, PairedEndSingleSampleWorkflow.CramToBam -> SGE, PairedEndSingleSampleWorkflow.CollectQualityYieldMetrics -> SGE, PairedEndSingleSampleWorkflow.GatherBamFiles -> SGE, PairedEndSingleSampleWorkflow.CollectGvcfCallingMetrics -> SGE, PairedEndSingleSampleWorkflow.CollectAggregationMetrics -> SGE, PairedEndSingleSampleWorkflow.CheckContamination -> SGE, PairedEndSingleSampleWorkflow.CrossCheckFingerprints -> SGE, PairedEndSingleSampleWorkflow.MarkDuplicates -> SGE, PairedEndSingleSampleWorkflow.ValidateGVCF -> SGE, PairedEndSingleSampleWorkflow.CollectReadgroupBamQualityMetrics -> SGE, PairedEndSingleSampleWorkflow.CollectWgsMetrics -> SGE, PairedEndSingleSampleWorkflow.SortAndFixReadGroupBam -> SGE, PairedEndSingleSampleWorkflow.CheckFinalVcfExtension -> SGE, PairedEndSingleSampleWorkflow.CreateSequenceGroupingTSV -> SGE, PairedEndSingleSampleWorkflow.CollectRawWgsMetrics -> SGE, PairedEndSingleSampleWorkflow.MergeBamAlignment -> SGE, PairedEndSingleSampleWorkflow.GatherBqsrReports -> SGE, PairedEndSingleSampleWorkflow.ConvertToCram -> SGE, PairedEndSingleSampleWorkflow.BaseRecalibrator -> SGE, PairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics -> SGE, PairedEndSingleSampleWorkflow.ValidateReadGroupSamFile -> SGE, PairedEndSingleSampleWorkflow.SortAndFixSampleBam -> SGE, PairedEndSingleSampleWorkflow.MergeVCFs -> SGE, PairedEndSingleSampleWorkflow.CalculateReadGroupChecksum -> SGE, PairedEndSingleSampleWorkflow.ValidateAggregatedSamFile -> SGE
+[2017-09-15 23:03:04,97] [info] WorkflowExecutionActor-e641607e-6ca0-41bd-98a0-ec0af7941147 [[38;5;2me641607e[0m]: Starting calls: PairedEndSingleSampleWorkflow.CheckFinalVcfExtension:NA:1, PairedEndSingleSampleWorkflow.CreateSequenceGroupingTSV:NA:1, PairedEndSingleSampleWorkflow.GetBwaVersion:NA:1
+[2017-09-15 23:03:07,02] [info] WorkflowExecutionActor-e641607e-6ca0-41bd-98a0-ec0af7941147 [[38;5;2me641607e[0m]: Starting calls: PairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1, PairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:1:1, PairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1, PairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:1:1
+[2017-09-15 23:03:08,07] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: [38;5;5mjava -Xmx128m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectQualityYieldMetrics/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  CollectQualityYieldMetrics \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectQualityYieldMetrics/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/test-data/dna/wgs/hiseq2500/NA12878/NA12878.full.1.unaligned.bam \
+  OQ=true \
+  OUTPUT=NA12878.full.1.unaligned.unmapped.quality_yield_metrics[0m
+[2017-09-15 23:03:08,10] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_CollectQualityYieldMetrics \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectQualityYieldMetrics/shard-0 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectQualityYieldMetrics/shard-0/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectQualityYieldMetrics/shard-0/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectQualityYieldMetrics/shard-0/execution/script
+[2017-09-15 23:03:08,12] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:1:1]: [38;5;5mjava -Xmx128m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectQualityYieldMetrics/shard-1/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  CollectQualityYieldMetrics \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectQualityYieldMetrics/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/test-data/dna/wgs/hiseq2500/NA12878/NA12878.full.2.unaligned.bam \
+  OQ=true \
+  OUTPUT=NA12878.full.2.unaligned.unmapped.quality_yield_metrics[0m
+[2017-09-15 23:03:08,14] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:1:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_CollectQualityYieldMetrics \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectQualityYieldMetrics/shard-1 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectQualityYieldMetrics/shard-1/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectQualityYieldMetrics/shard-1/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectQualityYieldMetrics/shard-1/execution/script
+[2017-09-15 23:03:09,24] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: job id: 18367813.risoe-r04-sn064.cm.cluster
+[2017-09-15 23:03:09,25] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-15 23:03:09,26] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:1:1]: job id: 18367814.risoe-r04-sn064.cm.cluster
+[2017-09-15 23:03:09,26] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:1:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-15 23:03:12,33] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1]: [38;5;5mset -o pipefail
+set -e
+# set the bash variable needed for the command-line
+bash_ref_fasta=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta
+# if ref_alt has data in it, we proceed
+if [ -s /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta.64.alt ]; then
+  java -Xmx3000m \
+    -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+    SamToFastq \
+    INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/test-data/dna/wgs/hiseq2500/NA12878/NA12878.full.1.unaligned.bam \
+    FASTQ=/dev/stdout \
+    INTERLEAVE=true \
+    NON_PF=true | \
+  /services/tools/bwa/0.7.15/bwa mem -K 100000000 -p -v 3 -t 16 -Y $bash_ref_fasta /dev/stdin -  2> >(tee NA12878.full.1.unaligned.unmerged.bwa.stderr.log >&2) | \
+  /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-0/inputs/home/projects/dp_00005/apps/src/samtools-1.5/samtools view -1 - > NA12878.full.1.unaligned.unmerged.bam
+  grep -m1 "read .* ALT contigs" NA12878.full.1.unaligned.unmerged.bwa.stderr.log | \
+  grep -v "read 0 ALT contigs"
+# else ref_alt is empty or could not be found, so we bail out
+else
+  exit 1;
+fi[0m
+[2017-09-15 23:03:12,34] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:1:1]: [38;5;5mset -o pipefail
+set -e
+# set the bash variable needed for the command-line
+bash_ref_fasta=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta
+# if ref_alt has data in it, we proceed
+if [ -s /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta.64.alt ]; then
+  java -Xmx3000m \
+    -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-1/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+    SamToFastq \
+    INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/test-data/dna/wgs/hiseq2500/NA12878/NA12878.full.2.unaligned.bam \
+    FASTQ=/dev/stdout \
+    INTERLEAVE=true \
+    NON_PF=true | \
+  /services/tools/bwa/0.7.15/bwa mem -K 100000000 -p -v 3 -t 16 -Y $bash_ref_fasta /dev/stdin -  2> >(tee NA12878.full.2.unaligned.unmerged.bwa.stderr.log >&2) | \
+  /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-1/inputs/home/projects/dp_00005/apps/src/samtools-1.5/samtools view -1 - > NA12878.full.2.unaligned.unmerged.bam
+  grep -m1 "read .* ALT contigs" NA12878.full.2.unaligned.unmerged.bwa.stderr.log | \
+  grep -v "read 0 ALT contigs"
+# else ref_alt is empty or could not be found, so we bail out
+else
+  exit 1;
+fi[0m
+[2017-09-15 23:03:12,36] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_SamToFastqAndBwaMem \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-0 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-0/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-0/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=28,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-0/execution/script
+[2017-09-15 23:03:12,36] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:1:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_SamToFastqAndBwaMem \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-1 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-1/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-1/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=28,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-1/execution/script
+[2017-09-15 23:03:13,49] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:1:1]: job id: 18367819.risoe-r04-sn064.cm.cluster
+[2017-09-15 23:03:13,49] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:1:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-15 23:03:13,53] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1]: job id: 18367818.risoe-r04-sn064.cm.cluster
+[2017-09-15 23:03:13,53] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-15 23:18:32,95] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:1:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-15 23:18:37,00] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-15 23:18:40,10] [info] WorkflowExecutionActor-e641607e-6ca0-41bd-98a0-ec0af7941147 [[38;5;2me641607e[0m]: Starting calls: Collector-CollectQualityYieldMetrics
+[2017-09-16 04:04:40,91] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-16 04:04:43,76] [info] WorkflowExecutionActor-e641607e-6ca0-41bd-98a0-ec0af7941147 [[38;5;2me641607e[0m]: Starting calls: PairedEndSingleSampleWorkflow.MergeBamAlignment:0:1
+[2017-09-16 04:04:54,10] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:0:1]: [38;5;5m# set the bash variable needed for the command-line
+bash_ref_fasta=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta
+java -Xmx2500m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  MergeBamAlignment \
+  VALIDATION_STRINGENCY=SILENT \
+  EXPECTED_ORIENTATIONS=FR \
+  ATTRIBUTES_TO_RETAIN=X0 \
+  ALIGNED_BAM=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-0/execution/NA12878.full.1.unaligned.unmerged.bam \
+  UNMAPPED_BAM=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/test-data/dna/wgs/hiseq2500/NA12878/NA12878.full.1.unaligned.bam \
+  OUTPUT=NA12878.full.1.unaligned.aligned.unsorted.bam \
+  REFERENCE_SEQUENCE=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta \
+  PAIRED_RUN=true \
+  SORT_ORDER="unsorted" \
+  IS_BISULFITE_SEQUENCE=false \
+  ALIGNED_READS_ONLY=false \
+  CLIP_ADAPTERS=false \
+  MAX_RECORDS_IN_RAM=2000000 \
+  ADD_MATE_CIGAR=true \
+  MAX_INSERTIONS_OR_DELETIONS=-1 \
+  PRIMARY_ALIGNMENT_STRATEGY=MostDistant \
+  PROGRAM_RECORD_ID="bwamem" \
+  PROGRAM_GROUP_VERSION="0.7.15-r1140" \
+  PROGRAM_GROUP_COMMAND_LINE="/services/tools/bwa/0.7.15/bwa mem -K 100000000 -p -v 3 -t 16 -Y $bash_ref_fasta" \
+  PROGRAM_GROUP_NAME="bwamem" \
+  UNMAPPED_READ_STRATEGY=COPY_TO_TAG \
+  ALIGNER_PROPER_PAIR_FLAGS=true \
+  UNMAP_CONTAMINANT_READS=true[0m
+[2017-09-16 04:04:54,11] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:0:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_MergeBamAlignment \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-0 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-0/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-0/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-0/execution/script
+[2017-09-16 04:04:55,29] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:0:1]: job id: 18367889.risoe-r04-sn064.cm.cluster
+[2017-09-16 04:04:55,30] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:0:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-16 04:18:39,33] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:1:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-16 04:18:40,16] [info] WorkflowExecutionActor-e641607e-6ca0-41bd-98a0-ec0af7941147 [[38;5;2me641607e[0m]: Starting calls: PairedEndSingleSampleWorkflow.MergeBamAlignment:1:1, Collector-SamToFastqAndBwaMem
+[2017-09-16 04:18:40,57] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:1:1]: [38;5;5m# set the bash variable needed for the command-line
+bash_ref_fasta=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta
+java -Xmx2500m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-1/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  MergeBamAlignment \
+  VALIDATION_STRINGENCY=SILENT \
+  EXPECTED_ORIENTATIONS=FR \
+  ATTRIBUTES_TO_RETAIN=X0 \
+  ALIGNED_BAM=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SamToFastqAndBwaMem/shard-1/execution/NA12878.full.2.unaligned.unmerged.bam \
+  UNMAPPED_BAM=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/test-data/dna/wgs/hiseq2500/NA12878/NA12878.full.2.unaligned.bam \
+  OUTPUT=NA12878.full.2.unaligned.aligned.unsorted.bam \
+  REFERENCE_SEQUENCE=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta \
+  PAIRED_RUN=true \
+  SORT_ORDER="unsorted" \
+  IS_BISULFITE_SEQUENCE=false \
+  ALIGNED_READS_ONLY=false \
+  CLIP_ADAPTERS=false \
+  MAX_RECORDS_IN_RAM=2000000 \
+  ADD_MATE_CIGAR=true \
+  MAX_INSERTIONS_OR_DELETIONS=-1 \
+  PRIMARY_ALIGNMENT_STRATEGY=MostDistant \
+  PROGRAM_RECORD_ID="bwamem" \
+  PROGRAM_GROUP_VERSION="0.7.15-r1140" \
+  PROGRAM_GROUP_COMMAND_LINE="/services/tools/bwa/0.7.15/bwa mem -K 100000000 -p -v 3 -t 16 -Y $bash_ref_fasta" \
+  PROGRAM_GROUP_NAME="bwamem" \
+  UNMAPPED_READ_STRATEGY=COPY_TO_TAG \
+  ALIGNER_PROPER_PAIR_FLAGS=true \
+  UNMAP_CONTAMINANT_READS=true[0m
+[2017-09-16 04:18:40,58] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:1:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_MergeBamAlignment \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-1 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-1/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-1/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-1/execution/script
+[2017-09-16 04:18:41,68] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:1:1]: job id: 18367892.risoe-r04-sn064.cm.cluster
+[2017-09-16 04:18:41,68] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:1:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-16 06:42:15,54] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:0:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-16 06:42:16,09] [info] WorkflowExecutionActor-e641607e-6ca0-41bd-98a0-ec0af7941147 [[38;5;2me641607e[0m]: Starting calls: PairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:0:1, PairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:0:1
+[2017-09-16 06:42:17,73] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:0:1]: [38;5;5mjava -Xmx5000m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectUnsortedReadgroupBamQualityMetrics/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  CollectMultipleMetrics \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectUnsortedReadgroupBamQualityMetrics/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-0/execution/NA12878.full.1.unaligned.aligned.unsorted.bam \
+  OUTPUT=NA12878.full.1.unaligned.readgroup \
+  ASSUME_SORTED=true \
+  PROGRAM="null" \
+  PROGRAM="CollectBaseDistributionByCycle" \
+  PROGRAM="CollectInsertSizeMetrics" \
+  PROGRAM="MeanQualityByCycle" \
+  PROGRAM="QualityScoreDistribution" \
+  METRIC_ACCUMULATION_LEVEL="null" \
+  METRIC_ACCUMULATION_LEVEL="ALL_READS"
+touch NA12878.full.1.unaligned.readgroup.insert_size_metrics
+touch NA12878.full.1.unaligned.readgroup.insert_size_histogram.pdf[0m
+[2017-09-16 06:42:17,74] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:0:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_CollectUnsortedReadgroupBamQualityMetrics \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectUnsortedReadgroupBamQualityMetrics/shard-0 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectUnsortedReadgroupBamQualityMetrics/shard-0/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectUnsortedReadgroupBamQualityMetrics/shard-0/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectUnsortedReadgroupBamQualityMetrics/shard-0/execution/script
+[2017-09-16 06:42:18,88] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:0:1]: job id: 18367901.risoe-r04-sn064.cm.cluster
+[2017-09-16 06:42:18,88] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:0:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-16 06:42:24,97] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:0:1]: [38;5;5mset -o pipefail
+java -Xmx4000m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  SortSam \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-0/execution/NA12878.full.1.unaligned.aligned.unsorted.bam \
+  OUTPUT=/dev/stdout \
+  SORT_ORDER="coordinate" \
+  CREATE_INDEX=false \
+  CREATE_MD5_FILE=false | \
+java -Xmx500m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  SetNmAndUqTags \
+  INPUT=/dev/stdin \
+  OUTPUT=NA12878.full.1.unaligned.sorted.bam \
+  CREATE_INDEX=true \
+  CREATE_MD5_FILE=true \
+  REFERENCE_SEQUENCE=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta[0m
+[2017-09-16 06:42:24,98] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:0:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_SortAndFixReadGroupBam \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-0 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-0/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-0/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-0/execution/script
+[2017-09-16 06:42:26,07] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:0:1]: job id: 18367902.risoe-r04-sn064.cm.cluster
+[2017-09-16 06:42:26,07] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:0:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-16 06:57:20,67] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:1:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-16 06:57:22,87] [info] WorkflowExecutionActor-e641607e-6ca0-41bd-98a0-ec0af7941147 [[38;5;2me641607e[0m]: Starting calls: PairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:1:1, Collector-MergeBamAlignment, PairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:1:1
+[2017-09-16 06:57:23,14] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:1:1]: [38;5;5mjava -Xmx5000m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectUnsortedReadgroupBamQualityMetrics/shard-1/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  CollectMultipleMetrics \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectUnsortedReadgroupBamQualityMetrics/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-1/execution/NA12878.full.2.unaligned.aligned.unsorted.bam \
+  OUTPUT=NA12878.full.2.unaligned.readgroup \
+  ASSUME_SORTED=true \
+  PROGRAM="null" \
+  PROGRAM="CollectBaseDistributionByCycle" \
+  PROGRAM="CollectInsertSizeMetrics" \
+  PROGRAM="MeanQualityByCycle" \
+  PROGRAM="QualityScoreDistribution" \
+  METRIC_ACCUMULATION_LEVEL="null" \
+  METRIC_ACCUMULATION_LEVEL="ALL_READS"
+touch NA12878.full.2.unaligned.readgroup.insert_size_metrics
+touch NA12878.full.2.unaligned.readgroup.insert_size_histogram.pdf[0m
+[2017-09-16 06:57:23,15] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:1:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_CollectUnsortedReadgroupBamQualityMetrics \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectUnsortedReadgroupBamQualityMetrics/shard-1 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectUnsortedReadgroupBamQualityMetrics/shard-1/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectUnsortedReadgroupBamQualityMetrics/shard-1/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-CollectUnsortedReadgroupBamQualityMetrics/shard-1/execution/script
+[2017-09-16 06:57:23,22] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:1:1]: [38;5;5mset -o pipefail
+java -Xmx4000m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-1/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  SortSam \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-1/execution/NA12878.full.2.unaligned.aligned.unsorted.bam \
+  OUTPUT=/dev/stdout \
+  SORT_ORDER="coordinate" \
+  CREATE_INDEX=false \
+  CREATE_MD5_FILE=false | \
+java -Xmx500m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-1/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  SetNmAndUqTags \
+  INPUT=/dev/stdin \
+  OUTPUT=NA12878.full.2.unaligned.sorted.bam \
+  CREATE_INDEX=true \
+  CREATE_MD5_FILE=true \
+  REFERENCE_SEQUENCE=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta[0m
+[2017-09-16 06:57:23,23] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:1:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_SortAndFixReadGroupBam \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-1 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-1/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-1/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-1/execution/script
+[2017-09-16 06:57:23,89] [info] WorkflowExecutionActor-e641607e-6ca0-41bd-98a0-ec0af7941147 [[38;5;2me641607e[0m]: Starting calls: PairedEndSingleSampleWorkflow.MarkDuplicates:NA:1
+[2017-09-16 06:57:24,25] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:1:1]: job id: 18367903.risoe-r04-sn064.cm.cluster
+[2017-09-16 06:57:24,26] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:1:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-16 06:57:24,30] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:1:1]: job id: 18367904.risoe-r04-sn064.cm.cluster
+[2017-09-16 06:57:24,30] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:1:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-16 06:57:31,87] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MarkDuplicates:NA:1]: [38;5;5mjava -Xmx4000m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MarkDuplicates/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  MarkDuplicates \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MarkDuplicates/inputs/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-0/execution/NA12878.full.1.unaligned.aligned.unsorted.bam INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MarkDuplicates/inputs/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MergeBamAlignment/shard-1/execution/NA12878.full.2.unaligned.aligned.unsorted.bam \
+  OUTPUT=NA12878_20k.aligned.unsorted.duplicates_marked.bam \
+  METRICS_FILE=NA12878_20k.duplicate_metrics \
+  VALIDATION_STRINGENCY=SILENT \
+  OPTICAL_DUPLICATE_PIXEL_DISTANCE=2500 \
+  ASSUME_SORT_ORDER="queryname"
+  CREATE_MD5_FILE=true[0m
+[2017-09-16 06:57:31,88] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MarkDuplicates:NA:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_MarkDuplicates \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MarkDuplicates \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MarkDuplicates/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MarkDuplicates/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-MarkDuplicates/execution/script
+[2017-09-16 06:57:32,98] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MarkDuplicates:NA:1]: job id: 18367905.risoe-r04-sn064.cm.cluster
+[2017-09-16 06:57:32,99] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.MarkDuplicates:NA:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-16 07:16:52,51] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:0:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-16 07:36:29,47] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:1:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-16 07:36:30,91] [info] WorkflowExecutionActor-e641607e-6ca0-41bd-98a0-ec0af7941147 [[38;5;2me641607e[0m]: Starting calls: Collector-CollectUnsortedReadgroupBamQualityMetrics
+[2017-09-16 11:01:35,20] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:0:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-16 11:01:37,71] [info] WorkflowExecutionActor-e641607e-6ca0-41bd-98a0-ec0af7941147 [[38;5;2me641607e[0m]: Starting calls: PairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:0:1
+[2017-09-16 11:01:49,41] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:0:1]: [38;5;5mjava -Xmx4000m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  ValidateSamFile \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-0/execution/NA12878.full.1.unaligned.sorted.bam \
+  OUTPUT=NA12878.full.1.unaligned.validation_report \
+  REFERENCE_SEQUENCE=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta \
+  MAX_OUTPUT=1000000000 \
+  IGNORE=null \
+  MODE=VERBOSE \
+  IS_BISULFITE_SEQUENCED=false[0m
+[2017-09-16 11:01:49,42] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:0:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_ValidateReadGroupSamFile \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-0 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-0/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-0/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-0/execution/script
+[2017-09-16 11:01:50,59] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:0:1]: job id: 18367946.risoe-r04-sn064.cm.cluster
+[2017-09-16 11:01:50,59] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:0:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-16 11:29:54,46] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:1:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-16 11:29:54,99] [info] WorkflowExecutionActor-e641607e-6ca0-41bd-98a0-ec0af7941147 [[38;5;2me641607e[0m]: Starting calls: Collector-SortAndFixReadGroupBam, PairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:1:1
+[2017-09-16 11:29:55,30] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:1:1]: [38;5;5mjava -Xmx4000m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-1/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  ValidateSamFile \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-SortAndFixReadGroupBam/shard-1/execution/NA12878.full.2.unaligned.sorted.bam \
+  OUTPUT=NA12878.full.2.unaligned.validation_report \
+  REFERENCE_SEQUENCE=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-1/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta \
+  MAX_OUTPUT=1000000000 \
+  IGNORE=null \
+  MODE=VERBOSE \
+  IS_BISULFITE_SEQUENCED=false[0m
+[2017-09-16 11:29:55,31] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:1:1]: executing: qsub \
+-V \
+-N cromwell_e641607e_ValidateReadGroupSamFile \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-1 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-1/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-1/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata/cromwell-executions/PairedEndSingleSampleWorkflow/e641607e-6ca0-41bd-98a0-ec0af7941147/call-ValidateReadGroupSamFile/shard-1/execution/script
+[2017-09-16 11:29:56,42] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:1:1]: job id: 18367949.risoe-r04-sn064.cm.cluster
+[2017-09-16 11:29:56,42] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:1:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-16 11:50:26,36] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:0:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-16 12:17:05,53] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2me641607e[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:1:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-16 12:17:07,53] [info] WorkflowExecutionActor-e641607e-6ca0-41bd-98a0-ec0af7941147 [[38;5;2me641607e[0m]: Starting calls: Collector-ValidateReadGroupSamFile

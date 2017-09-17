@@ -1,25 +1,23 @@
 {
   "##_COMMENT1": "SAMPLE NAME AND UNMAPPED BAMS",
-  "PairedEndSingleSampleWorkflow.sample_name": "NA12878",
-  "PairedEndSingleSampleWorkflow.base_file_name": "NA12878_20k",
+  "PairedEndSingleSampleWorkflow.sample_name": "36PGF",
+  "PairedEndSingleSampleWorkflow.base_file_name": "36PGF",
   "PairedEndSingleSampleWorkflow.flowcell_unmapped_bams": [
-    "/home/projects/dp_00005/data/cromwell_test/genomics-public-data/test-data/dna/wgs/hiseq2500/NA12878/H06HDADXX130110.1.ATCACGAT.20k_reads.bam",
-    "/home/projects/dp_00005/data/cromwell_test/genomics-public-data/test-data/dna/wgs/hiseq2500/NA12878/H06HDADXX130110.2.ATCACGAT.20k_reads.bam",
-    "/home/projects/dp_00005/data/cromwell_test/genomics-public-data/test-data/dna/wgs/hiseq2500/NA12878/H06JUADXX130110.1.ATCACGAT.20k_reads.bam"
+    "/home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.bam"
   ],
-  "PairedEndSingleSampleWorkflow.final_gvcf_name": "NA12878.g.vcf.gz",
+  "PairedEndSingleSampleWorkflow.final_gvcf_name": "36PGF.g.vcf.gz",
   "PairedEndSingleSampleWorkflow.unmapped_bam_suffix": ".bam",
 
   "KRISTIAN_COMMENT:": "TOOL_PATHS",
   "PairedEndSingleSampleWorkflow.seq_cache_populate": "/home/projects/dp_00005/apps/src/samtools-1.5/misc/seq_cache_populate.pl",
-  "PairedEndSingleSampleWorkflow.gatk3": "/home/projects/dp_00005/apps/src/GenomeAnalysisTK-3.8-0-ge9d806836/GenomeAnalysisTK.jar",
-  "PairedEndSingleSampleWorkflow.gatk": "/home/projects/dp_00005/apps/src/gatk-4.beta.5/gatk-package-4.beta.5-local.jar",
+  "PairedEndSingleSampleWorkflow.gatk": "/home/projects/dp_00005/apps/src/GenomeAnalysisTK-3.8-0-ge9d806836/GenomeAnalysisTK.jar",
   "PairedEndSingleSampleWorkflow.picard": "/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar",
   "PairedEndSingleSampleWorkflow.samtools": "/home/projects/dp_00005/apps/src/samtools-1.5/samtools",
   "PairedEndSingleSampleWorkflow.verifyBamID": "/home/projects/dp_00005/apps/src/verifyBamID/verifyBamID",
   "PairedEndSingleSampleWorkflow.bwa": "/services/tools/bwa/0.7.15/bwa",
   "PairedEndSingleSampleWorkflow.python3": "/services/tools/anaconda3/4.0.0/bin/python",
   "PairedEndSingleSampleWorkflow.python2": "/services/tools/anaconda2/4.0.0/bin/python",
+  "PairedEndSingleSampleWorkflow.gatk4": "/home/projects/dp_00005/apps/src/gatk-4.beta.3/gatk-package-4.beta.3-local.jar",
 
   "##_COMMENT2": "INTERVALS",  
   "PairedEndSingleSampleWorkflow.scattered_calling_intervals": [
