@@ -6,3 +6,4 @@ target
 scripts/*/cromwell-*
 *.log
 scripts/*/*.log
+*.swp

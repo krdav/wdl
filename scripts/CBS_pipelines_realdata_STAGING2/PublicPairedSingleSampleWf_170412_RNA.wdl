@@ -27,6 +27,155 @@
 ## licensing information pertaining to the included programs.
 
 # TASK DEFINITIONS
+
+task STAR_Map {
+  File STAR
+  String STARindexDir
+  String sample_name
+  File input_fastqR1
+  File input_fastqR2
+  String suffix="Aligned.sortedByCoord.out"
+  Int cpu=28
+
+  command {
+    ln -s ${STARindexDir} GenomeDir
+    # Use default mode --genomeDir=./GenomeDir/
+    ${STAR} --readFilesCommand zcat \
+        --readFilesIn ${input_fastqR1} ${input_fastqR2} \
+        --quantMode TranscriptomeSAM GeneCounts \
+        --outFileNamePrefix ${SampleName} \
+        --outSAMtype BAM SortedByCoordinate \
+        --limitBAMsortRAM 35000000000 \
+        --twopassMode Basic \
+        --runThreadN ${cpu}
+  }
+  output {
+    File out_bam = "${sample_name}${suffix}.bam"
+    String out_SampleName = "${sample_name}${suffix}"
+  }
+  runtime {
+    cpu: cpu
+  }
+}
+
+task SplitNCigarReads {
+  File GATK
+  String SampleName
+  String RefGen_noext
+  File in_bam
+  File in_bai
+  String suffix="_split"
+  Int cpu=2
+
+  command {
+    # Run options are set to follow the GATK best practice for RNAseq. data.
+    java -jar ${GATK} \
+      -T SplitNCigarReads \
+      -R ${RefGen_noext}.fa \
+      -I ${in_bam} \
+      -o ${SampleName}${suffix}.bam \
+      -rf ReassignOneMappingQuality \
+      -RMQF 255 \
+      -RMQT 60 \
+      -U ALLOW_N_CIGAR_READS
+ }
+  output {
+    File out_bam = "${SampleName}${suffix}.bam"
+    File out_bai = "${SampleName}${suffix}.bai"
+    String out_SampleName = "${SampleName}${suffix}"
+  }
+  runtime {
+    cpu: cpu
+  }
+}
+
+task BaseRecalibrator_RNA {
+  File GATK
+  String SampleName
+  String RefGen_noext
+  File in_bam
+  File in_bai
+  File dbsnp
+  String suffix="_recal"
+  Int cpu=28
+
+  command {
+    java -jar ${GATK} \
+      -T BaseRecalibrator \
+      -R ${RefGen_noext}.fa \
+      -I ${in_bam} \
+      -knownSites ${dbsnp} \
+      -o ${SampleName}${suffix}.grp \
+      -nct ${cpu}
+ }
+  output {
+    File out_grp = "${SampleName}${suffix}.grp"
+    String out_SampleName = "${SampleName}${suffix}"
+  }
+  runtime {
+    cpu: cpu
+  }
+}
+
+task PrintReads_RNA {
+  File GATK
+  String SampleName
+  String RefGen_noext
+  File in_bam
+  File in_bai
+  File in_grp
+  String suffix="_recalprint"
+  Int cpu=28
+
+  command {
+    java -jar ${GATK} \
+      -T PrintReads \
+      -R ${RefGen_noext}.fa \
+      -I ${in_bam} \
+      -BQSR ${in_grp} \
+      -o ${SampleName}${suffix}.bam \
+      -nct ${cpu}
+ }
+  output {
+    File out_bam = "${SampleName}${suffix}.bam"
+    File out_bai = "${SampleName}${suffix}.bai"
+    String out_SampleName = "${SampleName}${suffix}"
+  }
+  runtime {
+    cpu: cpu
+  }
+}
+
+task VariantFiltration_RNA {
+  File GATK
+  String SampleName
+  String RefGen_noext
+  File in_vcf
+  String suffix="_filter"
+  Int cpu=2
+
+  command {
+    java -jar ${GATK} \
+      -T VariantFiltration \
+      -R ${RefGen_noext}.fa \
+      -V ${in_vcf} \
+      -window 35 \
+      -cluster 3 \
+      -filterName FS \
+      -filter "FS > 3.0" \
+      -filterName QD \
+      -filter "QD < 2.0" \
+      -o ${SampleName}${suffix}.vcf
+ }
+  output {
+    File out_vcf = "${SampleName}${suffix}.vcf"
+    String out_SampleName = "${SampleName}${suffix}"
+  }
+  runtime {
+    cpu: cpu
+  }
+}
+
 task UnzipAndSplit {
   File input_fastqR1
   File input_fastqR2
@@ -1174,13 +1323,16 @@ workflow PairedEndSingleSampleWorkflow {
   File wgs_coverage_interval_list
   
   String sample_name
-  String base_file_name
+  String base_file_name_normal
+  String base_file_name_tumor
   String final_gvcf_name
 #  Array[File] flowcell_unmapped_bams
-  File rawdata_fastqR1
-  File rawdata_fastqR2
+  File rawdata_normal_fastqR1
+  File rawdata_normal_fastqR2
+  File rawdata_tumor_fastqR1
+  File rawdata_tumor_fastqR2
   String unmapped_bam_suffix
-  
+
   Array[File] scattered_calling_intervals
   File wgs_calling_interval_list
   
@@ -1208,8 +1360,9 @@ workflow PairedEndSingleSampleWorkflow {
   Int agg_preemptible_tries
 
 
-  String recalibrated_bam_basename = base_file_name + ".aligned.duplicates_marked.recalibrated"
+  String recalibrated_bam_basename = base_file_name_normal + ".aligned.duplicates_marked.recalibrated"
 
+  # Tools:
   File picard
   File gatk
   File gatk4
@@ -1221,6 +1374,7 @@ workflow PairedEndSingleSampleWorkflow {
   File seq_cache_populate
   File pigz
   File trimmomatic
+  File star
 
   String bwa_commandline = bwa + " mem -K 100000000 -p -v 3 -t 28 -Y $bash_ref_fasta"
 
@@ -1241,13 +1395,12 @@ workflow PairedEndSingleSampleWorkflow {
 
 
   ###### Here the workflow is adapted to .fastq files:
-
   # Decompress and split the files into chunks, return an array of .fastq files:
   call UnzipAndSplit {
       input:
         PIGZ=pigz,
-        input_fastqR1 = rawdata_fastqR1,
-        input_fastqR2 = rawdata_fastqR2,
+        input_fastqR1 = rawdata_normal_fastqR1,
+        input_fastqR2 = rawdata_normal_fastqR2,
         sample_name=sample_name
   }
 
@@ -1381,8 +1534,8 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       input_bams = MergeBamAlignment.output_bam,
-      output_bam_basename = base_file_name + ".aligned.unsorted.duplicates_marked",
-      metrics_filename = base_file_name + ".duplicate_metrics",
+      output_bam_basename = base_file_name_normal + ".aligned.unsorted.duplicates_marked",
+      metrics_filename = base_file_name_normal + ".duplicate_metrics",
       disk_size = agg_large_disk
   }
 
@@ -1391,7 +1544,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       input_bam = MarkDuplicates.output_bam,
-      output_bam_basename = base_file_name + ".aligned.duplicate_marked.sorted",
+      output_bam_basename = base_file_name_normal + ".aligned.duplicate_marked.sorted",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -1406,7 +1559,7 @@ workflow PairedEndSingleSampleWorkflow {
       input_bams = SortAndFixSampleBam.output_bam,
       input_bam_indexes = SortAndFixSampleBam.output_bam_index,
       haplotype_database_file = haplotype_database_file,
-      metrics_filename = base_file_name + ".crosscheck",
+      metrics_filename = base_file_name_normal + ".crosscheck",
       disk_size = agg_small_disk,
       preemptible_tries = agg_preemptible_tries
   }
@@ -1426,7 +1579,7 @@ workflow PairedEndSingleSampleWorkflow {
       input_bam_index = SortAndFixSampleBam.output_bam_index,
       contamination_sites_vcf = contamination_sites_vcf,
       contamination_sites_vcf_index = contamination_sites_vcf_index,
-      output_prefix = base_file_name + ".preBqsr",
+      output_prefix = base_file_name_normal + ".preBqsr",
       disk_size = agg_small_disk,
       preemptible_tries = agg_preemptible_tries
   }
@@ -1439,7 +1592,7 @@ workflow PairedEndSingleSampleWorkflow {
         GATK=gatk,
         input_bam = SortAndFixSampleBam.output_bam,
         input_bam_index = SortAndFixSampleBam.output_bam_index,
-        recalibration_report_filename = base_file_name + ".recal_data.csv",
+        recalibration_report_filename = base_file_name_normal + ".recal_data.csv",
         sequence_group_interval = subgroup,
         dbSNP_vcf = dbSNP_vcf,
         dbSNP_vcf_index = dbSNP_vcf_index,
@@ -1458,7 +1611,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       GATK=gatk,
       input_bqsr_reports = BaseRecalibrator.recalibration_report,
-      output_report_filename = base_file_name + ".recal_data.csv",
+      output_report_filename = base_file_name_normal + ".recal_data.csv",
       disk_size = flowcell_small_disk,
       preemptible_tries = preemptible_tries
   }
@@ -1487,7 +1640,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       input_bams = ApplyBQSR.recalibrated_bam,
-      output_bam_basename = base_file_name,
+      output_bam_basename = base_file_name_normal,
       disk_size = agg_large_disk,
       preemptible_tries = agg_preemptible_tries
   }
@@ -1498,7 +1651,7 @@ workflow PairedEndSingleSampleWorkflow {
       PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
-      output_bam_prefix = base_file_name + ".readgroup",
+      output_bam_prefix = base_file_name_normal + ".readgroup",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -1511,7 +1664,7 @@ workflow PairedEndSingleSampleWorkflow {
       PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
-      report_filename = base_file_name + ".validation_report",
+      report_filename = base_file_name_normal + ".validation_report",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -1525,7 +1678,7 @@ workflow PairedEndSingleSampleWorkflow {
       PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
-      output_bam_prefix = base_file_name,
+      output_bam_prefix = base_file_name_normal,
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -1540,7 +1693,7 @@ workflow PairedEndSingleSampleWorkflow {
       input_bam_index = GatherBamFiles.output_bam_index,
       haplotype_database_file = haplotype_database_file,
       genotypes = fingerprint_genotypes_file,
-      output_basename = base_file_name,
+      output_basename = base_file_name_normal,
       sample = sample_name,
       disk_size = agg_small_disk,
       preemptible_tries = agg_preemptible_tries
@@ -1552,7 +1705,7 @@ workflow PairedEndSingleSampleWorkflow {
       PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
-      metrics_filename = base_file_name + ".wgs_metrics",
+      metrics_filename = base_file_name_normal + ".wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
       wgs_coverage_interval_list = wgs_coverage_interval_list,
@@ -1565,7 +1718,7 @@ workflow PairedEndSingleSampleWorkflow {
       PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
-      metrics_filename = base_file_name + ".raw_wgs_metrics",
+      metrics_filename = base_file_name_normal + ".raw_wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
       wgs_coverage_interval_list = wgs_coverage_interval_list,
@@ -1591,7 +1744,7 @@ workflow PairedEndSingleSampleWorkflow {
       input_bam = GatherBamFiles.output_bam,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
-      output_basename = base_file_name,
+      output_basename = base_file_name_normal,
       disk_size = agg_medium_disk,
       preemptible_tries = agg_preemptible_tries
   }
@@ -1604,7 +1757,7 @@ workflow PairedEndSingleSampleWorkflow {
       ref_dict = ref_dict,
       ref_fasta_index = ref_fasta_index,
       cram_file = ConvertToCram.output_cram,
-      output_basename = base_file_name + ".roundtrip",
+      output_basename = base_file_name_normal + ".roundtrip",
       disk_size = agg_medium_disk
   }
 
@@ -1614,7 +1767,7 @@ workflow PairedEndSingleSampleWorkflow {
       PICARD=picard,
       input_bam = CramToBam.output_bam,
       input_bam_index = CramToBam.output_bam_index,
-      report_filename = base_file_name + ".bam.roundtrip.validation_report",
+      report_filename = base_file_name_normal + ".bam.roundtrip.validation_report",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -1635,7 +1788,7 @@ workflow PairedEndSingleSampleWorkflow {
         input_bam = GatherBamFiles.output_bam,
         input_bam_index = GatherBamFiles.output_bam_index,
         interval_list = subInterval,
-        gvcf_basename = base_file_name,
+        gvcf_basename = base_file_name_normal,
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
@@ -1677,7 +1830,7 @@ workflow PairedEndSingleSampleWorkflow {
       PICARD=picard,
       input_vcf = MergeVCFs.output_vcf,
       input_vcf_index = MergeVCFs.output_vcf_index,
-      metrics_basename = base_file_name,
+      metrics_basename = base_file_name_normal,
       dbSNP_vcf = dbSNP_vcf,
       dbSNP_vcf_index = dbSNP_vcf_index,
       ref_dict = ref_dict,
