@@ -84,149 +84,415 @@ Could not cache /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT006
 	Suppressed: lenthall.exception.AggregatedException: Could not cache /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics -> /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-CollectQualityYieldMetrics/shard-0/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics:
 /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics doesn't exists
 File not found /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-CollectQualityYieldMetrics/shard-0/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics -> /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics
-File not found /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics
-File not found /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics
-		at lenthall.util.TryUtil$.sequenceIterable(TryUtil.scala:26)
-		at lenthall.util.TryUtil$.sequence(TryUtil.scala:33)
-		at cromwell.backend.sfs.SharedFileSystem$.$anonfun$duplicate$3(SharedFileSystem.scala:82)
-		at scala.Option.getOrElse(Option.scala:121)
-		at cromwell.backend.sfs.SharedFileSystem$.cromwell$backend$sfs$SharedFileSystem$$duplicate(SharedFileSystem.scala:82)
-		at cromwell.backend.sfs.SharedFileSystem.cacheCopy(SharedFileSystem.scala:150)
-		at cromwell.backend.sfs.SharedFileSystem.cacheCopy$(SharedFileSystem.scala:149)
-		at cromwell.backend.sfs.SharedFileSystemJobCachingActorHelper$$anon$1.cacheCopy(SharedFileSystemJobCachingActorHelper.scala:13)
-		at cromwell.backend.sfs.SharedFileSystemCacheHitCopyingActor.$anonfun$duplicate$1(SharedFileSystemCacheHitCopyingActor.scala:17)
-		at scala.collection.TraversableLike.$anonfun$map$1(TraversableLike.scala:234)
-		at scala.collection.immutable.HashSet$HashSet1.foreach(HashSet.scala:320)
-		at scala.collection.immutable.HashSet$HashTrieSet.foreach(HashSet.scala:976)
-		at scala.collection.TraversableLike.map(TraversableLike.scala:234)
-		at scala.collection.TraversableLike.map$(TraversableLike.scala:227)
-		at scala.collection.AbstractSet.scala$collection$SetLike$$super$map(Set.scala:47)
-		at scala.collection.SetLike.map(SetLike.scala:101)
-		at scala.collection.SetLike.map$(SetLike.scala:101)
-		at scala.collection.AbstractSet.map(Set.scala:47)
-		at cromwell.backend.sfs.SharedFileSystemCacheHitCopyingActor.duplicate(SharedFileSystemCacheHitCopyingActor.scala:15)
-		... 22 common frames omitted
-		Suppressed: java.lang.RuntimeException: /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics doesn't exists
-			at cromwell.backend.sfs.SharedFileSystem$.cromwell$backend$sfs$SharedFileSystem$$localizePathAlreadyLocalized(SharedFileSystem.scala:42)
-			at cromwell.backend.sfs.SharedFileSystem.$anonfun$createStrategies$6(SharedFileSystem.scala:125)
-			at cromwell.backend.sfs.SharedFileSystem$.$anonfun$duplicate$1(SharedFileSystem.scala:80)
-			at scala.collection.immutable.Stream.map(Stream.scala:415)
-			at cromwell.backend.sfs.SharedFileSystem$.cromwell$backend$sfs$SharedFileSystem$$duplicate(SharedFileSystem.scala:80)
-			... 36 common frames omitted
-		Suppressed: java.nio.file.NoSuchFileException: /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-CollectQualityYieldMetrics/shard-0/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics -> /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics
-			at sun.nio.fs.UnixException.translateToIOException(UnixException.java:86)
-			at sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:102)
-			at sun.nio.fs.UnixFileSystemProvider.createLink(UnixFileSystemProvider.java:476)
-			at java.nio.file.Files.createLink(Files.java:1086)
-			at better.files.File.linkTo(File.scala:675)
-			at cromwell.core.path.BetterFileMethods.linkTo(BetterFileMethods.scala:437)
-			at cromwell.core.path.BetterFileMethods.linkTo$(BetterFileMethods.scala:435)
-			at cromwell.core.path.DefaultPath.linkTo(DefaultPathBuilder.scala:53)
-			at cromwell.backend.sfs.SharedFileSystem$.$anonfun$localizePathViaHardLink$1(SharedFileSystem.scala:57)
-			at scala.util.Try$.apply(Try.scala:209)
-			at cromwell.backend.sfs.SharedFileSystem$.cromwell$backend$sfs$SharedFileSystem$$localizePathViaHardLink(SharedFileSystem.scala:55)
-			at cromwell.backend.sfs.SharedFileSystem.$anonfun$createStrategies$3(SharedFileSystem.scala:118)
-			at cromwell.backend.sfs.SharedFileSystem$.$anonfun$duplicate$1(SharedFileSystem.scala:80)
-			at scala.collection.immutable.Stream.$anonfun$map$1(Stream.scala:415)
-			at scala.collection.immutable.Stream$Cons.tail(Stream.scala:1169)
-			at scala.collection.immutable.Stream$Cons.tail(Stream.scala:1159)
-			at scala.collection.LinearSeqOptimized.find(LinearSeqOptimized.scala:112)
-			at scala.collection.LinearSeqOptimized.find$(LinearSeqOptimized.scala:108)
-			at scala.collection.immutable.Stream.find(Stream.scala:201)
-			at cromwell.backend.sfs.SharedFileSystem$.cromwell$backend$sfs$SharedFileSystem$$duplicate(SharedFileSystem.scala:81)
-			... 36 common frames omitted
-		Suppressed: java.io.FileNotFoundException: /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics
-			at cromwell.backend.sfs.SharedFileSystem$.cromwell$backend$sfs$SharedFileSystem$$localizePathViaSymbolicLink(SharedFileSystem.scala:64)
-			at cromwell.backend.sfs.SharedFileSystem.$anonfun$createStrategies$4(SharedFileSystem.scala:119)
-			at cromwell.backend.sfs.SharedFileSystem$.$anonfun$duplicate$1(SharedFileSystem.scala:80)
-			at scala.collection.immutable.Stream.$anonfun$map$1(Stream.scala:415)
-			at scala.collection.immutable.Stream$Cons.tail(Stream.scala:1169)
-			at scala.collection.immutable.Stream$Cons.tail(Stream.scala:1159)
-			at scala.collection.LinearSeqOptimized.find(LinearSeqOptimized.scala:112)
-			at scala.collection.LinearSeqOptimized.find$(LinearSeqOptimized.scala:108)
-			at scala.collection.immutable.Stream.find(Stream.scala:201)
-			at cromwell.backend.sfs.SharedFileSystem$.cromwell$backend$sfs$SharedFileSystem$$duplicate(SharedFileSystem.scala:81)
-			... 36 common frames omitted
-		Suppressed: java.nio.file.NoSuchFileException: /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics
-			at sun.nio.fs.UnixException.translateToIOException(UnixException.java:86)
-			at sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:102)
-			at sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:107)
-			at sun.nio.fs.UnixCopyFile.copy(UnixCopyFile.java:526)
-			at sun.nio.fs.UnixFileSystemProvider.copy(UnixFileSystemProvider.java:253)
-			at java.nio.file.Files.copy(Files.java:1274)
-			at better.files.File.copyTo(File.scala:663)
-			at cromwell.core.path.BetterFileMethods.copyTo(BetterFileMethods.scala:425)
-			at cromwell.core.path.BetterFileMethods.copyTo$(BetterFileMethods.scala:424)
-			at cromwell.core.path.DefaultPath.copyTo(DefaultPathBuilder.scala:53)
-			at cromwell.backend.sfs.SharedFileSystem$.$anonfun$localizePathViaCopy$1(SharedFileSystem.scala:49)
-			at scala.util.Try$.apply(Try.scala:209)
-			at cromwell.backend.sfs.SharedFileSystem$.cromwell$backend$sfs$SharedFileSystem$$localizePathViaCopy(SharedFileSystem.scala:46)
-			at cromwell.backend.sfs.SharedFileSystem.$anonfun$createStrategies$5(SharedFileSystem.scala:120)
-			at cromwell.backend.sfs.SharedFileSystem$.$anonfun$duplicate$1(SharedFileSystem.scala:80)
-			at scala.collection.immutable.Stream.$anonfun$map$1(Stream.scala:415)
-			at scala.collection.immutable.Stream$Cons.tail(Stream.scala:1169)
-			at scala.collection.immutable.Stream$Cons.tail(Stream.scala:1159)
-			at scala.collection.LinearSeqOptimized.find(LinearSeqOptimized.scala:112)
-			at scala.collection.LinearSeqOptimized.find$(LinearSeqOptimized.scala:108)
-			at scala.collection.immutable.Stream.find(Stream.scala:201)
-			at cromwell.backend.sfs.SharedFileSystem$.cromwell$backend$sfs$SharedFileSystem$$duplicate(SharedFileSystem.scala:81)
-			... 36 common frames omitted
-[2017-09-16 23:46:29,60] [info] Trying to use another cache hit for job: PairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1
-[2017-09-16 23:46:30,82] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mc44b0020[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: [38;5;5mjava -Xmx128m \
-  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-CollectQualityYieldMetrics/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
-  CollectQualityYieldMetrics \
-  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-CollectQualityYieldMetrics/shard-0/inputs/home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.bam \
-  OQ=true \
-  OUTPUT=/home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yield_metrics[0m
-[2017-09-16 23:46:30,83] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mc44b0020[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: executing: qsub \
--V \
--N cromwell_c44b0020_CollectQualityYieldMetrics \
--d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-CollectQualityYieldMetrics/shard-0 \
--o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-CollectQualityYieldMetrics/shard-0/execution/stdout \
--e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-CollectQualityYieldMetrics/shard-0/execution/stderr \
--W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
-/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-CollectQualityYieldMetrics/shard-0/execution/script
-[2017-09-16 23:46:31,96] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mc44b0020[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: job id: 18368128.risoe-r04-sn064.cm.cluster
-[2017-09-16 23:46:31,97] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mc44b0020[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: Status change from - to WaitingForReturnCodeFile
-[2017-09-17 00:29:19,55] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mc44b0020[0mPairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1]: Status change from WaitingForReturnCodeFile to Done
-[2017-09-17 00:29:21,41] [info] WorkflowExecutionActor-c44b0020-ae84-49f0-a66d-f464faa48734 [[38;5;2mc44b0020[0m]: Starting calls: Collector-CollectQualityYieldMetrics
-[2017-09-17 05:51:52,32] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mc44b0020[0mPairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1]: Status change from WaitingForReturnCodeFile to Done
-[2017-09-17 05:51:54,83] [info] WorkflowExecutionActor-c44b0020-ae84-49f0-a66d-f464faa48734 [[38;5;2mc44b0020[0m]: Starting calls: PairedEndSingleSampleWorkflow.MergeBamAlignment:0:1, Collector-SamToFastqAndBwaMem
-[2017-09-17 05:51:55,58] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mc44b0020[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:0:1]: [38;5;5m# set the bash variable needed for the command-line
-bash_ref_fasta=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-MergeBamAlignment/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta
-java -Xmx2500m \
-  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-MergeBamAlignment/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
-  MergeBamAlignment \
-  VALIDATION_STRINGENCY=SILENT \
-  EXPECTED_ORIENTATIONS=FR \
-  ATTRIBUTES_TO_RETAIN=X0 \
-  ALIGNED_BAM=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-MergeBamAlignment/shard-0/inputs/home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmerged.bam \
-  UNMAPPED_BAM=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-MergeBamAlignment/shard-0/inputs/home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.bam \
-  OUTPUT=/home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.aligned.unsorted.bam \
-  REFERENCE_SEQUENCE=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-MergeBamAlignment/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta \
-  PAIRED_RUN=true \
-  SORT_ORDER="unsorted" \
-  IS_BISULFITE_SEQUENCE=false \
-  ALIGNED_READS_ONLY=false \
-  CLIP_ADAPTERS=false \
-  MAX_RECORDS_IN_RAM=2000000 \
-  ADD_MATE_CIGAR=true \
-  MAX_INSERTIONS_OR_DELETIONS=-1 \
-  PRIMARY_ALIGNMENT_STRATEGY=MostDistant \
-  PROGRAM_RECORD_ID="bwamem" \
-  PROGRAM_GROUP_VERSION="0.7.15-r1140" \
-  PROGRAM_GROUP_COMMAND_LINE="/services/tools/bwa/0.7.15/bwa mem -K 100000000 -p -v 3 -t 28 -Y $bash_ref_fasta" \
-  PROGRAM_GROUP_NAME="bwamem" \
-  UNMAPPED_READ_STRATEGY=COPY_TO_TAG \
-  ALIGNER_PROPER_PAIR_FLAGS=true \
-  UNMAP_CONTAMINANT_READS=true[0m
-[2017-09-17 05:51:55,59] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mc44b0020[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:0:1]: executing: qsub \
--V \
--N cromwell_c44b0020_MergeBamAlignment \
--d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-MergeBamAlignment/shard-0 \
--o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-MergeBamAlignment/shard-0/execution/stdout \
--e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-MergeBamAlignment/shard-0/execution/stderr \
--W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
-/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-MergeBamAlignment/shard-0/execution/script
-[2017-09-17 05:51:56,72] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mc44b0020[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:0:1]: job id: 18368177.risoe-r04-sn064.cm.cluster
-[2017-09-17 05:51:56,73] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mc44b0020[0mPairedEndSingleSampleWorkflow.MergeBamAlignment:0:1]: Status change from - to WaitingForReturnCodeFile
+File not found /home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.unmapped.quality_yie[2017-09-18 14:58:32,09] [[38;5;1merror[0m] Failed to summarize metadata
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5010ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+[2017-09-18 14:58:32,09] [[38;5;1merror[0m] Error summarizing metadata
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5010ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+[2017-09-18 14:58:44,12] [[38;5;1merror[0m] Failed to summarize metadata
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5009ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+[2017-09-18 14:58:44,12] [[38;5;1merror[0m] Error summarizing metadata
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5009ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+[2017-09-18 14:58:56,14] [[38;5;1merror[0m] Failed to summarize metadata
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5001ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+[2017-09-18 14:58:56,14] [[38;5;1merror[0m] Error summarizing metadata
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5001ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+[2017-09-18 14:59:08,15] [[38;5;1merror[0m] Failed to summarize metadata
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5000ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at sun.reflect.GeneratedConstructorAccessor68.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:425)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:989)
+	at com.mysql.jdbc.MysqlIO.readPacket(MysqlIO.java:632)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1016)
+	at com.mysql.jdbc.ConnectionImpl.coreConnect(ConnectionImpl.java:2194)
+	at com.mysql.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:2225)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2024)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:779)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:47)
+	at sun.reflect.GeneratedConstructorAccessor5.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:425)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:389)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:330)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:95)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:101)
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:341)
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:193)
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:430)
+	at com.zaxxer.hikari.pool.HikariPool.access$500(HikariPool.java:64)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:570)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:563)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	... 3 common frames omitted
+Caused by: java.net.SocketTimeoutException: Read timed out
+	at java.net.SocketInputStream.socketRead0(Native Method)
+	at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+	at java.net.SocketInputStream.read(SocketInputStream.java:171)
+	at java.net.SocketInputStream.read(SocketInputStream.java:141)
+	at com.mysql.jdbc.util.ReadAheadInputStream.fill(ReadAheadInputStream.java:101)
+	at com.mysql.jdbc.util.ReadAheadInputStream.readFromUnderlyingStreamIfNecessary(ReadAheadInputStream.java:144)
+	at com.mysql.jdbc.util.ReadAheadInputStream.read(ReadAheadInputStream.java:174)
+	at com.mysql.jdbc.MysqlIO.readFully(MysqlIO.java:3008)
+	at com.mysql.jdbc.MysqlIO.readPacket(MysqlIO.java:567)
+	... 24 common frames omitted
+[2017-09-18 14:59:08,16] [[38;5;1merror[0m] Error summarizing metadata
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5000ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at sun.reflect.GeneratedConstructorAccessor68.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:425)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:989)
+	at com.mysql.jdbc.MysqlIO.readPacket(MysqlIO.java:632)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1016)
+	at com.mysql.jdbc.ConnectionImpl.coreConnect(ConnectionImpl.java:2194)
+	at com.mysql.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:2225)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2024)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:779)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:47)
+	at sun.reflect.GeneratedConstructorAccessor5.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:425)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:389)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:330)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:95)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:101)
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:341)
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:193)
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:430)
+	at com.zaxxer.hikari.pool.HikariPool.access$500(HikariPool.java:64)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:570)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:563)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	... 3 common frames omitted
+Caused by: java.net.SocketTimeoutException: Read timed out
+	at java.net.SocketInputStream.socketRead0(Native Method)
+	at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+	at java.net.SocketInputStream.read(SocketInputStream.java:171)
+	at java.net.SocketInputStream.read(SocketInputStream.java:141)
+	at com.mysql.jdbc.util.ReadAheadInputStream.fill(ReadAheadInputStream.java:101)
+	at com.mysql.jdbc.util.ReadAheadInputStream.readFromUnderlyingStreamIfNecessary(ReadAheadInputStream.java:144)
+	at com.mysql.jdbc.util.ReadAheadInputStream.read(ReadAheadInputStream.java:174)
+	at com.mysql.jdbc.MysqlIO.readFully(MysqlIO.java:3008)
+	at com.mysql.jdbc.MysqlIO.readPacket(MysqlIO.java:567)
+	... 24 common frames omitted
+[2017-09-18 14:59:20,17] [[38;5;1merror[0m] Failed to summarize metadata
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5000ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at sun.reflect.GeneratedConstructorAccessor68.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:425)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:989)
+	at com.mysql.jdbc.MysqlIO.readPacket(MysqlIO.java:632)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1016)
+	at com.mysql.jdbc.ConnectionImpl.coreConnect(ConnectionImpl.java:2194)
+	at com.mysql.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:2225)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2024)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:779)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:47)
+	at sun.reflect.GeneratedConstructorAccessor5.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:425)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:389)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:330)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:95)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:101)
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:341)
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:193)
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:430)
+	at com.zaxxer.hikari.pool.HikariPool.access$500(HikariPool.java:64)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:570)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:563)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	... 3 common frames omitted
+Caused by: java.net.SocketTimeoutException: Read timed out
+	at java.net.SocketInputStream.socketRead0(Native Method)
+	at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+	at java.net.SocketInputStream.read(SocketInputStream.java:171)
+	at java.net.SocketInputStream.read(SocketInputStream.java:141)
+	at com.mysql.jdbc.util.ReadAheadInputStream.fill(ReadAheadInputStream.java:101)
+	at com.mysql.jdbc.util.ReadAheadInputStream.readFromUnderlyingStreamIfNecessary(ReadAheadInputStream.java:144)
+	at com.mysql.jdbc.util.ReadAheadInputStream.read(ReadAheadInputStream.java:174)
+	at com.mysql.jdbc.MysqlIO.readFully(MysqlIO.java:3008)
+	at com.mysql.jdbc.MysqlIO.readPacket(MysqlIO.java:567)
+	... 24 common frames omitted
+[2017-09-18 14:59:20,18] [[38;5;1merror[0m] Error summarizing metadata
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5000ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at sun.reflect.GeneratedConstructorAccessor68.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:425)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:989)
+	at com.mysql.jdbc.MysqlIO.readPacket(MysqlIO.java:632)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1016)
+	at com.mysql.jdbc.ConnectionImpl.coreConnect(ConnectionImpl.java:2194)
+	at com.mysql.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:2225)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2024)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:779)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:47)
+	at sun.reflect.GeneratedConstructorAccessor5.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:425)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:389)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:330)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:95)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:101)
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:341)
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:193)
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:430)
+	at com.zaxxer.hikari.pool.HikariPool.access$500(HikariPool.java:64)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:570)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:563)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	... 3 common frames omitted
+Caused by: java.net.SocketTimeoutException: Read timed out
+	at java.net.SocketInputStream.socketRead0(Native Method)
+	at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+	at java.net.SocketInputStream.read(SocketInputStream.java:171)
+	at java.net.SocketInputStream.read(SocketInputStream.java:141)
+	at com.mysql.jdbc.util.ReadAheadInputStream.fill(ReadAheadInputStream.java:101)
+	at com.mysql.jdbc.util.ReadAheadInputStream.readFromUnderlyingStreamIfNecessary(ReadAheadInputStream.java:144)
+	at com.mysql.jdbc.util.ReadAheadInputStream.read(ReadAheadInputStream.java:174)
+	at com.mysql.jdbc.MysqlIO.readFully(MysqlIO.java:3008)
+	at com.mysql.jdbc.MysqlIO.readPacket(MysqlIO.java:567)
+	... 24 common frames omitted
+[2017-09-18 14:59:27,17] [[38;5;1merror[0m] SingleWorkflowRunnerActor received Failure message: db - Connection is not available, request timed out after 5000ms.
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5000ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at sun.reflect.GeneratedConstructorAccessor68.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:425)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:989)
+	at com.mysql.jdbc.MysqlIO.readPacket(MysqlIO.java:632)
+	at com.mysql.jdbc.MysqlIO.doHandshake(MysqlIO.java:1016)
+	at com.mysql.jdbc.ConnectionImpl.coreConnect(ConnectionImpl.java:2194)
+	at com.mysql.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:2225)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2024)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:779)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:47)
+	at sun.reflect.GeneratedConstructorAccessor5.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:425)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:389)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:330)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:95)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:101)
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:341)
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:193)
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:430)
+	at com.zaxxer.hikari.pool.HikariPool.access$500(HikariPool.java:64)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:570)
+	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:563)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	... 3 common frames omitted
+Caused by: java.net.SocketTimeoutException: Read timed out
+	at java.net.SocketInputStream.socketRead0(Native Method)
+	at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+	at java.net.SocketInputStream.read(SocketInputStream.java:171)
+	at java.net.SocketInputStream.read(SocketInputStream.java:141)
+	at com.mysql.jdbc.util.ReadAheadInputStream.fill(ReadAheadInputStream.java:101)
+	at com.mysql.jdbc.util.ReadAheadInputStream.readFromUnderlyingStreamIfNecessary(ReadAheadInputStream.java:144)
+	at com.mysql.jdbc.util.ReadAheadInputStream.read(ReadAheadInputStream.java:174)
+	at com.mysql.jdbc.MysqlIO.readFully(MysqlIO.java:3008)
+	at com.mysql.jdbc.MysqlIO.readPacket(MysqlIO.java:567)
+	... 24 common frames omitted
+[2017-09-18 14:59:27,18] [info] Message [cromwell.core.actor.StreamActorHelper$StreamFailed] without sender to Actor[akka://cromwell-system/deadLetters] was not delivered. [1] dead letters encountered. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+[2017-09-18 14:59:27,18] [info] Message [cromwell.core.actor.StreamActorHelper$StreamFailed] without sender to Actor[akka://cromwell-system/deadLetters] was not delivered. [2] dead letters encountered. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+db - Connection is not available, request timed out after 5000ms.
+[2017-09-18 14:59:27,21] [info] Automatic shutdown of the async connection
+[2017-09-18 14:59:27,21] [info] Gracefully shutdown sentry threads.
+[2017-09-18 14:59:27,21] [info] Shutdown finished.
+nt of stderr for potential additional information: /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/c44b0020-ae84-49f0-a66d-f464faa48734/call-ValidateReadGroupSamFile/shard-0/execution/stderr
+[2017-09-18 01:13:14,78] [info] WorkflowManagerActor WorkflowActor-c44b0020-ae84-49f0-a66d-f464faa48734 is in a terminal state: WorkflowFailedState
+[2017-09-18 01:14:09,03] [info] SingleWorkflowRunnerActor workflow finished with status 'Failed'.
+[2017-09-18 01:14:09,05] [info] Message [cromwell.core.actor.StreamActorHelper$StreamFailed] without sender to Actor[akka://cromwell-system/deadLetters] was not delivered. [1] dead letters encountered. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+[2017-09-18 01:14:09,05] [info] Message [cromwell.core.actor.StreamActorHelper$StreamFailed] without sender to Actor[akka://cromwell-system/deadLetters] was not delivered. [2] dead letters encountered. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+Workflow c44b0020-ae84-49f0-a66d-f464faa48734 transitioned to state Failed
+[2017-09-18 01:14:09,09] [info] Automatic shutdown of the async connection
+[2017-09-18 01:14:09,09] [info] Gracefully shutdown sentry threads.
+[2017-09-18 01:14:09,09] [info] Shutdown finished.

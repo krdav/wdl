@@ -1,0 +1,151 @@
+[2017-09-17 21:51:30,27] [info] Running with database db.url = jdbc:mysql://localhost:2801/cromwell_db?useSSL=false&rewriteBatchedStatements=true
+[2017-09-17 21:51:35,41] [info] Running with database db.url = jdbc:mysql://localhost:2801/cromwell_db?useSSL=false&rewriteBatchedStatements=true
+[2017-09-17 21:51:35,96] [info] Slf4jLogger started
+[2017-09-17 21:51:36,18] [info] Metadata summary refreshing every 2 seconds.
+[2017-09-17 21:51:36,20] [info] WriteMetadataActor configured to write to the database with batch size 200 and flush rate 5 seconds.
+[2017-09-17 21:51:36,23] [info] CallCacheWriteActor configured to write to the database with batch size 100 and flush rate 3 seconds.
+[2017-09-17 21:51:36,95] [info] SingleWorkflowRunnerActor: Submitting workflow
+[2017-09-17 21:51:36,99] [info] Workflow f3d13cd7-3421-4cab-a543-a354986cbc5b submitted.
+[2017-09-17 21:51:37,00] [info] SingleWorkflowRunnerActor: Workflow submitted [38;5;2mf3d13cd7-3421-4cab-a543-a354986cbc5b[0m
+[2017-09-17 21:51:37,00] [info] 1 new workflows fetched
+[2017-09-17 21:51:37,00] [info] WorkflowManagerActor Starting workflow [38;5;2mf3d13cd7-3421-4cab-a543-a354986cbc5b[0m
+[2017-09-17 21:51:37,01] [info] WorkflowManagerActor Successfully started WorkflowActor-f3d13cd7-3421-4cab-a543-a354986cbc5b
+[2017-09-17 21:51:37,01] [info] Retrieved 1 workflows from the WorkflowStoreActor
+[2017-09-17 21:51:37,95] [info] MaterializeWorkflowDescriptorActor [[38;5;2mf3d13cd7[0m]: Call-to-Backend assignments: PairedEndSingleSampleWorkflow.SortAndFixSampleBam -> SGE, PairedEndSingleSampleWorkflow.SamToFastqAndBwaMem -> SGE, PairedEndSingleSampleWorkflow.SortAndFixReadGroupBam -> SGE, PairedEndSingleSampleWorkflow.CollectReadgroupBamQualityMetrics -> SGE, PairedEndSingleSampleWorkflow.GetBwaVersion -> SGE, PairedEndSingleSampleWorkflow.CollectWgsMetrics -> SGE, PairedEndSingleSampleWorkflow.CollectAggregationMetrics -> SGE, PairedEndSingleSampleWorkflow.CollectGvcfCallingMetrics -> SGE, PairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics -> SGE, PairedEndSingleSampleWorkflow.ValidateReadGroupSamFile -> SGE, PairedEndSingleSampleWorkflow.ValidateGVCF -> SGE, PairedEndSingleSampleWorkflow.BaseRecalibrator -> SGE, PairedEndSingleSampleWorkflow.CheckContamination -> SGE, PairedEndSingleSampleWorkflow.CreateSequenceGroupingTSV -> SGE, PairedEndSingleSampleWorkflow.CalculateReadGroupChecksum -> SGE, PairedEndSingleSampleWorkflow.HaplotypeCaller -> SGE, PairedEndSingleSampleWorkflow.MergeVCFs -> SGE, PairedEndSingleSampleWorkflow.ValidateBamFromCram -> SGE, PairedEndSingleSampleWorkflow.GatherBqsrReports -> SGE, PairedEndSingleSampleWorkflow.CrossCheckFingerprints -> SGE, PairedEndSingleSampleWorkflow.GatherBamFiles -> SGE, PairedEndSingleSampleWorkflow.CramToBam -> SGE, PairedEndSingleSampleWorkflow.ConvertToCram -> SGE, PairedEndSingleSampleWorkflow.ApplyBQSR -> SGE, PairedEndSingleSampleWorkflow.ValidateAggregatedSamFile -> SGE, PairedEndSingleSampleWorkflow.MergeBamAlignment -> SGE, PairedEndSingleSampleWorkflow.CheckFingerprint -> SGE, PairedEndSingleSampleWorkflow.CollectRawWgsMetrics -> SGE, PairedEndSingleSampleWorkflow.MarkDuplicates -> SGE, PairedEndSingleSampleWorkflow.CollectQualityYieldMetrics -> SGE, PairedEndSingleSampleWorkflow.CheckFinalVcfExtension -> SGE
+[2017-09-17 21:51:40,31] [info] WorkflowExecutionActor-f3d13cd7-3421-4cab-a543-a354986cbc5b [[38;5;2mf3d13cd7[0m]: Starting calls: PairedEndSingleSampleWorkflow.CheckFinalVcfExtension:NA:1, PairedEndSingleSampleWorkflow.CreateSequenceGroupingTSV:NA:1, PairedEndSingleSampleWorkflow.GetBwaVersion:NA:1
+[2017-09-17 21:51:42,36] [info] WorkflowExecutionActor-f3d13cd7-3421-4cab-a543-a354986cbc5b [[38;5;2mf3d13cd7[0m]: Starting calls: PairedEndSingleSampleWorkflow.CollectQualityYieldMetrics:0:1, PairedEndSingleSampleWorkflow.SamToFastqAndBwaMem:0:1
+[2017-09-17 21:58:22,20] [info] WorkflowExecutionActor-f3d13cd7-3421-4cab-a543-a354986cbc5b [[38;5;2mf3d13cd7[0m]: Starting calls: Collector-CollectQualityYieldMetrics
+[2017-09-17 21:59:00,98] [info] WorkflowExecutionActor-f3d13cd7-3421-4cab-a543-a354986cbc5b [[38;5;2mf3d13cd7[0m]: Starting calls: PairedEndSingleSampleWorkflow.MergeBamAlignment:0:1, Collector-SamToFastqAndBwaMem
+[2017-09-17 22:15:57,92] [info] WorkflowExecutionActor-f3d13cd7-3421-4cab-a543-a354986cbc5b [[38;5;2mf3d13cd7[0m]: Starting calls: PairedEndSingleSampleWorkflow.CollectUnsortedReadgroupBamQualityMetrics:0:1, Collector-MergeBamAlignment, PairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:0:1
+[2017-09-17 22:15:58,94] [info] WorkflowExecutionActor-f3d13cd7-3421-4cab-a543-a354986cbc5b [[38;5;2mf3d13cd7[0m]: Starting calls: PairedEndSingleSampleWorkflow.MarkDuplicates:NA:1
+[2017-09-17 22:16:17,84] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.MarkDuplicates:NA:1]: [38;5;5mjava -Xmx4000m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-MarkDuplicates/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  MarkDuplicates \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-MarkDuplicates/inputs/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-MergeBamAlignment/shard-0/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.aligned.unsorted.bam \
+  OUTPUT=36PGF.aligned.unsorted.duplicates_marked.bam \
+  METRICS_FILE=36PGF.duplicate_metrics \
+  VALIDATION_STRINGENCY=SILENT \
+  OPTICAL_DUPLICATE_PIXEL_DISTANCE=2500 \
+  ASSUME_SORT_ORDER="queryname"
+  CREATE_MD5_FILE=true[0m
+[2017-09-17 22:16:17,84] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:0:1]: [38;5;5mset -o pipefail
+java -Xmx4000m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-SortAndFixReadGroupBam/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  SortSam \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-SortAndFixReadGroupBam/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-MergeBamAlignment/shard-0/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.aligned.unsorted.bam \
+  OUTPUT=/dev/stdout \
+  SORT_ORDER="coordinate" \
+  CREATE_INDEX=false \
+  CREATE_MD5_FILE=false | \
+java -Xmx500m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-SortAndFixReadGroupBam/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  SetNmAndUqTags \
+  INPUT=/dev/stdin \
+  OUTPUT=/home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.sorted.bam \
+  CREATE_INDEX=true \
+  CREATE_MD5_FILE=true \
+  REFERENCE_SEQUENCE=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-SortAndFixReadGroupBam/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta[0m
+[2017-09-17 22:16:17,87] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.MarkDuplicates:NA:1]: executing: qsub \
+-V \
+-N cromwell_f3d13cd7_MarkDuplicates \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-MarkDuplicates \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-MarkDuplicates/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-MarkDuplicates/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-MarkDuplicates/execution/script
+[2017-09-17 22:16:17,87] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:0:1]: executing: qsub \
+-V \
+-N cromwell_f3d13cd7_SortAndFixReadGroupBam \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-SortAndFixReadGroupBam/shard-0 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-SortAndFixReadGroupBam/shard-0/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-SortAndFixReadGroupBam/shard-0/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-SortAndFixReadGroupBam/shard-0/execution/script
+[2017-09-17 22:16:19,14] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:0:1]: job id: 18368474.risoe-r04-sn064.cm.cluster
+[2017-09-17 22:16:19,15] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:0:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-17 22:16:19,18] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.MarkDuplicates:NA:1]: job id: 18368475.risoe-r04-sn064.cm.cluster
+[2017-09-17 22:16:19,18] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.MarkDuplicates:NA:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-17 22:25:03,62] [info] WorkflowExecutionActor-f3d13cd7-3421-4cab-a543-a354986cbc5b [[38;5;2mf3d13cd7[0m]: Starting calls: Collector-CollectUnsortedReadgroupBamQualityMetrics
+[2017-09-18 09:36:25,62] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.SortAndFixReadGroupBam:0:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-18 09:36:27,90] [info] WorkflowExecutionActor-f3d13cd7-3421-4cab-a543-a354986cbc5b [[38;5;2mf3d13cd7[0m]: Starting calls: Collector-SortAndFixReadGroupBam, PairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:0:1
+[2017-09-18 09:36:42,73] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:0:1]: [38;5;5mjava -Xmx4000m \
+  -jar /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-ValidateReadGroupSamFile/shard-0/inputs/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar \
+  ValidateSamFile \
+  INPUT=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-ValidateReadGroupSamFile/shard-0/inputs/home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.sorted.bam \
+  OUTPUT=/home/projects/dp_00005/data/bgi_received_11092017/F17FTSEUHT0065_HUMdnpR/Raw/36PGF/170830_X512_FCH3N2TCCXY_L5_8521708000404.validation_report \
+  REFERENCE_SEQUENCE=/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-ValidateReadGroupSamFile/shard-0/inputs/home/projects/dp_00005/data/cromwell_test/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta \
+  MAX_OUTPUT=1000000000 \
+  IGNORE=null \
+  MODE=VERBOSE \
+  IS_BISULFITE_SEQUENCED=false[0m
+[2017-09-18 09:36:42,74] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:0:1]: executing: qsub \
+-V \
+-N cromwell_f3d13cd7_ValidateReadGroupSamFile \
+-d /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-ValidateReadGroupSamFile/shard-0 \
+-o /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-ValidateReadGroupSamFile/shard-0/execution/stdout \
+-e /home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-ValidateReadGroupSamFile/shard-0/execution/stderr \
+-W group_list=dp_00005 -A dp_00005 -l nodes=1:ppn=1,walltime=100:00:00 \
+/home/projects/dp_00005/data/cromwell_test/wdl/scripts/CBS_pipelines_realdata_STAGING/cromwell-executions/PairedEndSingleSampleWorkflow/f3d13cd7-3421-4cab-a543-a354986cbc5b/call-ValidateReadGroupSamFile/shard-0/execution/script
+[2017-09-18 09:36:43,90] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:0:1]: job id: 18368630.risoe-r04-sn064.cm.cluster
+[2017-09-18 09:36:43,90] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:0:1]: Status change from - to WaitingForReturnCodeFile
+[2017-09-18 11:52:26,94] [info] DispatchedConfigAsyncJobExecutionActor [[38;5;2mf3d13cd7[0mPairedEndSingleSampleWorkflow.ValidateReadGroupSamFile:0:1]: Status change from WaitingForReturnCodeFile to Done
+[2017-09-18 11:52:27,90] [info] WorkflowExecutionActor-f3d13cd7-3421-4cab-a543-a354986cbc5b [[38;5;2mf3d13cd7[0m]: Starting calls: Collector-ValidateReadGroupSamFile
+[2017-09-18 14:58:32,09] [[38;5;1merror[0m] Failed to summarize metadata
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5087ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+[2017-09-18 14:58:32,17] [[38;5;220mwarn[0m] Couldn't find a suitable DSN, defaulting to a Noop one.
+[2017-09-18 14:58:32,18] [info] Using noop to send events.
+[2017-09-18 14:58:32,21] [[38;5;1merror[0m] Error summarizing metadata
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5087ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+[2017-09-18 14:58:38,44] [[38;5;1merror[0m] SingleWorkflowRunnerActor received Failure message: db - Connection is not available, request timed out after 5009ms.
+java.sql.SQLTransientConnectionException: db - Connection is not available, request timed out after 5009ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:548)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:186)
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:145)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:83)
+	at slick.jdbc.hikaricp.HikariCPJdbcDataSource.createConnection(HikariCPJdbcDataSource.scala:18)
+	at slick.jdbc.JdbcBackend$BaseSession.<init>(JdbcBackend.scala:439)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:47)
+	at slick.jdbc.JdbcBackend$DatabaseDef.createSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession(BasicBackend.scala:218)
+	at slick.basic.BasicBackend$DatabaseDef.acquireSession$(BasicBackend.scala:217)
+	at slick.jdbc.JdbcBackend$DatabaseDef.acquireSession(JdbcBackend.scala:38)
+	at slick.basic.BasicBackend$DatabaseDef$$anon$2.run(BasicBackend.scala:239)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:748)
+[2017-09-18 14:58:38,46] [info] Message [cromwell.core.actor.StreamActorHelper$StreamFailed] without sender to Actor[akka://cromwell-system/deadLetters] was not delivered. [1] dead letters encountered. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+[2017-09-18 14:58:38,46] [info] Message [cromwell.core.actor.StreamActorHelper$StreamFailed] without sender to Actor[akka://cromwell-system/deadLetters] was not delivered. [2] dead letters encountered. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+db - Connection is not available, request timed out after 5009ms.
+[2017-09-18 14:58:38,48] [info] Automatic shutdown of the async connection
+[2017-09-18 14:58:38,48] [info] Gracefully shutdown sentry threads.
+[2017-09-18 14:58:38,48] [info] Shutdown finished.
