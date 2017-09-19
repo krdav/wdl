@@ -260,8 +260,6 @@ task FastqToBam {
 task CollectQualityYieldMetrics {
   File input_bam
   String metrics_filename
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File PICARD
 
@@ -332,18 +330,15 @@ task SamToFastqAndBwaMem {
   File ref_fasta
   File ref_fasta_index
   File ref_dict
-
   # This is the .alt file from bwa-kit (https://github.com/lh3/bwa/tree/master/bwakit), 
   # listing the reference contigs that are "alternative". 
   File ref_alt
-
   File ref_amb
   File ref_ann
   File ref_bwt
   File ref_pac
   File ref_sa
-  Int disk_size
-  Int preemptible_tries
+
   Int cpu=28
   File PICARD
   File SAMTOOLS
@@ -393,8 +388,6 @@ task MergeBamAlignment {
   File ref_fasta
   File ref_fasta_index
   File ref_dict
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File PICARD
 
@@ -443,8 +436,6 @@ task SortAndFixTags {
   File ref_dict
   File ref_fasta
   File ref_fasta_index
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File PICARD
 
@@ -482,7 +473,6 @@ task SortAndFixTags {
 task CollectUnsortedReadgroupBamQualityMetrics {
   File input_bam
   String output_bam_prefix
-  Int disk_size
   Int cpu=1
   File PICARD
 
@@ -527,7 +517,6 @@ task CollectReadgroupBamQualityMetrics {
   File ref_dict
   File ref_fasta
   File ref_fasta_index
-  Int disk_size
   Int cpu=1
   File PICARD
 
@@ -564,7 +553,6 @@ task CollectAggregationMetrics {
   File ref_dict
   File ref_fasta
   File ref_fasta_index
-  Int disk_size
   Int cpu=1
   File PICARD
 
@@ -614,8 +602,6 @@ task CrossCheckFingerprints {
   Array[File] input_bam_indexes
   File haplotype_database_file # if this file is empty (0-length) the workflow should not do fingerprint comparison (as there are no fingerprints for the sample)
   String metrics_filename
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File PICARD
 
@@ -650,8 +636,6 @@ task CheckFingerprint {
   File genotypes
   String output_basename
   String sample
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File PICARD
 
@@ -688,7 +672,6 @@ task MarkDuplicates {
   Array[File] input_bams
   String output_bam_basename
   String metrics_filename
-  Int disk_size
   Int cpu=1
   File PICARD
 
@@ -719,7 +702,6 @@ task MarkDuplicates {
 # Generate sets of intervals for scatter-gathering over chromosomes
 task CreateSequenceGroupingTSV {
   File ref_dict
-  Int preemptible_tries
   Int cpu=1
 
   # Use python to create the Sequencing Groupings used for BQSR and PrintReads Scatter. 
@@ -783,8 +765,6 @@ task BaseRecalibrator {
   File ref_dict
   File ref_fasta
   File ref_fasta_index
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File GATK
 
@@ -825,8 +805,6 @@ task ApplyBQSR {
   File ref_dict
   File ref_fasta
   File ref_fasta_index
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File GATK4
 
@@ -863,8 +841,6 @@ task ApplyBQSR {
 task GatherBqsrReports {
   Array[File] input_bqsr_reports
   String output_report_filename
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File GATK
 
@@ -886,8 +862,7 @@ task GatherBqsrReports {
 task GatherBamFiles {
   Array[File] input_bams
   String output_bam_basename
-  Int disk_size
-  Int preemptible_tries
+
   Int cpu=1
   File PICARD
 
@@ -920,8 +895,6 @@ task ValidateSamFile {
   File ref_fasta_index
   Int? max_output
   Array[String]? ignore
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File PICARD
 
@@ -953,7 +926,6 @@ task CollectWgsMetrics {
   File wgs_coverage_interval_list
   File ref_fasta
   File ref_fasta_index
-  Int disk_size
   Int cpu=1
   File PICARD
 
@@ -983,7 +955,6 @@ task CollectRawWgsMetrics {
   File wgs_coverage_interval_list
   File ref_fasta
   File ref_fasta_index
-  Int disk_size
   Int cpu=1
   File PICARD
 
@@ -1010,8 +981,6 @@ task CalculateReadGroupChecksum {
   File input_bam
   File input_bam_index
   String read_group_md5_filename
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File PICARD
 
@@ -1049,8 +1018,6 @@ task CheckContamination {
   File contamination_sites_vcf
   File contamination_sites_vcf_index
   String output_prefix
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File verifyBamID
 
@@ -1120,8 +1087,6 @@ task HaplotypeCaller {
   File ref_fasta
   File ref_fasta_index
   Float? contamination
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File GATK
 
@@ -1154,8 +1119,6 @@ task MergeVCFs {
   Array[File] input_vcfs
   Array[File] input_vcfs_indexes
   String output_vcf_name
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File PICARD
 
@@ -1187,8 +1150,6 @@ task ValidateGVCF {
   File dbSNP_vcf
   File dbSNP_vcf_index
   File wgs_calling_interval_list
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File GATK
 
@@ -1217,9 +1178,7 @@ task CollectGvcfCallingMetrics {
   File dbSNP_vcf
   File dbSNP_vcf_index
   File ref_dict
-  Int disk_size
   File wgs_evaluation_interval_list
-  Int preemptible_tries
   Int cpu=1
   File PICARD
 
@@ -1250,8 +1209,6 @@ task ConvertToCram {
   File ref_fasta
   File ref_fasta_index
   String output_basename
-  Int disk_size
-  Int preemptible_tries
   Int cpu=1
   File SAMTOOLS
   File seq_cache_populate
@@ -1289,8 +1246,6 @@ task CramToBam {
   File ref_dict
   File cram_file
   String output_basename
-
-  Int disk_size
   Int cpu=1
   File SAMTOOLS
 
@@ -1350,15 +1305,6 @@ workflow PairedEndSingleSampleWorkflow {
   File dbSNP_vcf_index
   Array[File] known_indels_sites_VCFs
   Array[File] known_indels_sites_indices
-  
-  Int flowcell_small_disk
-  Int flowcell_medium_disk
-  Int agg_small_disk
-  Int agg_medium_disk
-  Int agg_large_disk
-  Int preemptible_tries
-  Int agg_preemptible_tries
-
 
   String recalibrated_bam_basename = base_file_name_normal + ".aligned.duplicates_marked.recalibrated"
 
@@ -1444,9 +1390,7 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         PICARD=picard,
         input_bam = unmapped_bam,
-        metrics_filename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics",
-        disk_size = flowcell_small_disk,
-        preemptible_tries = preemptible_tries
+        metrics_filename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics"
     }
 
     # Map reads to reference
@@ -1465,9 +1409,7 @@ workflow PairedEndSingleSampleWorkflow {
         ref_amb = ref_amb,
         ref_ann = ref_ann,
         ref_pac = ref_pac,
-        ref_sa = ref_sa,
-        disk_size = flowcell_medium_disk,
-        preemptible_tries = preemptible_tries
+        ref_sa = ref_sa
      }
 
     # Merge original uBAM and BWA-aligned BAM 
@@ -1481,9 +1423,7 @@ workflow PairedEndSingleSampleWorkflow {
         output_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".aligned.unsorted",
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
-        ref_dict = ref_dict,
-        disk_size = flowcell_medium_disk,
-        preemptible_tries = preemptible_tries
+        ref_dict = ref_dict
     }
 
     # QC the aligned but unsorted readgroup BAM
@@ -1492,8 +1432,7 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         PICARD=picard,
         input_bam = MergeBamAlignment.output_bam,
-        output_bam_prefix = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".readgroup",
-        disk_size = flowcell_medium_disk
+        output_bam_prefix = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".readgroup"
     }
 
     # Sort and fix tags in the merged BAM
@@ -1504,9 +1443,7 @@ workflow PairedEndSingleSampleWorkflow {
         output_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".sorted",
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
-        ref_fasta_index = ref_fasta_index,
-        disk_size = flowcell_medium_disk,
-        preemptible_tries = preemptible_tries
+        ref_fasta_index = ref_fasta_index
     }
     
     # Validate the aligned and sorted readgroup BAM
@@ -1520,9 +1457,7 @@ workflow PairedEndSingleSampleWorkflow {
         ref_dict = ref_dict,
         input_bam = SortAndFixReadGroupBam.output_bam,
         input_bam_index = SortAndFixReadGroupBam.output_bam_index,
-        report_filename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".validation_report",
-        disk_size = flowcell_medium_disk,
-        preemptible_tries = preemptible_tries
+        report_filename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".validation_report"
     }
 
   }
@@ -1535,8 +1470,7 @@ workflow PairedEndSingleSampleWorkflow {
       PICARD=picard,
       input_bams = MergeBamAlignment.output_bam,
       output_bam_basename = base_file_name_normal + ".aligned.unsorted.duplicates_marked",
-      metrics_filename = base_file_name_normal + ".duplicate_metrics",
-      disk_size = agg_large_disk
+      metrics_filename = base_file_name_normal + ".duplicate_metrics"
   }
 
   # Sort aggregated+deduped BAM file and fix tags
@@ -1547,9 +1481,7 @@ workflow PairedEndSingleSampleWorkflow {
       output_bam_basename = base_file_name_normal + ".aligned.duplicate_marked.sorted",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      disk_size = agg_large_disk,
-      preemptible_tries = 0
+      ref_fasta_index = ref_fasta_index
   }
 
   # Check identity of fingerprints across readgroups
@@ -1559,16 +1491,13 @@ workflow PairedEndSingleSampleWorkflow {
       input_bams = SortAndFixSampleBam.output_bam,
       input_bam_indexes = SortAndFixSampleBam.output_bam_index,
       haplotype_database_file = haplotype_database_file,
-      metrics_filename = base_file_name_normal + ".crosscheck",
-      disk_size = agg_small_disk,
-      preemptible_tries = agg_preemptible_tries
+      metrics_filename = base_file_name_normal + ".crosscheck"
   }
 
   # Create list of sequences for scatter-gather parallelization 
   call CreateSequenceGroupingTSV {
     input:
-      ref_dict = ref_dict,
-      preemptible_tries = preemptible_tries
+      ref_dict = ref_dict
   }
   
   # Estimate level of cross-sample contamination
@@ -1579,9 +1508,7 @@ workflow PairedEndSingleSampleWorkflow {
       input_bam_index = SortAndFixSampleBam.output_bam_index,
       contamination_sites_vcf = contamination_sites_vcf,
       contamination_sites_vcf_index = contamination_sites_vcf_index,
-      output_prefix = base_file_name_normal + ".preBqsr",
-      disk_size = agg_small_disk,
-      preemptible_tries = agg_preemptible_tries
+      output_prefix = base_file_name_normal + ".preBqsr"
   }
   
   # Perform Base Quality Score Recalibration (BQSR) on the sorted BAM in parallel
@@ -1600,9 +1527,7 @@ workflow PairedEndSingleSampleWorkflow {
         known_indels_sites_indices = known_indels_sites_indices,
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
-        ref_fasta_index = ref_fasta_index,
-        disk_size = agg_small_disk,
-        preemptible_tries = agg_preemptible_tries
+        ref_fasta_index = ref_fasta_index
     }  
   }  
   
@@ -1611,9 +1536,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       GATK=gatk,
       input_bqsr_reports = BaseRecalibrator.recalibration_report,
-      output_report_filename = base_file_name_normal + ".recal_data.csv",
-      disk_size = flowcell_small_disk,
-      preemptible_tries = preemptible_tries
+      output_report_filename = base_file_name_normal + ".recal_data.csv"
   }
 
   scatter (subgroup in CreateSequenceGroupingTSV.sequence_grouping_with_unmapped) {
@@ -1629,9 +1552,7 @@ workflow PairedEndSingleSampleWorkflow {
         sequence_group_interval = subgroup,
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
-        ref_fasta_index = ref_fasta_index,
-        disk_size = agg_small_disk,
-        preemptible_tries = agg_preemptible_tries
+        ref_fasta_index = ref_fasta_index
     }
   } 
 
@@ -1640,9 +1561,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       input_bams = ApplyBQSR.recalibrated_bam,
-      output_bam_basename = base_file_name_normal,
-      disk_size = agg_large_disk,
-      preemptible_tries = agg_preemptible_tries
+      output_bam_basename = base_file_name_normal
   }
   
   # QC the final BAM (consolidated after scattered BQSR)
@@ -1654,8 +1573,7 @@ workflow PairedEndSingleSampleWorkflow {
       output_bam_prefix = base_file_name_normal + ".readgroup",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      disk_size = agg_small_disk
+      ref_fasta_index = ref_fasta_index
   }
 
   # Validate the final BAM 
@@ -1667,9 +1585,7 @@ workflow PairedEndSingleSampleWorkflow {
       report_filename = base_file_name_normal + ".validation_report",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      disk_size = agg_small_disk,
-      preemptible_tries = agg_preemptible_tries
+      ref_fasta_index = ref_fasta_index
   }
   
   # QC the final BAM some more (no such thing as too much QC)
@@ -1681,8 +1597,7 @@ workflow PairedEndSingleSampleWorkflow {
       output_bam_prefix = base_file_name_normal,
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      disk_size = agg_small_disk
+      ref_fasta_index = ref_fasta_index
   }
   
   # Check the sample BAM fingerprint against the sample array 
@@ -1694,9 +1609,7 @@ workflow PairedEndSingleSampleWorkflow {
       haplotype_database_file = haplotype_database_file,
       genotypes = fingerprint_genotypes_file,
       output_basename = base_file_name_normal,
-      sample = sample_name,
-      disk_size = agg_small_disk,
-      preemptible_tries = agg_preemptible_tries
+      sample = sample_name
   }
   
   # QC the sample WGS metrics (stringent thresholds)
@@ -1708,8 +1621,7 @@ workflow PairedEndSingleSampleWorkflow {
       metrics_filename = base_file_name_normal + ".wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
-      wgs_coverage_interval_list = wgs_coverage_interval_list,
-      disk_size = agg_small_disk
+      wgs_coverage_interval_list = wgs_coverage_interval_list
   }
   
   # QC the sample raw WGS metrics (common thresholds)
@@ -1721,8 +1633,7 @@ workflow PairedEndSingleSampleWorkflow {
       metrics_filename = base_file_name_normal + ".raw_wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
-      wgs_coverage_interval_list = wgs_coverage_interval_list,
-      disk_size = agg_small_disk
+      wgs_coverage_interval_list = wgs_coverage_interval_list
   }
   
   # Generate a checksum per readgroup in the final BAM
@@ -1731,9 +1642,7 @@ workflow PairedEndSingleSampleWorkflow {
       PICARD=picard,
       input_bam = GatherBamFiles.output_bam,
       input_bam_index = GatherBamFiles.output_bam_index,
-      read_group_md5_filename = recalibrated_bam_basename + ".bam.read_group_md5",
-      disk_size = agg_small_disk,
-      preemptible_tries = agg_preemptible_tries
+      read_group_md5_filename = recalibrated_bam_basename + ".bam.read_group_md5"
   }
   
   # Convert the final merged recalibrated BAM file to CRAM format
@@ -1744,9 +1653,7 @@ workflow PairedEndSingleSampleWorkflow {
       input_bam = GatherBamFiles.output_bam,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
-      output_basename = base_file_name_normal,
-      disk_size = agg_medium_disk,
-      preemptible_tries = agg_preemptible_tries
+      output_basename = base_file_name_normal
   }
 
   # Convert the CRAM back to BAM to check that the conversions do not introduce errors
@@ -1757,8 +1664,7 @@ workflow PairedEndSingleSampleWorkflow {
       ref_dict = ref_dict,
       ref_fasta_index = ref_fasta_index,
       cram_file = ConvertToCram.output_cram,
-      output_basename = base_file_name_normal + ".roundtrip",
-      disk_size = agg_medium_disk
+      output_basename = base_file_name_normal + ".roundtrip"
   }
 
   # Validate the roundtripped BAM
@@ -1772,9 +1678,7 @@ workflow PairedEndSingleSampleWorkflow {
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
       max_output = 1000000000,
-      disk_size = agg_small_disk,
-      ignore = ["null"],
-      preemptible_tries = agg_preemptible_tries
+      ignore = ["null"]
   }
   
   # Call variants in parallel over WGS calling intervals
@@ -1791,9 +1695,7 @@ workflow PairedEndSingleSampleWorkflow {
         gvcf_basename = base_file_name_normal,
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
-        ref_fasta_index = ref_fasta_index,
-        disk_size = agg_small_disk,
-        preemptible_tries = agg_preemptible_tries
+        ref_fasta_index = ref_fasta_index
      }
   }
   
@@ -1803,9 +1705,7 @@ workflow PairedEndSingleSampleWorkflow {
       PICARD=picard,
       input_vcfs = HaplotypeCaller.output_gvcf,
       input_vcfs_indexes = HaplotypeCaller.output_gvcf_index,
-      output_vcf_name = final_gvcf_name,
-      disk_size = agg_small_disk,
-      preemptible_tries = agg_preemptible_tries
+      output_vcf_name = final_gvcf_name
   }
   
   # Validate the GVCF output of HaplotypeCaller
@@ -1819,9 +1719,7 @@ workflow PairedEndSingleSampleWorkflow {
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
       ref_dict = ref_dict,
-      wgs_calling_interval_list = wgs_calling_interval_list,
-      disk_size = agg_small_disk,
-      preemptible_tries = agg_preemptible_tries
+      wgs_calling_interval_list = wgs_calling_interval_list
   }
   
   # QC the GVCF
@@ -1834,9 +1732,7 @@ workflow PairedEndSingleSampleWorkflow {
       dbSNP_vcf = dbSNP_vcf,
       dbSNP_vcf_index = dbSNP_vcf_index,
       ref_dict = ref_dict,
-      wgs_evaluation_interval_list = wgs_evaluation_interval_list,
-      disk_size = agg_small_disk,
-      preemptible_tries = agg_preemptible_tries
+      wgs_evaluation_interval_list = wgs_evaluation_interval_list
   }
 
   # Outputs that will be retained when execution is complete  
