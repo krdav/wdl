@@ -1517,7 +1517,7 @@ workflow PairedEndSingleSampleWorkflow {
   call GatherBqsrReports as GatherBqsrReports_normal {
     input:
       GATK=gatk,
-      input_bqsr_reports = BaseRecalibrator_normal_.recalibration_report,
+      input_bqsr_reports = BaseRecalibrator_normal.recalibration_report,
       output_report_filename = base_file_name_normal + ".recal_data.csv"
   }
 
@@ -1571,7 +1571,7 @@ workflow PairedEndSingleSampleWorkflow {
   }
   
   # QC the final BAM some more (no such thing as too much QC)
-  call CollectAggregationMetrics_normal {
+  call CollectAggregationMetrics as CollectAggregationMetrics_normal {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_normal.out_bam,
@@ -1583,7 +1583,7 @@ workflow PairedEndSingleSampleWorkflow {
   }
   
   # Check the sample BAM fingerprint against the sample array 
-  call CheckFingerprint_normal {
+  call CheckFingerprint as CheckFingerprint_normal {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_normal.out_bam,
@@ -1595,7 +1595,7 @@ workflow PairedEndSingleSampleWorkflow {
   }
   
   # QC the sample WGS metrics (stringent thresholds)
-  call CollectWgsMetrics_normal_ {
+  call CollectWgsMetrics as CollectWgsMetrics_normal {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_normal.out_bam,
@@ -1650,7 +1650,7 @@ workflow PairedEndSingleSampleWorkflow {
   }
 
   # Validate the roundtripped BAM
-  call ValidateSamFile as ValidateBamFromCram_normal_ {
+  call ValidateSamFile as ValidateBamFromCram_normal {
     input:
       PICARD=picard,
       in_bam = CramToBam_normal.out_bam,
@@ -1705,7 +1705,7 @@ workflow PairedEndSingleSampleWorkflow {
   }
   
   # QC the GVCF
-  call CollectGvcfCallingMetrics_normal {
+  call CollectGvcfCallingMetrics as CollectGvcfCallingMetrics_normal {
     input:
       PICARD=picard,
       input_vcf = MergeVCFs_normal.output_vcf,
@@ -1793,7 +1793,7 @@ workflow PairedEndSingleSampleWorkflow {
         metrics_filename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics"
     }
 
-    call STAR_Map {
+    call STAR_Map as STAR_Map_tumor {
       input: STAR=star,
         STARindexDir=premade_STARindexDir,
         sample_name = sample_name + '_tumor',
@@ -1825,7 +1825,7 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         PICARD=picard,
         unmapped_bam = FastqToBam_tumor.out_bam,
-        aligned_bam = STAR_Map.out_bam,
+        aligned_bam = STAR_Map_tumor.out_bam,
         out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".aligned.unsorted",
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
@@ -1880,7 +1880,7 @@ workflow PairedEndSingleSampleWorkflow {
   }
 
   # Use SplitNCigarReads for best practices on RNAseq data:
-  call SplitNCigarReads {
+  call SplitNCigarReads as SplitNCigarReads_tumor {
     input: GATK=gatk,
       sample_name = sample_name + '_tumor',
       ref_fasta=ref_fasta,
@@ -1891,7 +1891,7 @@ workflow PairedEndSingleSampleWorkflow {
   call SortAndFixTags as SortAndFixSampleBam_tumor {
     input:
       PICARD=picard,
-      in_bam = SplitNCigarReads.out_bam,
+      in_bam = SplitNCigarReads_tumor.out_bam,
       out_bam_basename = base_file_name_tumor + ".aligned.duplicate_marked.sorted",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
