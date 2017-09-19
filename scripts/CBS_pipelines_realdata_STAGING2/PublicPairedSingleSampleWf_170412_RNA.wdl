@@ -1781,8 +1781,6 @@ workflow PairedEndSingleSampleWorkflow {
     # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
     # String base_name = sub(sub(unmapped_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
 
-    String sub_strip_path = "/home/projects/dp_00005/data/cromwell_test/.*/"
-    String sub_strip_unmapped = unmapped_bam_suffix + "$"
 
     # QC the unmapped BAM 
     call CollectQualityYieldMetrics as CollectQualityYieldMetrics_tumor {
@@ -1970,7 +1968,7 @@ workflow PairedEndSingleSampleWorkflow {
   } 
 
   # Merge the recalibrated BAM files resulting from by-interval recalibration
-  call GatherBamFiles {
+  call GatherBamFiles as GatherBamFiles_tumor {
     input:
       PICARD=picard,
       in_bams = ApplyBQSR_tumor.recalibrated_bam,
@@ -1981,8 +1979,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CollectReadgroupBamQualityMetrics as CollectReadgroupBamQualityMetrics_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles.out_bam,
-      in_bam_index = GatherBamFiles.out_bam_index,
+      in_bam = GatherBamFiles_tumor.out_bam,
+      in_bam_index = GatherBamFiles_tumor.out_bam_index,
       out_bam_prefix = base_file_name_tumor + ".readgroup",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -1993,8 +1991,8 @@ workflow PairedEndSingleSampleWorkflow {
   call ValidateSamFile as ValidateAggregatedSamFile_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles.out_bam,
-      in_bam_index = GatherBamFiles.out_bam_index,
+      in_bam = GatherBamFiles_tumor.out_bam,
+      in_bam_index = GatherBamFiles_tumor.out_bam_index,
       report_filename = base_file_name_tumor + ".validation_report",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -2005,8 +2003,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CollectAggregationMetrics as CollectAggregationMetrics_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles.out_bam,
-      in_bam_index = GatherBamFiles.out_bam_index,
+      in_bam = GatherBamFiles_tumor.out_bam,
+      in_bam_index = GatherBamFiles_tumor.out_bam_index,
       out_bam_prefix = base_file_name_tumor,
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -2017,8 +2015,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CheckFingerprint as CheckFingerprint_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles.out_bam,
-      in_bam_index = GatherBamFiles.out_bam_index,
+      in_bam = GatherBamFiles_tumor.out_bam,
+      in_bam_index = GatherBamFiles_tumor.out_bam_index,
       haplotype_database_file = haplotype_database_file,
       genotypes = fingerprint_genotypes_file,
       output_basename = base_file_name_tumor,
@@ -2029,8 +2027,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CollectWgsMetrics as CollectWgsMetrics_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles.out_bam,
-      in_bam_index = GatherBamFiles.out_bam_index,
+      in_bam = GatherBamFiles_tumor.out_bam,
+      in_bam_index = GatherBamFiles_tumor.out_bam_index,
       metrics_filename = base_file_name_tumor + ".wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -2041,8 +2039,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CollectRawWgsMetrics as CollectRawWgsMetrics_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles.out_bam,
-      in_bam_index = GatherBamFiles.out_bam_index,
+      in_bam = GatherBamFiles_tumor.out_bam,
+      in_bam_index = GatherBamFiles_tumor.out_bam_index,
       metrics_filename = base_file_name_tumor + ".raw_wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -2053,8 +2051,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CalculateReadGroupChecksum as CalculateReadGroupChecksum_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles.out_bam,
-      in_bam_index = GatherBamFiles.out_bam_index,
+      in_bam = GatherBamFiles_tumor.out_bam,
+      in_bam_index = GatherBamFiles_tumor.out_bam_index,
       read_group_md5_filename = recalibrated_bam_basename + ".bam.read_group_md5"
   }
   
@@ -2063,7 +2061,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       seq_cache_populate=seq_cache_populate,
       SAMTOOLS=samtools,
-      in_bam = GatherBamFiles.out_bam,
+      in_bam = GatherBamFiles_tumor.out_bam,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
       output_basename = base_file_name_tumor
@@ -2102,8 +2100,8 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         GATK=gatk,
         contamination = CheckContamination_tumor.contamination,
-        in_bam = GatherBamFiles.out_bam,
-        in_bam_index = GatherBamFiles.out_bam_index,
+        in_bam = GatherBamFiles_tumor.out_bam,
+        in_bam_index = GatherBamFiles_tumor.out_bam_index,
         interval_list = subInterval,
         gvcf_basename = base_file_name_tumor,
         ref_dict = ref_dict,

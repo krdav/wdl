@@ -118,6 +118,5 @@
   "PairedEndSingleSampleWorkflow.ValidateReadGroupSamFile.ignore": ["null"],
   "PairedEndSingleSampleWorkflow.ValidateReadGroupSamFile.max_output": 1000000000,
   "PairedEndSingleSampleWorkflow.ValidateAggregatedSamFile.ignore": ["null"],
-  "PairedEndSingleSampleWorkflow.ValidateAggregatedSamFile.max_output": 1000000000,
-
+  "PairedEndSingleSampleWorkflow.ValidateAggregatedSamFile.max_output": 1000000000
 }
