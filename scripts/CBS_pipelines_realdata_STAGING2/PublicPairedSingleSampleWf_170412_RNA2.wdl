@@ -1317,50 +1317,21 @@ workflow PairedEndSingleSampleWorkflow {
 
 
 
-#  import UnzipTrimBam.wdl as UnzipTrimBam
-
-
-
-
-  ###### Here the workflow is adapted to .fastq files:
-  # Decompress and split the files into chunks, return an array of .fastq files:
-  call UnzipAndSplit as UnzipAndSplit_normal {
-      input:
-        PIGZ=pigz,
-        input_fastqR1 = rawdata_normal_fastqR1,
-        input_fastqR2 = rawdata_normal_fastqR2,
-        sample_name = sample_name + '_normal'
+  import UnzipTrimBam.wdl as UnzipTrimBam
+  call UnzipTrimBam as UnzipTrimBam_normal {
+    input:
+      rawdata_fastqR1 = rawdata_normal_fastqR1,
+      rawdata_fastqR2 = rawdata_normal_fastqR2,
+      sample_name = sample_name,
+      pigz = pigz,
+      trimmomatic = trimmomatic,
+      picard = picard
   }
-
-
-  Array[Pair[File, File]] fastqR1R2_chunks_normal = zip(UnzipAndSplit_normal.R1_splits, UnzipAndSplit_normal.R2_splits)
-  scatter (fastq_chunk_normal in fastqR1R2_chunks_normal) {
-
-    call TrimReads as TrimReads_normal {
-        input:
-          TRIMMOMATIC=trimmomatic,
-          input_fastqR1 = fastq_chunk_normal.left,
-          input_fastqR2 = fastq_chunk_normal.right,
-          basenameR1 = basename(fastq_chunk_normal.left, ".fastq"),
-          basenameR2 = basename(fastq_chunk_normal.right, ".fastq")
-    }
-
-    call FastqToBam as FastqToBam_normal {
-        input:
-          PICARD=picard,
-          sample_name = sample_name + '_normal',
-          input_fastqR1 = TrimReads_normal.output_R1,
-          input_fastqR2 = TrimReads_normal.output_R2
-    }
-
-#  }
-
-  ######
 
 
   # Align flowcell-level unmapped input bams in parallel
 #  scatter (unmapped_bam in flowcell_unmapped_bams) {
-#  scatter (unmapped_bam in FastqToBam_normal.out_bam) {  
+  scatter (unmapped_bam in UnzipTrimBam_normal.FastqToBam.out_bam) {
     # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
     # String base_name = sub(sub(FastqToBam_normal.out_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
 
@@ -1371,8 +1342,8 @@ workflow PairedEndSingleSampleWorkflow {
     call CollectQualityYieldMetrics as CollectQualityYieldMetrics_normal {
       input:
         PICARD=picard,
-        in_bam = FastqToBam_normal.out_bam,
-        metrics_filename = sub(sub(FastqToBam_normal.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics"
+        in_bam = unmapped_bam,
+        metrics_filename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics"
     }
 
     # Map reads to reference
@@ -1380,9 +1351,9 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         SAMTOOLS=samtools,
         PICARD=picard,
-        in_bam = FastqToBam_normal.out_bam,
+        in_bam = unmapped_bam,
         bwa_commandline = bwa_commandline,
-        out_bam_basename = sub(sub(FastqToBam_normal.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmerged",
+        out_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmerged",
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict,
@@ -1398,9 +1369,9 @@ workflow PairedEndSingleSampleWorkflow {
     call MergeBamAlignment as MergeBamAlignment_normal {
       input:
         PICARD=picard,
-        unmapped_bam = FastqToBam_normal.out_bam,
+        unmapped_bam = unmapped_bam,
         aligned_bam = SamToFastqAndBwaMem_normal.out_bam,
-        out_bam_basename = sub(sub(FastqToBam_normal.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".aligned.unsorted",
+        out_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".aligned.unsorted",
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict
@@ -1412,7 +1383,7 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         PICARD=picard,
         in_bam = MergeBamAlignment_normal.out_bam,
-        out_bam_prefix = sub(sub(FastqToBam_normal.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".readgroup"
+        out_bam_prefix = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".readgroup"
     }
 
     # Sort and fix tags in the merged BAM
@@ -1420,7 +1391,7 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         PICARD=picard,
         in_bam = MergeBamAlignment_normal.out_bam,
-        out_bam_basename = sub(sub(FastqToBam_normal.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".sorted",
+        out_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".sorted",
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index
@@ -1437,7 +1408,7 @@ workflow PairedEndSingleSampleWorkflow {
         ref_dict = ref_dict,
         in_bam = SortAndFixReadGroupBam_normal.out_bam,
         in_bam_index = SortAndFixReadGroupBam_normal.out_bam_index,
-        report_filename = sub(sub(FastqToBam_normal.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".validation_report"
+        report_filename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".validation_report"
     }
 
   }
@@ -1739,92 +1710,49 @@ workflow PairedEndSingleSampleWorkflow {
 
   String final_gvcf_name_tumor = base_file_name_tumor + final_gvcf_ext
 
-
-  ###### Here the workflow is adapted to .fastq files:
-  # Decompress and split the files into chunks, return an array of .fastq files:
-  call UnzipAndSplit as UnzipAndSplit_tumor {
-      input:
-        PIGZ=pigz,
-        input_fastqR1 = rawdata_normal_fastqR1,
-        input_fastqR2 = rawdata_normal_fastqR2,
-        sample_name = sample_name + '_tumor'
+  call UnzipTrimBam as UnzipTrimBam_tumor {
+    input:
+      rawdata_fastqR1 = rawdata_tumor_fastqR1,
+      rawdata_fastqR2 = rawdata_tumor_fastqR2,
+      sample_name = sample_name,
+      pigz = pigz,
+      trimmomatic = trimmomatic,
+      picard = picard
   }
 
 
-  Array[Pair[File, File]] fastqR1R2_chunks_tumor = zip(UnzipAndSplit_tumor.R1_splits, UnzipAndSplit_tumor.R2_splits)
-  scatter (fastq_chunk_tumor in fastqR1R2_chunks_tumor) {
-
-    call TrimReads as TrimReads_tumor {
-        input:
-          TRIMMOMATIC=trimmomatic,
-          input_fastqR1 = fastq_chunk_tumor.left,
-          input_fastqR2 = fastq_chunk_tumor.right,
-          basenameR1 = basename(fastq_chunk_tumor.left, ".fastq"),
-          basenameR2 = basename(fastq_chunk_tumor.right, ".fastq")
-    }
-
-    call FastqToBam as FastqToBam_tumor {
-        input:
-          PICARD=picard,
-          sample_name = sample_name + '_tumor',
-          input_fastqR1 = TrimReads_tumor.output_R1,
-          input_fastqR2 = TrimReads_tumor.output_R2
-    }
-
-#  }
-
-  ######
-
-
+  Array[Int] Nsplits = range(length(UnzipTrimBam_tumor.FastqToBam.out_bam))
   # Align flowcell-level unmapped input bams in parallel
 #  scatter (unmapped_bam in flowcell_unmapped_bams) {
-#  scatter (unmapped_bam in FastqToBam.out_bam) {  
+  scatter (i in Nsplits) {
     # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
     # String base_name = sub(sub(unmapped_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
 
+    File unmapped_bam = UnzipTrimBam_tumor.FastqToBam.out_bam[i]
 
     # QC the unmapped BAM 
     call CollectQualityYieldMetrics as CollectQualityYieldMetrics_tumor {
       input:
         PICARD=picard,
-        in_bam = FastqToBam_tumor.out_bam,
-        metrics_filename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics"
+        in_bam = unmapped_bam,
+        metrics_filename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics"
     }
 
     call STAR_Map as STAR_Map_tumor {
       input: STAR=star,
         STARindexDir=premade_STARindexDir,
         sample_name = sample_name + '_tumor',
-        input_fastqR1 = TrimReads_tumor.output_R1,
-        input_fastqR2 = TrimReads_tumor.output_R2
+        input_fastqR1 = UnzipTrimBam_tumor.TrimReads.output_R1[i],
+        input_fastqR2 = UnzipTrimBam_tumor.TrimReads.output_R2[i]
     }
-
-#    # Map reads to reference
-#    call SamToFastqAndBwaMem {
-#      input:
-#        SAMTOOLS=samtools,
-#        PICARD=picard,
-#        in_bam = FastqToBam_tumor.out_bam,
-#        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmerged",
-#        ref_fasta = ref_fasta,
-#        ref_fasta_index = ref_fasta_index,
-#        ref_dict = ref_dict,
-#        ref_alt = ref_alt,
-#        ref_bwt = ref_bwt,
-#        ref_amb = ref_amb,
-#        ref_ann = ref_ann,
-#        ref_pac = ref_pac,
-#        ref_sa = ref_sa
-#     }
-
 
     # Merge original uBAM and BWA-aligned BAM 
     call MergeBamAlignment as MergeBamAlignment_tumor {
       input:
         PICARD=picard,
-        unmapped_bam = FastqToBam_tumor.out_bam,
+        unmapped_bam = unmapped_bam,
         aligned_bam = STAR_Map_tumor.out_bam,
-        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".aligned.unsorted",
+        out_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".aligned.unsorted",
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict
@@ -1836,7 +1764,7 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         PICARD=picard,
         in_bam = MergeBamAlignment_tumor.out_bam,
-        out_bam_prefix = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".readgroup"
+        out_bam_prefix = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".readgroup"
     }
 
     # Sort and fix tags in the merged BAM
@@ -1844,7 +1772,7 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         PICARD=picard,
         in_bam = MergeBamAlignment_tumor.out_bam,
-        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".sorted",
+        out_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".sorted",
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index
