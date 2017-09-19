@@ -10,7 +10,6 @@
   "PairedEndSingleSampleWorkflow.rawdata_tumor_fastqR1": "/home/projects/dp_00005/data/RNAseq/Staging10_RNA_S4_R1_0209.fastq.gz",
   "PairedEndSingleSampleWorkflow.rawdata_tumor_fastqR2": "/home/projects/dp_00005/data/RNAseq/Staging10_RNA_S4_R2_0209.fastq.gz",
   "PairedEndSingleSampleWorkflow.tumor_sample_type": "rnaseq",
-  "PairedEndSingleSampleWorkflow.HaplotypeCaller.stand_call_conf": 20,
   "PairedEndSingleSampleWorkflow.premade_STARindexDir": "/home/projects/dp_00005/data/references/hg38/STAR_index_overhang100",
 
   "KRISTIAN_COMMENT:": "TOOL_PATHS",
