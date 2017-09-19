@@ -34,24 +34,22 @@ task STAR_Map {
   String sample_name
   File input_fastqR1
   File input_fastqR2
-  String suffix="Aligned.sortedByCoord.out"
+#  String suffix="Aligned.sortedByCoord.out"
+  String suffix="Aligned.out"
   Int cpu=28
 
   command {
     ln -s ${STARindexDir} GenomeDir
     # Use default mode --genomeDir=./GenomeDir/
-    ${STAR} --readFilesCommand zcat \
-        --readFilesIn ${input_fastqR1} ${input_fastqR2} \
+    ${STAR} --readFilesIn ${input_fastqR1} ${input_fastqR2} \
         --quantMode TranscriptomeSAM GeneCounts \
-        --outFileNamePrefix ${SampleName} \
-        --outSAMtype BAM SortedByCoordinate \
-        --limitBAMsortRAM 35000000000 \
+        --outFileNamePrefix ${sample_name} \
         --twopassMode Basic \
         --runThreadN ${cpu}
   }
   output {
     File out_bam = "${sample_name}${suffix}.bam"
-    String out_SampleName = "${sample_name}${suffix}"
+    String out_sample_name = "${sample_name}${suffix}"
   }
   runtime {
     cpu: cpu
@@ -60,39 +58,40 @@ task STAR_Map {
 
 task SplitNCigarReads {
   File GATK
-  String SampleName
-  String RefGen_noext
+  String sample_name
+  String ref_fasta
   File in_bam
-  File in_bai
-  String suffix="_split"
+  String suffix="_splitNcigar"
   Int cpu=2
 
   command {
     # Run options are set to follow the GATK best practice for RNAseq. data.
     java -jar ${GATK} \
       -T SplitNCigarReads \
-      -R ${RefGen_noext}.fa \
+      -R ${ref_fasta}.fa \
       -I ${in_bam} \
-      -o ${SampleName}${suffix}.bam \
+      -o ${sample_name}${suffix}.bam \
       -rf ReassignOneMappingQuality \
       -RMQF 255 \
       -RMQT 60 \
       -U ALLOW_N_CIGAR_READS
  }
   output {
-    File out_bam = "${SampleName}${suffix}.bam"
-    File out_bai = "${SampleName}${suffix}.bai"
-    String out_SampleName = "${SampleName}${suffix}"
+    File out_bam = "${sample_name}${suffix}.bam"
+    File out_bai = "${sample_name}${suffix}.bai"
+    String out_sample_name = "${sample_name}${suffix}"
   }
   runtime {
     cpu: cpu
   }
 }
 
+
+### This was written for the old RNAseq pipeline, but should be deprecated:
 task BaseRecalibrator_RNA {
   File GATK
-  String SampleName
-  String RefGen_noext
+  String sample_name
+  String ref_fasta
   File in_bam
   File in_bai
   File dbsnp
@@ -102,44 +101,15 @@ task BaseRecalibrator_RNA {
   command {
     java -jar ${GATK} \
       -T BaseRecalibrator \
-      -R ${RefGen_noext}.fa \
+      -R ${ref_fasta}.fa \
       -I ${in_bam} \
       -knownSites ${dbsnp} \
-      -o ${SampleName}${suffix}.grp \
+      -o ${sample_name}${suffix}.grp \
       -nct ${cpu}
  }
   output {
-    File out_grp = "${SampleName}${suffix}.grp"
-    String out_SampleName = "${SampleName}${suffix}"
-  }
-  runtime {
-    cpu: cpu
-  }
-}
-
-task PrintReads_RNA {
-  File GATK
-  String SampleName
-  String RefGen_noext
-  File in_bam
-  File in_bai
-  File in_grp
-  String suffix="_recalprint"
-  Int cpu=28
-
-  command {
-    java -jar ${GATK} \
-      -T PrintReads \
-      -R ${RefGen_noext}.fa \
-      -I ${in_bam} \
-      -BQSR ${in_grp} \
-      -o ${SampleName}${suffix}.bam \
-      -nct ${cpu}
- }
-  output {
-    File out_bam = "${SampleName}${suffix}.bam"
-    File out_bai = "${SampleName}${suffix}.bai"
-    String out_SampleName = "${SampleName}${suffix}"
+    File out_grp = "${sample_name}${suffix}.grp"
+    String out_sample_name = "${sample_name}${suffix}"
   }
   runtime {
     cpu: cpu
@@ -148,8 +118,8 @@ task PrintReads_RNA {
 
 task VariantFiltration_RNA {
   File GATK
-  String SampleName
-  String RefGen_noext
+  String sample_name
+  String ref_fasta
   File in_vcf
   String suffix="_filter"
   Int cpu=2
@@ -157,7 +127,7 @@ task VariantFiltration_RNA {
   command {
     java -jar ${GATK} \
       -T VariantFiltration \
-      -R ${RefGen_noext}.fa \
+      -R ${ref_fasta}.fa \
       -V ${in_vcf} \
       -window 35 \
       -cluster 3 \
@@ -165,11 +135,11 @@ task VariantFiltration_RNA {
       -filter "FS > 3.0" \
       -filterName QD \
       -filter "QD < 2.0" \
-      -o ${SampleName}${suffix}.vcf
+      -o ${sample_name}${suffix}.vcf
  }
   output {
-    File out_vcf = "${SampleName}${suffix}.vcf"
-    String out_SampleName = "${SampleName}${suffix}"
+    File out_vcf = "${sample_name}${suffix}.vcf"
+    String out_sample_name = "${sample_name}${suffix}"
   }
   runtime {
     cpu: cpu
@@ -252,13 +222,13 @@ task FastqToBam {
     cpu: cpu
   }
   output {
-    File output_bam = "${basename}.bam"
+    File out_bam = "${basename}.bam"
   }
 }
 
 # Collect sequencing yield quality metrics
 task CollectQualityYieldMetrics {
-  File input_bam
+  File in_bam
   String metrics_filename
   Int cpu=1
   File PICARD
@@ -267,7 +237,7 @@ task CollectQualityYieldMetrics {
     java -Xmx128m \
       -jar ${PICARD} \
       CollectQualityYieldMetrics \
-      INPUT=${input_bam} \
+      INPUT=${in_bam} \
       OQ=true \
       OUTPUT=${metrics_filename}
   }
@@ -279,54 +249,37 @@ task CollectQualityYieldMetrics {
   }
 }
 
+
 ## Check the assumption that the final GVCF filename that is going to be used ends with .g.vcf.gz 
-task CheckFinalVcfExtension {
-  String vcf_filename
-  Int cpu=1
-  File PYTHON2
+#task CheckFinalVcfExtension {
+#  String vcf_filename
+#  Int cpu=1
+#  File PYTHON2
+#
+#  command <<<
+#    ${PYTHON2} <<CODE
+#    import os
+#    import sys
+#    filename="${vcf_filename}"
+#    if not filename.endswith(".g.vcf.gz"):
+#      raise Exception("input","output GVCF filename must end with '.g.vcf.gz', found %s"%(filename))
+#      sys.exit(1) 
+#    CODE
+#  >>>
+#  runtime {
+#    cpu: cpu
+#  }
+#  output {
+#    String common_suffix=read_string(stdout())
+#  }
+#}
 
-  command <<<
-    ${PYTHON2} <<CODE
-    import os
-    import sys
-    filename="${vcf_filename}"
-    if not filename.endswith(".g.vcf.gz"):
-      raise Exception("input","output GVCF filename must end with '.g.vcf.gz', found %s"%(filename))
-      sys.exit(1) 
-    CODE
-  >>>
-  runtime {
-    cpu: cpu
-  }
-  output {
-    String common_suffix=read_string(stdout())
-  }
-}
-
-# Get version of BWA
-task GetBwaVersion {
-  Int cpu=1
-  File BWA
-  command {
-    # Not setting "set -o pipefail" here because /bwa has a rc=1 and we don't want to allow rc=1 to succeed 
-    # because the sed may also fail with that error and that is something we actually want to fail on.
-    ${BWA} 2>&1 | \
-    grep -e '^Version' | \
-    sed 's/Version: //'
-  }
-  runtime {
-    cpu: cpu
-  }
-  output {
-    String version = read_string(stdout())
-  }
-}
 
 # Read unmapped BAM, convert on-the-fly to FASTQ and stream to BWA MEM for alignment
 task SamToFastqAndBwaMem {
-  File input_bam
+  File in_bam
   String bwa_commandline
-  String output_bam_basename
+  String out_bam_basename
   File ref_fasta
   File ref_fasta_index
   File ref_dict
@@ -354,14 +307,14 @@ task SamToFastqAndBwaMem {
       java -Xmx3000m \
         -jar ${PICARD} \
         SamToFastq \
-        INPUT=${input_bam} \
+        INPUT=${in_bam} \
         FASTQ=/dev/stdout \
         INTERLEAVE=true \
         NON_PF=true | \
-      ${bwa_commandline} /dev/stdin -  2> >(tee ${output_bam_basename}.bwa.stderr.log >&2) | \
-      ${SAMTOOLS} view -1 - > ${output_bam_basename}.bam
+      ${bwa_commandline} /dev/stdin -  2> >(tee ${out_bam_basename}.bwa.stderr.log >&2) | \
+      ${SAMTOOLS} view -1 - > ${out_bam_basename}.bam
 
-      grep -m1 "read .* ALT contigs" ${output_bam_basename}.bwa.stderr.log | \
+      grep -m1 "read .* ALT contigs" ${out_bam_basename}.bwa.stderr.log | \
       grep -v "read 0 ALT contigs"
 
     # else ref_alt is empty or could not be found, so we bail out
@@ -373,18 +326,16 @@ task SamToFastqAndBwaMem {
     cpu: cpu
   }
   output {
-    File output_bam = "${output_bam_basename}.bam"
-    File bwa_stderr_log = "${output_bam_basename}.bwa.stderr.log"
+    File out_bam = "${out_bam_basename}.bam"
+    File bwa_stderr_log = "${out_bam_basename}.bwa.stderr.log"
   }
 }
 
 # Merge original input uBAM file with BWA-aligned BAM file
 task MergeBamAlignment {
   File unmapped_bam
-  String bwa_commandline
-  String bwa_version
   File aligned_bam
-  String output_bam_basename
+  String out_bam_basename
   File ref_fasta
   File ref_fasta_index
   File ref_dict
@@ -402,7 +353,7 @@ task MergeBamAlignment {
       ATTRIBUTES_TO_RETAIN=X0 \
       ALIGNED_BAM=${aligned_bam} \
       UNMAPPED_BAM=${unmapped_bam} \
-      OUTPUT=${output_bam_basename}.bam \
+      OUTPUT=${out_bam_basename}.bam \
       REFERENCE_SEQUENCE=${ref_fasta} \
       PAIRED_RUN=true \
       SORT_ORDER="unsorted" \
@@ -413,10 +364,6 @@ task MergeBamAlignment {
       ADD_MATE_CIGAR=true \
       MAX_INSERTIONS_OR_DELETIONS=-1 \
       PRIMARY_ALIGNMENT_STRATEGY=MostDistant \
-      PROGRAM_RECORD_ID="bwamem" \
-      PROGRAM_GROUP_VERSION="${bwa_version}" \
-      PROGRAM_GROUP_COMMAND_LINE="${bwa_commandline}" \
-      PROGRAM_GROUP_NAME="bwamem" \
       UNMAPPED_READ_STRATEGY=COPY_TO_TAG \
       ALIGNER_PROPER_PAIR_FLAGS=true \
       UNMAP_CONTAMINANT_READS=true
@@ -425,14 +372,14 @@ task MergeBamAlignment {
     cpu: cpu
   }
   output {
-    File output_bam = "${output_bam_basename}.bam"
+    File out_bam = "${out_bam_basename}.bam"
   }
 }
 
 # Sort BAM file by coordinate order and fix tag values for NM and UQ
 task SortAndFixTags {
-  File input_bam
-  String output_bam_basename
+  File in_bam
+  String out_bam_basename
   File ref_dict
   File ref_fasta
   File ref_fasta_index
@@ -445,7 +392,7 @@ task SortAndFixTags {
     java -Xmx4000m \
       -jar ${PICARD} \
       SortSam \
-      INPUT=${input_bam} \
+      INPUT=${in_bam} \
       OUTPUT=/dev/stdout \
       SORT_ORDER="coordinate" \
       CREATE_INDEX=false \
@@ -454,7 +401,7 @@ task SortAndFixTags {
       -jar ${PICARD} \
       SetNmAndUqTags \
       INPUT=/dev/stdin \
-      OUTPUT=${output_bam_basename}.bam \
+      OUTPUT=${out_bam_basename}.bam \
       CREATE_INDEX=true \
       CREATE_MD5_FILE=true \
       REFERENCE_SEQUENCE=${ref_fasta}
@@ -463,16 +410,16 @@ task SortAndFixTags {
     cpu: cpu
   }
   output {
-    File output_bam = "${output_bam_basename}.bam"
-    File output_bam_index = "${output_bam_basename}.bai"
-    File output_bam_md5 = "${output_bam_basename}.bam.md5"
+    File out_bam = "${out_bam_basename}.bam"
+    File out_bam_index = "${out_bam_basename}.bai"
+    File out_bam_md5 = "${out_bam_basename}.bam.md5"
   }
 }
 
 # Collect base quality and insert size metrics
 task CollectUnsortedReadgroupBamQualityMetrics {
-  File input_bam
-  String output_bam_prefix
+  File in_bam
+  String out_bam_prefix
   Int cpu=1
   File PICARD
 
@@ -480,8 +427,8 @@ task CollectUnsortedReadgroupBamQualityMetrics {
     java -Xmx5000m \
       -jar ${PICARD} \
       CollectMultipleMetrics \
-      INPUT=${input_bam} \
-      OUTPUT=${output_bam_prefix} \
+      INPUT=${in_bam} \
+      OUTPUT=${out_bam_prefix} \
       ASSUME_SORTED=true \
       PROGRAM="null" \
       PROGRAM="CollectBaseDistributionByCycle" \
@@ -491,29 +438,29 @@ task CollectUnsortedReadgroupBamQualityMetrics {
       METRIC_ACCUMULATION_LEVEL="null" \
       METRIC_ACCUMULATION_LEVEL="ALL_READS"
 
-    touch ${output_bam_prefix}.insert_size_metrics
-    touch ${output_bam_prefix}.insert_size_histogram.pdf
+    touch ${out_bam_prefix}.insert_size_metrics
+    touch ${out_bam_prefix}.insert_size_histogram.pdf
   }
   runtime {
     cpu: cpu
   }
   output {
-    File base_distribution_by_cycle_pdf = "${output_bam_prefix}.base_distribution_by_cycle.pdf"
-    File base_distribution_by_cycle_metrics = "${output_bam_prefix}.base_distribution_by_cycle_metrics"
-    File insert_size_histogram_pdf = "${output_bam_prefix}.insert_size_histogram.pdf"
-    File insert_size_metrics = "${output_bam_prefix}.insert_size_metrics"
-    File quality_by_cycle_pdf = "${output_bam_prefix}.quality_by_cycle.pdf"
-    File quality_by_cycle_metrics = "${output_bam_prefix}.quality_by_cycle_metrics"
-    File quality_distribution_pdf = "${output_bam_prefix}.quality_distribution.pdf"
-    File quality_distribution_metrics = "${output_bam_prefix}.quality_distribution_metrics"
+    File base_distribution_by_cycle_pdf = "${out_bam_prefix}.base_distribution_by_cycle.pdf"
+    File base_distribution_by_cycle_metrics = "${out_bam_prefix}.base_distribution_by_cycle_metrics"
+    File insert_size_histogram_pdf = "${out_bam_prefix}.insert_size_histogram.pdf"
+    File insert_size_metrics = "${out_bam_prefix}.insert_size_metrics"
+    File quality_by_cycle_pdf = "${out_bam_prefix}.quality_by_cycle.pdf"
+    File quality_by_cycle_metrics = "${out_bam_prefix}.quality_by_cycle_metrics"
+    File quality_distribution_pdf = "${out_bam_prefix}.quality_distribution.pdf"
+    File quality_distribution_metrics = "${out_bam_prefix}.quality_distribution_metrics"
   }
 }
 
 # Collect alignment summary and GC bias quality metrics
 task CollectReadgroupBamQualityMetrics {
-  File input_bam
-  File input_bam_index
-  String output_bam_prefix
+  File in_bam
+  File in_bam_index
+  String out_bam_prefix
   File ref_dict
   File ref_fasta
   File ref_fasta_index
@@ -524,9 +471,9 @@ task CollectReadgroupBamQualityMetrics {
     java -Xmx5000m \
       -jar ${PICARD} \
       CollectMultipleMetrics \
-      INPUT=${input_bam} \
+      INPUT=${in_bam} \
       REFERENCE_SEQUENCE=${ref_fasta} \
-      OUTPUT=${output_bam_prefix} \
+      OUTPUT=${out_bam_prefix} \
       ASSUME_SORTED=true \
       PROGRAM="null" \
       PROGRAM="CollectAlignmentSummaryMetrics" \
@@ -538,18 +485,18 @@ task CollectReadgroupBamQualityMetrics {
     cpu: cpu
   }
   output {
-    File alignment_summary_metrics = "${output_bam_prefix}.alignment_summary_metrics"
-    File gc_bias_detail_metrics = "${output_bam_prefix}.gc_bias.detail_metrics"
-    File gc_bias_pdf = "${output_bam_prefix}.gc_bias.pdf"
-    File gc_bias_summary_metrics = "${output_bam_prefix}.gc_bias.summary_metrics"
+    File alignment_summary_metrics = "${out_bam_prefix}.alignment_summary_metrics"
+    File gc_bias_detail_metrics = "${out_bam_prefix}.gc_bias.detail_metrics"
+    File gc_bias_pdf = "${out_bam_prefix}.gc_bias.pdf"
+    File gc_bias_summary_metrics = "${out_bam_prefix}.gc_bias.summary_metrics"
   }
 }
 
 # Collect quality metrics from the aggregated bam
 task CollectAggregationMetrics {
-  File input_bam
-  File input_bam_index
-  String output_bam_prefix
+  File in_bam
+  File in_bam_index
+  String out_bam_prefix
   File ref_dict
   File ref_fasta
   File ref_fasta_index
@@ -560,9 +507,9 @@ task CollectAggregationMetrics {
     java -Xmx5000m \
       -jar ${PICARD} \
       CollectMultipleMetrics \
-      INPUT=${input_bam} \
+      INPUT=${in_bam} \
       REFERENCE_SEQUENCE=${ref_fasta} \
-      OUTPUT=${output_bam_prefix} \
+      OUTPUT=${out_bam_prefix} \
       ASSUME_SORTED=true \
       PROGRAM="null" \
       PROGRAM="CollectAlignmentSummaryMetrics" \
@@ -574,32 +521,32 @@ task CollectAggregationMetrics {
       METRIC_ACCUMULATION_LEVEL="SAMPLE" \
       METRIC_ACCUMULATION_LEVEL="LIBRARY"
 
-    touch ${output_bam_prefix}.insert_size_metrics
-    touch ${output_bam_prefix}.insert_size_histogram.pdf
+    touch ${out_bam_prefix}.insert_size_metrics
+    touch ${out_bam_prefix}.insert_size_histogram.pdf
   }
   runtime {
     cpu: cpu
   }
   output {
-    File alignment_summary_metrics = "${output_bam_prefix}.alignment_summary_metrics"
-    File bait_bias_detail_metrics = "${output_bam_prefix}.bait_bias_detail_metrics"
-    File bait_bias_summary_metrics = "${output_bam_prefix}.bait_bias_summary_metrics"
-    File gc_bias_detail_metrics = "${output_bam_prefix}.gc_bias.detail_metrics"
-    File gc_bias_pdf = "${output_bam_prefix}.gc_bias.pdf"
-    File gc_bias_summary_metrics = "${output_bam_prefix}.gc_bias.summary_metrics"
-    File insert_size_histogram_pdf = "${output_bam_prefix}.insert_size_histogram.pdf"
-    File insert_size_metrics = "${output_bam_prefix}.insert_size_metrics"
-    File pre_adapter_detail_metrics = "${output_bam_prefix}.pre_adapter_detail_metrics"
-    File pre_adapter_summary_metrics = "${output_bam_prefix}.pre_adapter_summary_metrics"
-    File quality_distribution_pdf = "${output_bam_prefix}.quality_distribution.pdf"
-    File quality_distribution_metrics = "${output_bam_prefix}.quality_distribution_metrics"
+    File alignment_summary_metrics = "${out_bam_prefix}.alignment_summary_metrics"
+    File bait_bias_detail_metrics = "${out_bam_prefix}.bait_bias_detail_metrics"
+    File bait_bias_summary_metrics = "${out_bam_prefix}.bait_bias_summary_metrics"
+    File gc_bias_detail_metrics = "${out_bam_prefix}.gc_bias.detail_metrics"
+    File gc_bias_pdf = "${out_bam_prefix}.gc_bias.pdf"
+    File gc_bias_summary_metrics = "${out_bam_prefix}.gc_bias.summary_metrics"
+    File insert_size_histogram_pdf = "${out_bam_prefix}.insert_size_histogram.pdf"
+    File insert_size_metrics = "${out_bam_prefix}.insert_size_metrics"
+    File pre_adapter_detail_metrics = "${out_bam_prefix}.pre_adapter_detail_metrics"
+    File pre_adapter_summary_metrics = "${out_bam_prefix}.pre_adapter_summary_metrics"
+    File quality_distribution_pdf = "${out_bam_prefix}.quality_distribution.pdf"
+    File quality_distribution_metrics = "${out_bam_prefix}.quality_distribution_metrics"
   }
 }
 
 # Check that the fingerprints of separate readgroups all match
 task CrossCheckFingerprints {
-  Array[File] input_bams
-  Array[File] input_bam_indexes
+  Array[File] in_bams
+  Array[File] in_bam_indexes
   File haplotype_database_file # if this file is empty (0-length) the workflow should not do fingerprint comparison (as there are no fingerprints for the sample)
   String metrics_filename
   Int cpu=1
@@ -613,7 +560,7 @@ task CrossCheckFingerprints {
        OUTPUT=${metrics_filename} \
        HAPLOTYPE_MAP=${haplotype_database_file} \
        EXPECT_ALL_READ_GROUPS_TO_MATCH=true \
-       INPUT=${sep=' INPUT=' input_bams} \
+       INPUT=${sep=' INPUT=' in_bams} \
        LOD_THRESHOLD=-20.0
     else
       echo "No haplotype_database_file. Skipping Fingerprint check."
@@ -630,8 +577,8 @@ task CrossCheckFingerprints {
 
 # Check that the fingerprint of the sample BAM matches the sample array
 task CheckFingerprint {
-  File input_bam
-  File input_bam_index
+  File in_bam
+  File in_bam_index
   File haplotype_database_file
   File genotypes
   String output_basename
@@ -644,7 +591,7 @@ task CheckFingerprint {
     java -Dsamjdk.buffer_size=131072 -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx1024m  \
     -jar ${PICARD} \
     CheckFingerprint \
-    INPUT=${input_bam} \
+    INPUT=${in_bam} \
     OUTPUT=${output_basename} \
     GENOTYPES=${genotypes} \
     HAPLOTYPE_MAP=${haplotype_database_file} \
@@ -669,8 +616,8 @@ task CheckFingerprint {
 
 # Mark duplicate reads to avoid counting non-independent observations
 task MarkDuplicates {
-  Array[File] input_bams
-  String output_bam_basename
+  Array[File] in_bams
+  String out_bam_basename
   String metrics_filename
   Int cpu=1
   File PICARD
@@ -682,8 +629,8 @@ task MarkDuplicates {
     java -Xmx4000m \
       -jar ${PICARD} \
       MarkDuplicates \
-      INPUT=${sep=' INPUT=' input_bams} \
-      OUTPUT=${output_bam_basename}.bam \
+      INPUT=${sep=' INPUT=' in_bams} \
+      OUTPUT=${out_bam_basename}.bam \
       METRICS_FILE=${metrics_filename} \
       VALIDATION_STRINGENCY=SILENT \
       OPTICAL_DUPLICATE_PIXEL_DISTANCE=2500 \
@@ -694,7 +641,7 @@ task MarkDuplicates {
     cpu: cpu
   }
   output {
-    File output_bam = "${output_bam_basename}.bam"
+    File out_bam = "${out_bam_basename}.bam"
     File duplicate_metrics = "${metrics_filename}"
   }
 }
@@ -754,8 +701,8 @@ task CreateSequenceGroupingTSV {
 
 # Generate Base Quality Score Recalibration (BQSR) model
 task BaseRecalibrator {
-  File input_bam
-  File input_bam_index
+  File in_bam
+  File in_bam_index
   String recalibration_report_filename
   Array[String] sequence_group_interval
   File dbSNP_vcf
@@ -778,7 +725,7 @@ task BaseRecalibrator {
       -jar ${GATK} \
       -T BaseRecalibrator \
       -R ${ref_fasta} \
-      -I ${input_bam} \
+      -I ${in_bam} \
       --useOriginalQualities \
       -o ${recalibration_report_filename} \
       -knownSites ${dbSNP_vcf} \
@@ -797,9 +744,9 @@ task BaseRecalibrator {
 
 # Apply Base Quality Score Recalibration (BQSR) model
 task ApplyBQSR {
-  File input_bam
-  File input_bam_index
-  String output_bam_basename
+  File in_bam
+  File in_bam_index
+  String out_bam_basename
   File recalibration_report
   Array[String] sequence_group_interval
   File ref_dict
@@ -819,9 +766,9 @@ task ApplyBQSR {
       --createOutputBamMD5 \
       --addOutputSAMProgramRecord \
       -R ${ref_fasta} \
-      -I ${input_bam} \
+      -I ${in_bam} \
       --useOriginalQualities \
-      -O ${output_bam_basename}.bam \
+      -O ${out_bam_basename}.bam \
       -bqsr ${recalibration_report} \
       -SQQ 10 -SQQ 20 -SQQ 30 \
       -L $rand.intervals
@@ -830,8 +777,8 @@ task ApplyBQSR {
     cpu: cpu
   }
   output {
-    File recalibrated_bam = "${output_bam_basename}.bam"
-    File recalibrated_bam_checksum = "${output_bam_basename}.bam.md5"
+    File recalibrated_bam = "${out_bam_basename}.bam"
+    File recalibrated_bam_checksum = "${out_bam_basename}.bam.md5"
     #this output is only for GOTC STAGING to give some GC statistics to the GATK4 team
     #File gc_logs = "gc_log.log"
   }
@@ -860,8 +807,8 @@ task GatherBqsrReports {
 
 # Combine multiple recalibrated BAM files from scattered ApplyRecalibration runs
 task GatherBamFiles {
-  Array[File] input_bams
-  String output_bam_basename
+  Array[File] in_bams
+  String out_bam_basename
 
   Int cpu=1
   File PICARD
@@ -870,8 +817,8 @@ task GatherBamFiles {
     java -Xmx2000m \
       -jar ${PICARD} \
       GatherBamFiles \
-      INPUT=${sep=' INPUT=' input_bams} \
-      OUTPUT=${output_bam_basename}.bam \
+      INPUT=${sep=' INPUT=' in_bams} \
+      OUTPUT=${out_bam_basename}.bam \
       CREATE_INDEX=true \
       CREATE_MD5_FILE=true
     }
@@ -879,16 +826,16 @@ task GatherBamFiles {
     cpu: cpu
   }
   output {
-    File output_bam = "${output_bam_basename}.bam"
-    File output_bam_index = "${output_bam_basename}.bai"
-    File output_bam_md5 = "${output_bam_basename}.bam.md5"
+    File out_bam = "${out_bam_basename}.bam"
+    File out_bam_index = "${out_bam_basename}.bai"
+    File out_bam_md5 = "${out_bam_basename}.bam.md5"
   }
 }
 
 # Validate the output bam file
 task ValidateSamFile {
-  File input_bam
-  File input_bam_index
+  File in_bam
+  File in_bam_index
   String report_filename
   File ref_dict
   File ref_fasta
@@ -902,7 +849,7 @@ task ValidateSamFile {
     java -Xmx4000m \
       -jar ${PICARD} \
       ValidateSamFile \
-      INPUT=${input_bam} \
+      INPUT=${in_bam} \
       OUTPUT=${report_filename} \
       REFERENCE_SEQUENCE=${ref_fasta} \
       ${"MAX_OUTPUT=" + max_output} \
@@ -920,8 +867,8 @@ task ValidateSamFile {
 
 # Collect WGS metrics (Broad Genomics stringent QC thresholds)
 task CollectWgsMetrics {
-  File input_bam
-  File input_bam_index
+  File in_bam
+  File in_bam_index
   String metrics_filename
   File wgs_coverage_interval_list
   File ref_fasta
@@ -933,7 +880,7 @@ task CollectWgsMetrics {
     java -Xmx2000m \
       -jar ${PICARD} \
       CollectWgsMetrics \
-      INPUT=${input_bam} \
+      INPUT=${in_bam} \
       VALIDATION_STRINGENCY=SILENT \
       REFERENCE_SEQUENCE=${ref_fasta} \
       INTERVALS=${wgs_coverage_interval_list} \
@@ -949,8 +896,8 @@ task CollectWgsMetrics {
 
 # Collect raw WGS metrics (commonly used QC thresholds)
 task CollectRawWgsMetrics {
-  File input_bam
-  File input_bam_index
+  File in_bam
+  File in_bam_index
   String metrics_filename
   File wgs_coverage_interval_list
   File ref_fasta
@@ -962,7 +909,7 @@ task CollectRawWgsMetrics {
     java -Xmx2000m \
       -jar ${PICARD} \
       CollectRawWgsMetrics \
-      INPUT=${input_bam} \
+      INPUT=${in_bam} \
       VALIDATION_STRINGENCY=SILENT \
       REFERENCE_SEQUENCE=${ref_fasta} \
       INTERVALS=${wgs_coverage_interval_list} \
@@ -978,8 +925,8 @@ task CollectRawWgsMetrics {
 
 # Generate a checksum per readgroup
 task CalculateReadGroupChecksum {
-  File input_bam
-  File input_bam_index
+  File in_bam
+  File in_bam_index
   String read_group_md5_filename
   Int cpu=1
   File PICARD
@@ -988,7 +935,7 @@ task CalculateReadGroupChecksum {
     java -Xmx1000m \
       -jar ${PICARD} \
       CalculateReadGroupChecksum \
-      INPUT=${input_bam} \
+      INPUT=${in_bam} \
       OUTPUT=${read_group_md5_filename}
   }
   runtime {
@@ -1013,8 +960,8 @@ task CalculateReadGroupChecksum {
 # Here, I am handling this by returning both the original selfSM file for reporting, and the adjusted
 # contamination estimate for use in variant calling
 task CheckContamination {
-  File input_bam
-  File input_bam_index
+  File in_bam
+  File in_bam_index
   File contamination_sites_vcf
   File contamination_sites_vcf_index
   String output_prefix
@@ -1033,7 +980,7 @@ task CheckContamination {
     --ignoreRG \
     --vcf ${contamination_sites_vcf} \
     --out ${output_prefix} \
-    --bam ${input_bam} \
+    --bam ${in_bam} \
     1>/dev/null
 
     python3 <<CODE
@@ -1079,8 +1026,8 @@ task CheckContamination {
 
 # Call variants on a single sample with HaplotypeCaller to produce a GVCF
 task HaplotypeCaller {
-  File input_bam
-  File input_bam_index
+  File in_bam
+  File in_bam_index
   File interval_list
   String gvcf_basename
   File ref_dict
@@ -1096,7 +1043,7 @@ task HaplotypeCaller {
       -T HaplotypeCaller \
       -R ${ref_fasta} \
       -o ${gvcf_basename}.vcf.gz \
-      -I ${input_bam} \
+      -I ${in_bam} \
       -ERC GVCF \
       --max_alternate_alleles 3 \
       -variant_index_parameter 128000 \
@@ -1111,6 +1058,45 @@ task HaplotypeCaller {
   output {
     File output_gvcf = "${gvcf_basename}.vcf.gz"
     File output_gvcf_index = "${gvcf_basename}.vcf.gz.tbi"
+  }
+}
+
+
+task HaplotypeCaller_RNA {
+  File in_bam
+  File in_bam_index
+  File interval_list
+  String gvcf_basename
+  File ref_dict
+  File ref_fasta
+  File ref_fasta_index
+  Float? contamination
+  Int cpu=1
+  File GATK
+
+  command {
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
+      -jar ${GATK} \
+      -T HaplotypeCaller \
+      -R ${ref_fasta} \
+      -o ${gvcf_basename}.vcf.gz \
+      -I ${in_bam} \
+      -ERC GVCF \
+      --max_alternate_alleles 3 \
+      -variant_index_parameter 128000 \
+      -variant_index_type LINEAR \
+      -stand_call_conf 20 \
+      -dontUseSoftClippedBases \
+      -contamination ${default=0 contamination} \
+      --read_filter OverclippedRead \
+      -L ${interval_list}
+ }
+  output {
+    File output_gvcf = "${gvcf_basename}.vcf.gz"
+    File output_gvcf_index = "${gvcf_basename}.vcf.gz.tbi"
+  }
+  runtime {
+    cpu: cpu
   }
 }
 
@@ -1205,7 +1191,7 @@ task CollectGvcfCallingMetrics {
 # Convert BAM file to CRAM format for validation
 # Note that reading CRAMs directly with Picard is not yet supported
 task ConvertToCram {
-  File input_bam
+  File in_bam
   File ref_fasta
   File ref_fasta_index
   String output_basename
@@ -1217,7 +1203,7 @@ task ConvertToCram {
     set -e
     set -o pipefail
 
-    ${SAMTOOLS} view -C -T ${ref_fasta} ${input_bam} | \
+    ${SAMTOOLS} view -C -T ${ref_fasta} ${in_bam} | \
     tee ${output_basename}.cram | \
     md5sum | awk '{print $1}' > ${output_basename}.cram.md5
 
@@ -1262,8 +1248,8 @@ command <<<
     cpu: cpu
   }
   output {
-    File output_bam = "${output_basename}.bam"
-    File output_bam_index = "${output_basename}.bai"
+    File out_bam = "${output_basename}.bam"
+    File out_bam_index = "${output_basename}.bai"
   }
 }
 
@@ -1280,7 +1266,7 @@ workflow PairedEndSingleSampleWorkflow {
   String sample_name
   String base_file_name_normal
   String base_file_name_tumor
-  String final_gvcf_name
+  String final_gvcf_ext
 #  Array[File] flowcell_unmapped_bams
   File rawdata_normal_fastqR1
   File rawdata_normal_fastqR2
@@ -1324,20 +1310,15 @@ workflow PairedEndSingleSampleWorkflow {
 
   String bwa_commandline = bwa + " mem -K 100000000 -p -v 3 -t 28 -Y $bash_ref_fasta"
 
+  String final_gvcf_name_normal = base_file_name_normal + final_gvcf_ext
 
-  # Get the version of BWA to include in the PG record in the header of the BAM produced 
-  # by MergeBamAlignment. 
-  call GetBwaVersion {
-    input:
-      BWA=bwa
-  }
 
   # Check that the GVCF output name follows convention
-  call CheckFinalVcfExtension {
-    input:
-      PYTHON2=python2,
-      vcf_filename = final_gvcf_name
-   }
+#  call CheckFinalVcfExtension {
+#    input:
+#      PYTHON2=python2,
+#      vcf_filename = final_gvcf_name_normal
+#   }
 
 
   ###### Here the workflow is adapted to .fastq files:
@@ -1347,7 +1328,7 @@ workflow PairedEndSingleSampleWorkflow {
         PIGZ=pigz,
         input_fastqR1 = rawdata_normal_fastqR1,
         input_fastqR2 = rawdata_normal_fastqR2,
-        sample_name=sample_name
+        sample_name = sample_name + '_normal'
   }
 
 
@@ -1366,7 +1347,7 @@ workflow PairedEndSingleSampleWorkflow {
     call FastqToBam {
         input:
           PICARD=picard,
-          sample_name=sample_name,
+          sample_name = sample_name + '_normal',
           input_fastqR1 = TrimReads.output_R1,
           input_fastqR2 = TrimReads.output_R2
     }
@@ -1378,7 +1359,7 @@ workflow PairedEndSingleSampleWorkflow {
 
   # Align flowcell-level unmapped input bams in parallel
 #  scatter (unmapped_bam in flowcell_unmapped_bams) {
-  scatter (unmapped_bam in FastqToBam.output_bam) {  
+  scatter (unmapped_bam in FastqToBam.out_bam) {  
     # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
     # String base_name = sub(sub(unmapped_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
 
@@ -1389,7 +1370,7 @@ workflow PairedEndSingleSampleWorkflow {
     call CollectQualityYieldMetrics {
       input:
         PICARD=picard,
-        input_bam = unmapped_bam,
+        in_bam = unmapped_bam,
         metrics_filename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics"
     }
 
@@ -1398,9 +1379,9 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         SAMTOOLS=samtools,
         PICARD=picard,
-        input_bam = unmapped_bam,
+        in_bam = unmapped_bam,
         bwa_commandline = bwa_commandline,
-        output_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmerged",
+        out_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmerged",
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict,
@@ -1417,10 +1398,8 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         PICARD=picard,
         unmapped_bam = unmapped_bam,
-        bwa_commandline = bwa_commandline,
-        bwa_version = GetBwaVersion.version,
-        aligned_bam = SamToFastqAndBwaMem.output_bam,
-        output_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".aligned.unsorted",
+        aligned_bam = SamToFastqAndBwaMem.out_bam,
+        out_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".aligned.unsorted",
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict
@@ -1431,16 +1410,16 @@ workflow PairedEndSingleSampleWorkflow {
     call CollectUnsortedReadgroupBamQualityMetrics {
       input:
         PICARD=picard,
-        input_bam = MergeBamAlignment.output_bam,
-        output_bam_prefix = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".readgroup"
+        in_bam = MergeBamAlignment.out_bam,
+        out_bam_prefix = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".readgroup"
     }
 
     # Sort and fix tags in the merged BAM
     call SortAndFixTags as SortAndFixReadGroupBam {
       input:
         PICARD=picard,
-        input_bam = MergeBamAlignment.output_bam,
-        output_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".sorted",
+        in_bam = MergeBamAlignment.out_bam,
+        out_bam_basename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".sorted",
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index
@@ -1455,8 +1434,8 @@ workflow PairedEndSingleSampleWorkflow {
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict,
-        input_bam = SortAndFixReadGroupBam.output_bam,
-        input_bam_index = SortAndFixReadGroupBam.output_bam_index,
+        in_bam = SortAndFixReadGroupBam.out_bam,
+        in_bam_index = SortAndFixReadGroupBam.out_bam_index,
         report_filename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".validation_report"
     }
 
@@ -1468,8 +1447,8 @@ workflow PairedEndSingleSampleWorkflow {
   call MarkDuplicates {
     input:
       PICARD=picard,
-      input_bams = MergeBamAlignment.output_bam,
-      output_bam_basename = base_file_name_normal + ".aligned.unsorted.duplicates_marked",
+      in_bams = MergeBamAlignment.out_bam,
+      out_bam_basename = base_file_name_normal + ".aligned.unsorted.duplicates_marked",
       metrics_filename = base_file_name_normal + ".duplicate_metrics"
   }
 
@@ -1477,8 +1456,8 @@ workflow PairedEndSingleSampleWorkflow {
   call SortAndFixTags as SortAndFixSampleBam {
     input:
       PICARD=picard,
-      input_bam = MarkDuplicates.output_bam,
-      output_bam_basename = base_file_name_normal + ".aligned.duplicate_marked.sorted",
+      in_bam = MarkDuplicates.out_bam,
+      out_bam_basename = base_file_name_normal + ".aligned.duplicate_marked.sorted",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index
@@ -1488,8 +1467,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CrossCheckFingerprints {
     input:
       PICARD=picard,
-      input_bams = SortAndFixSampleBam.output_bam,
-      input_bam_indexes = SortAndFixSampleBam.output_bam_index,
+      in_bams = SortAndFixSampleBam.out_bam,
+      in_bam_indexes = SortAndFixSampleBam.out_bam_index,
       haplotype_database_file = haplotype_database_file,
       metrics_filename = base_file_name_normal + ".crosscheck"
   }
@@ -1504,8 +1483,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CheckContamination {
     input:
       verifyBamID=verifyBamID,
-      input_bam = SortAndFixSampleBam.output_bam,
-      input_bam_index = SortAndFixSampleBam.output_bam_index,
+      in_bam = SortAndFixSampleBam.out_bam,
+      in_bam_index = SortAndFixSampleBam.out_bam_index,
       contamination_sites_vcf = contamination_sites_vcf,
       contamination_sites_vcf_index = contamination_sites_vcf_index,
       output_prefix = base_file_name_normal + ".preBqsr"
@@ -1517,8 +1496,8 @@ workflow PairedEndSingleSampleWorkflow {
     call BaseRecalibrator {
       input:
         GATK=gatk,
-        input_bam = SortAndFixSampleBam.output_bam,
-        input_bam_index = SortAndFixSampleBam.output_bam_index,
+        in_bam = SortAndFixSampleBam.out_bam,
+        in_bam_index = SortAndFixSampleBam.out_bam_index,
         recalibration_report_filename = base_file_name_normal + ".recal_data.csv",
         sequence_group_interval = subgroup,
         dbSNP_vcf = dbSNP_vcf,
@@ -1545,9 +1524,9 @@ workflow PairedEndSingleSampleWorkflow {
     call ApplyBQSR {
       input:
         GATK4=gatk4,
-        input_bam = SortAndFixSampleBam.output_bam,
-        input_bam_index = SortAndFixSampleBam.output_bam_index,
-        output_bam_basename = recalibrated_bam_basename,
+        in_bam = SortAndFixSampleBam.out_bam,
+        in_bam_index = SortAndFixSampleBam.out_bam_index,
+        out_bam_basename = recalibrated_bam_basename,
         recalibration_report = GatherBqsrReports.output_bqsr_report,
         sequence_group_interval = subgroup,
         ref_dict = ref_dict,
@@ -1560,17 +1539,17 @@ workflow PairedEndSingleSampleWorkflow {
   call GatherBamFiles {
     input:
       PICARD=picard,
-      input_bams = ApplyBQSR.recalibrated_bam,
-      output_bam_basename = base_file_name_normal
+      in_bams = ApplyBQSR.recalibrated_bam,
+      out_bam_basename = base_file_name_normal
   }
   
   # QC the final BAM (consolidated after scattered BQSR)
   call CollectReadgroupBamQualityMetrics {
     input:
       PICARD=picard,
-      input_bam = GatherBamFiles.output_bam,
-      input_bam_index = GatherBamFiles.output_bam_index,
-      output_bam_prefix = base_file_name_normal + ".readgroup",
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
+      out_bam_prefix = base_file_name_normal + ".readgroup",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index
@@ -1580,8 +1559,8 @@ workflow PairedEndSingleSampleWorkflow {
   call ValidateSamFile as ValidateAggregatedSamFile {
     input:
       PICARD=picard,
-      input_bam = GatherBamFiles.output_bam,
-      input_bam_index = GatherBamFiles.output_bam_index,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
       report_filename = base_file_name_normal + ".validation_report",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -1592,9 +1571,9 @@ workflow PairedEndSingleSampleWorkflow {
   call CollectAggregationMetrics {
     input:
       PICARD=picard,
-      input_bam = GatherBamFiles.output_bam,
-      input_bam_index = GatherBamFiles.output_bam_index,
-      output_bam_prefix = base_file_name_normal,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
+      out_bam_prefix = base_file_name_normal,
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index
@@ -1604,20 +1583,20 @@ workflow PairedEndSingleSampleWorkflow {
   call CheckFingerprint {
     input:
       PICARD=picard,
-      input_bam = GatherBamFiles.output_bam,
-      input_bam_index = GatherBamFiles.output_bam_index,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
       haplotype_database_file = haplotype_database_file,
       genotypes = fingerprint_genotypes_file,
       output_basename = base_file_name_normal,
-      sample = sample_name
+      sample = sample_name + '_normal'
   }
   
   # QC the sample WGS metrics (stringent thresholds)
   call CollectWgsMetrics {
     input:
       PICARD=picard,
-      input_bam = GatherBamFiles.output_bam,
-      input_bam_index = GatherBamFiles.output_bam_index,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
       metrics_filename = base_file_name_normal + ".wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -1628,8 +1607,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CollectRawWgsMetrics {
     input:
       PICARD=picard,
-      input_bam = GatherBamFiles.output_bam,
-      input_bam_index = GatherBamFiles.output_bam_index,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
       metrics_filename = base_file_name_normal + ".raw_wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -1640,8 +1619,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CalculateReadGroupChecksum {
     input:
       PICARD=picard,
-      input_bam = GatherBamFiles.output_bam,
-      input_bam_index = GatherBamFiles.output_bam_index,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
       read_group_md5_filename = recalibrated_bam_basename + ".bam.read_group_md5"
   }
   
@@ -1650,7 +1629,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       seq_cache_populate=seq_cache_populate,
       SAMTOOLS=samtools,
-      input_bam = GatherBamFiles.output_bam,
+      in_bam = GatherBamFiles.out_bam,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
       output_basename = base_file_name_normal
@@ -1671,8 +1650,8 @@ workflow PairedEndSingleSampleWorkflow {
   call ValidateSamFile as ValidateBamFromCram {
     input:
       PICARD=picard,
-      input_bam = CramToBam.output_bam,
-      input_bam_index = CramToBam.output_bam_index,
+      in_bam = CramToBam.out_bam,
+      in_bam_index = CramToBam.out_bam_index,
       report_filename = base_file_name_normal + ".bam.roundtrip.validation_report",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -1689,8 +1668,8 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         GATK=gatk,
         contamination = CheckContamination.contamination,
-        input_bam = GatherBamFiles.output_bam,
-        input_bam_index = GatherBamFiles.output_bam_index,
+        in_bam = GatherBamFiles.out_bam,
+        in_bam_index = GatherBamFiles.out_bam_index,
         interval_list = subInterval,
         gvcf_basename = base_file_name_normal,
         ref_dict = ref_dict,
@@ -1705,7 +1684,7 @@ workflow PairedEndSingleSampleWorkflow {
       PICARD=picard,
       input_vcfs = HaplotypeCaller.output_gvcf,
       input_vcfs_indexes = HaplotypeCaller.output_gvcf_index,
-      output_vcf_name = final_gvcf_name
+      output_vcf_name = final_gvcf_name_normal
   }
   
   # Validate the GVCF output of HaplotypeCaller
@@ -1735,25 +1714,497 @@ workflow PairedEndSingleSampleWorkflow {
       wgs_evaluation_interval_list = wgs_evaluation_interval_list
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  String final_gvcf_name_tumor = base_file_name_tumor + final_gvcf_ext
+
+
+  ###### Here the workflow is adapted to .fastq files:
+  # Decompress and split the files into chunks, return an array of .fastq files:
+  call UnzipAndSplit as UnzipAndSplit_tumor {
+      input:
+        PIGZ=pigz,
+        input_fastqR1 = rawdata_normal_fastqR1,
+        input_fastqR2 = rawdata_normal_fastqR2,
+        sample_name = sample_name + '_tumor'
+  }
+
+
+  Array[Pair[File, File]] fastqR1R2_chunks_tumor = zip(UnzipAndSplit_tumor.R1_splits, UnzipAndSplit_tumor.R2_splits)
+  scatter (fastq_chunk_tumor in fastqR1R2_chunks_tumor) {
+
+    call TrimReads as TrimReads_tumor {
+        input:
+          TRIMMOMATIC=trimmomatic,
+          input_fastqR1 = fastq_chunk_tumor.left,
+          input_fastqR2 = fastq_chunk_tumor.right,
+          basenameR1 = basename(fastq_chunk_tumor.left, ".fastq"),
+          basenameR2 = basename(fastq_chunk_tumor.right, ".fastq")
+    }
+
+    call FastqToBam as FastqToBam_tumor {
+        input:
+          PICARD=picard,
+          sample_name = sample_name + '_tumor',
+          input_fastqR1 = TrimReads_tumor.output_R1,
+          input_fastqR2 = TrimReads_tumor.output_R2
+    }
+
+#  }
+
+  ######
+
+
+  # Align flowcell-level unmapped input bams in parallel
+#  scatter (unmapped_bam in flowcell_unmapped_bams) {
+#  scatter (unmapped_bam in FastqToBam.out_bam) {  
+    # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
+    # String base_name = sub(sub(unmapped_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
+
+    String sub_strip_path = "/home/projects/dp_00005/data/cromwell_test/.*/"
+    String sub_strip_unmapped = unmapped_bam_suffix + "$"
+
+    # QC the unmapped BAM 
+    call CollectQualityYieldMetrics as CollectQualityYieldMetrics_tumor {
+      input:
+        PICARD=picard,
+        in_bam = FastqToBam_tumor.out_bam,
+        metrics_filename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics"
+    }
+
+    call STAR_Map {
+      input: STAR=star,
+        STARindexDir=premade_STARindexDir,
+        sample_name = sample_name + '_tumor',
+        input_fastqR1 = TrimReads_tumor.output_R1,
+        input_fastqR2 = TrimReads_tumor.output_R2
+    }
+
+#    # Map reads to reference
+#    call SamToFastqAndBwaMem {
+#      input:
+#        SAMTOOLS=samtools,
+#        PICARD=picard,
+#        in_bam = FastqToBam_tumor.out_bam,
+#        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmerged",
+#        ref_fasta = ref_fasta,
+#        ref_fasta_index = ref_fasta_index,
+#        ref_dict = ref_dict,
+#        ref_alt = ref_alt,
+#        ref_bwt = ref_bwt,
+#        ref_amb = ref_amb,
+#        ref_ann = ref_ann,
+#        ref_pac = ref_pac,
+#        ref_sa = ref_sa
+#     }
+
+
+    # Merge original uBAM and BWA-aligned BAM 
+    call MergeBamAlignment as MergeBamAlignment_tumor {
+      input:
+        PICARD=picard,
+        unmapped_bam = FastqToBam_tumor.out_bam,
+        aligned_bam = STAR_Map.out_bam,
+        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".aligned.unsorted",
+        ref_fasta = ref_fasta,
+        ref_fasta_index = ref_fasta_index,
+        ref_dict = ref_dict
+    }
+
+    # QC the aligned but unsorted readgroup BAM
+    # No reference needed as the input here is unsorted; providing a reference would cause an error
+    call CollectUnsortedReadgroupBamQualityMetrics as CollectUnsortedReadgroupBamQualityMetrics_tumor {
+      input:
+        PICARD=picard,
+        in_bam = MergeBamAlignment_tumor.out_bam,
+        out_bam_prefix = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".readgroup"
+    }
+
+    # Sort and fix tags in the merged BAM
+    call SortAndFixTags as SortAndFixReadGroupBam_tumor {
+      input:
+        PICARD=picard,
+        in_bam = MergeBamAlignment_tumor.out_bam,
+        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".sorted",
+        ref_dict = ref_dict,
+        ref_fasta = ref_fasta,
+        ref_fasta_index = ref_fasta_index
+    }
+    
+    # Validate the aligned and sorted readgroup BAM
+    # This is called to help in finding problems early.
+    # If considered too time consuming and not helpful, can be removed.
+    call ValidateSamFile as ValidateReadGroupSamFile_tumor {
+      input:
+        PICARD=picard,
+        ref_fasta = ref_fasta,
+        ref_fasta_index = ref_fasta_index,
+        ref_dict = ref_dict,
+        in_bam = SortAndFixReadGroupBam_tumor.out_bam,
+        in_bam_index = SortAndFixReadGroupBam_tumor.out_bam_index,
+        report_filename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".validation_report"
+    }
+
+  }
+
+  # Aggregate aligned+merged flowcell BAM files and mark duplicates
+  # We take advantage of the tool's ability to take multiple BAM inputs and write out a single output
+  # to avoid having to spend time just merging BAM files.
+  call MarkDuplicates as MarkDuplicates_tumor {
+    input:
+      PICARD=picard,
+      in_bams = MergeBamAlignment_tumor.out_bam,
+      out_bam_basename = base_file_name_tumor + ".aligned.unsorted.duplicates_marked",
+      metrics_filename = base_file_name_tumor + ".duplicate_metrics"
+  }
+
+  # Use SplitNCigarReads for best practices on RNAseq data:
+  call SplitNCigarReads {
+    input: GATK=gatk,
+      sample_name = sample_name + '_tumor',
+      ref_fasta=ref_fasta,
+      in_bam=MarkDuplicates_tumor.out_bam
+  }
+
+  # Sort aggregated+deduped BAM file and fix tags
+  call SortAndFixTags as SortAndFixSampleBam_tumor {
+    input:
+      PICARD=picard,
+      in_bam = SplitNCigarReads.out_bam,
+      out_bam_basename = base_file_name_tumor + ".aligned.duplicate_marked.sorted",
+      ref_dict = ref_dict,
+      ref_fasta = ref_fasta,
+      ref_fasta_index = ref_fasta_index
+  }
+
+  # Check identity of fingerprints across readgroups
+  call CrossCheckFingerprints as CrossCheckFingerprints_tumor {
+    input:
+      PICARD=picard,
+      in_bams = SortAndFixSampleBam_tumor.out_bam,
+      in_bam_indexes = SortAndFixSampleBam_tumor.out_bam_index,
+      haplotype_database_file = haplotype_database_file,
+      metrics_filename = base_file_name_tumor + ".crosscheck"
+  }
+
+  # Create list of sequences for scatter-gather parallelization 
+  call CreateSequenceGroupingTSV as CreateSequenceGroupingTSV_tumor {
+    input:
+      ref_dict = ref_dict
+  }
+  
+  # Estimate level of cross-sample contamination
+  call CheckContamination as CheckContamination_tumor {
+    input:
+      verifyBamID=verifyBamID,
+      in_bam = SortAndFixSampleBam_tumor.out_bam,
+      in_bam_index = SortAndFixSampleBam_tumor.out_bam_index,
+      contamination_sites_vcf = contamination_sites_vcf,
+      contamination_sites_vcf_index = contamination_sites_vcf_index,
+      output_prefix = base_file_name_tumor + ".preBqsr"
+  }
+  
+  # Perform Base Quality Score Recalibration (BQSR) on the sorted BAM in parallel
+  scatter (subgroup in CreateSequenceGroupingTSV_tumor.sequence_grouping) {
+    # Generate the recalibration model by interval
+    call BaseRecalibrator as BaseRecalibrator_tumor {
+      input:
+        GATK=gatk,
+        in_bam = SortAndFixSampleBam_tumor.out_bam,
+        in_bam_index = SortAndFixSampleBam_tumor.out_bam_index,
+        recalibration_report_filename = base_file_name_tumor + ".recal_data.csv",
+        sequence_group_interval = subgroup,
+        dbSNP_vcf = dbSNP_vcf,
+        dbSNP_vcf_index = dbSNP_vcf_index,
+        known_indels_sites_VCFs = known_indels_sites_VCFs,
+        known_indels_sites_indices = known_indels_sites_indices,
+        ref_dict = ref_dict,
+        ref_fasta = ref_fasta,
+        ref_fasta_index = ref_fasta_index
+    }  
+  }
+
+  # Merge the recalibration reports resulting from by-interval recalibration
+  call GatherBqsrReports as GatherBqsrReports_tumor {
+    input:
+      GATK=gatk,
+      input_bqsr_reports = BaseRecalibrator_tumor.recalibration_report,
+      output_report_filename = base_file_name_tumor + ".recal_data.csv"
+  }
+
+  scatter (subgroup in CreateSequenceGroupingTSV_tumor.sequence_grouping_with_unmapped) {
+
+    # Apply the recalibration model by interval
+    call ApplyBQSR as ApplyBQSR_tumor {
+      input:
+        GATK4=gatk4,
+        in_bam = SortAndFixSampleBam_tumor.out_bam,
+        in_bam_index = SortAndFixSampleBam_tumor.out_bam_index,
+        out_bam_basename = recalibrated_bam_basename,
+        recalibration_report = GatherBqsrReports_tumor.output_bqsr_report,
+        sequence_group_interval = subgroup,
+        ref_dict = ref_dict,
+        ref_fasta = ref_fasta,
+        ref_fasta_index = ref_fasta_index
+    }
+  } 
+
+  # Merge the recalibrated BAM files resulting from by-interval recalibration
+  call GatherBamFiles {
+    input:
+      PICARD=picard,
+      in_bams = ApplyBQSR_tumor.recalibrated_bam,
+      out_bam_basename = base_file_name_tumor
+  }
+  
+  # QC the final BAM (consolidated after scattered BQSR)
+  call CollectReadgroupBamQualityMetrics as CollectReadgroupBamQualityMetrics_tumor {
+    input:
+      PICARD=picard,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
+      out_bam_prefix = base_file_name_tumor + ".readgroup",
+      ref_dict = ref_dict,
+      ref_fasta = ref_fasta,
+      ref_fasta_index = ref_fasta_index
+  }
+
+  # Validate the final BAM 
+  call ValidateSamFile as ValidateAggregatedSamFile_tumor {
+    input:
+      PICARD=picard,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
+      report_filename = base_file_name_tumor + ".validation_report",
+      ref_dict = ref_dict,
+      ref_fasta = ref_fasta,
+      ref_fasta_index = ref_fasta_index
+  }
+  
+  # QC the final BAM some more (no such thing as too much QC)
+  call CollectAggregationMetrics as CollectAggregationMetrics_tumor {
+    input:
+      PICARD=picard,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
+      out_bam_prefix = base_file_name_tumor,
+      ref_dict = ref_dict,
+      ref_fasta = ref_fasta,
+      ref_fasta_index = ref_fasta_index
+  }
+  
+  # Check the sample BAM fingerprint against the sample array 
+  call CheckFingerprint as CheckFingerprint_tumor {
+    input:
+      PICARD=picard,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
+      haplotype_database_file = haplotype_database_file,
+      genotypes = fingerprint_genotypes_file,
+      output_basename = base_file_name_tumor,
+      sample = sample_name + '_tumor'
+  }
+  
+  # QC the sample WGS metrics (stringent thresholds)
+  call CollectWgsMetrics as CollectWgsMetrics_tumor {
+    input:
+      PICARD=picard,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
+      metrics_filename = base_file_name_tumor + ".wgs_metrics",
+      ref_fasta = ref_fasta,
+      ref_fasta_index = ref_fasta_index,
+      wgs_coverage_interval_list = wgs_coverage_interval_list
+  }
+  
+  # QC the sample raw WGS metrics (common thresholds)
+  call CollectRawWgsMetrics as CollectRawWgsMetrics_tumor {
+    input:
+      PICARD=picard,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
+      metrics_filename = base_file_name_tumor + ".raw_wgs_metrics",
+      ref_fasta = ref_fasta,
+      ref_fasta_index = ref_fasta_index,
+      wgs_coverage_interval_list = wgs_coverage_interval_list
+  }
+  
+  # Generate a checksum per readgroup in the final BAM
+  call CalculateReadGroupChecksum as CalculateReadGroupChecksum_tumor {
+    input:
+      PICARD=picard,
+      in_bam = GatherBamFiles.out_bam,
+      in_bam_index = GatherBamFiles.out_bam_index,
+      read_group_md5_filename = recalibrated_bam_basename + ".bam.read_group_md5"
+  }
+  
+  # Convert the final merged recalibrated BAM file to CRAM format
+  call ConvertToCram as ConvertToCram_tumor {
+    input:
+      seq_cache_populate=seq_cache_populate,
+      SAMTOOLS=samtools,
+      in_bam = GatherBamFiles.out_bam,
+      ref_fasta = ref_fasta,
+      ref_fasta_index = ref_fasta_index,
+      output_basename = base_file_name_tumor
+  }
+
+  # Convert the CRAM back to BAM to check that the conversions do not introduce errors
+  call CramToBam as CramToBam_tumor {
+    input:
+      SAMTOOLS=samtools,
+      ref_fasta = ref_fasta,
+      ref_dict = ref_dict,
+      ref_fasta_index = ref_fasta_index,
+      cram_file = ConvertToCram_tumor.output_cram,
+      output_basename = base_file_name_tumor + ".roundtrip"
+  }
+
+  # Validate the roundtripped BAM
+  call ValidateSamFile as ValidateBamFromCram_tumor {
+    input:
+      PICARD=picard,
+      in_bam = CramToBam_tumor.out_bam,
+      in_bam_index = CramToBam_tumor.out_bam_index,
+      report_filename = base_file_name_tumor + ".bam.roundtrip.validation_report",
+      ref_dict = ref_dict,
+      ref_fasta = ref_fasta,
+      ref_fasta_index = ref_fasta_index,
+      max_output = 1000000000,
+      ignore = ["null"]
+  }
+  
+  # Call variants in parallel over WGS calling intervals
+  scatter (subInterval in scattered_calling_intervals) {
+  
+    # Generate GVCF by interval
+    call HaplotypeCaller_RNA as HaplotypeCaller_tumor {
+      input:
+        GATK=gatk,
+        contamination = CheckContamination_tumor.contamination,
+        in_bam = GatherBamFiles.out_bam,
+        in_bam_index = GatherBamFiles.out_bam_index,
+        interval_list = subInterval,
+        gvcf_basename = base_file_name_tumor,
+        ref_dict = ref_dict,
+        ref_fasta = ref_fasta,
+        ref_fasta_index = ref_fasta_index
+     }
+  }
+  
+  # Combine by-interval GVCFs into a single sample GVCF file
+  call MergeVCFs as MergeVCFs_tumor {
+    input:
+      PICARD=picard,
+      input_vcfs = HaplotypeCaller_tumor.output_gvcf,
+      input_vcfs_indexes = HaplotypeCaller_tumor.output_gvcf_index,
+      output_vcf_name = final_gvcf_name_tumor
+  }
+  
+  # Validate the GVCF output of HaplotypeCaller
+  call ValidateGVCF as ValidateGVCF_tumor {
+    input:
+      GATK=gatk,
+      input_vcf = MergeVCFs_tumor.output_vcf,
+      input_vcf_index = MergeVCFs_tumor.output_vcf_index,
+      dbSNP_vcf = dbSNP_vcf,
+      dbSNP_vcf_index = dbSNP_vcf_index,
+      ref_fasta = ref_fasta,
+      ref_fasta_index = ref_fasta_index,
+      ref_dict = ref_dict,
+      wgs_calling_interval_list = wgs_calling_interval_list
+  }
+  
+  # QC the GVCF
+  call CollectGvcfCallingMetrics as CollectGvcfCallingMetrics_tumor {
+    input:
+      PICARD=picard,
+      input_vcf = MergeVCFs_tumor.output_vcf,
+      input_vcf_index = MergeVCFs_tumor.output_vcf_index,
+      metrics_basename = base_file_name_tumor,
+      dbSNP_vcf = dbSNP_vcf,
+      dbSNP_vcf_index = dbSNP_vcf_index,
+      ref_dict = ref_dict,
+      wgs_evaluation_interval_list = wgs_evaluation_interval_list
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   # Outputs that will be retained when execution is complete  
   output {
     CollectQualityYieldMetrics.*
+    CollectQualityYieldMetrics_tumor.*
     ValidateReadGroupSamFile.*
+    ValidateReadGroupSamFile_tumor.*
     CollectReadgroupBamQualityMetrics.*
+    CollectReadgroupBamQualityMetrics_tumor.*
     CollectUnsortedReadgroupBamQualityMetrics.*
+    CollectUnsortedReadgroupBamQualityMetrics_tumor.*
     CrossCheckFingerprints.*
+    CrossCheckFingerprints_tumor.*
     ValidateBamFromCram.*
+    ValidateBamFromCram_tumor.*
     CalculateReadGroupChecksum.*
+    CalculateReadGroupChecksum_tumor.*
     ValidateAggregatedSamFile.*
+    ValidateAggregatedSamFile_tumor.*
     CollectAggregationMetrics.*
+    CollectAggregationMetrics_tumor.*
     CheckFingerprint.*
+    CheckFingerprint_tumor.*
     CollectWgsMetrics.*
+    CollectWgsMetrics_tumor.*
     CollectRawWgsMetrics.*
+    CollectRawWgsMetrics_tumor.*
     CheckContamination.*
+    CheckContamination_tumor.*
     CollectGvcfCallingMetrics.*
+    CollectGvcfCallingMetrics_tumor.*
     MarkDuplicates.duplicate_metrics
+    MarkDuplicates_tumor.duplicate_metrics
     GatherBqsrReports.*
+    GatherBqsrReports_tumor.*
     ConvertToCram.*
+    ConvertToCram_tumor.*
     MergeVCFs.*
+    MergeVCFs_tumor.*
     } 
 }
