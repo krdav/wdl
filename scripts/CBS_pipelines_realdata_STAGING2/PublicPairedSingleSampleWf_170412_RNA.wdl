@@ -35,6 +35,7 @@ task STAR_Map {
   File input_fastqR1
   File input_fastqR2
 #  String suffix="Aligned.sortedByCoord.out"
+  # This is STAR's suffix and cannot change:
   String suffix="Aligned.out"
   Int cpu=28
 
@@ -43,6 +44,7 @@ task STAR_Map {
     # Use default mode --genomeDir=./GenomeDir/
     ${STAR} --readFilesIn ${input_fastqR1} ${input_fastqR2} \
         --quantMode TranscriptomeSAM GeneCounts \
+        --outSAMtype BAM Unsorted \
         --outFileNamePrefix ${sample_name} \
         --twopassMode Basic \
         --runThreadN ${cpu}
@@ -1286,7 +1288,8 @@ workflow PairedEndSingleSampleWorkflow {
   File ref_amb
   File ref_ann
   File ref_pac
-  
+  String premade_STARindexDir
+
   File dbSNP_vcf
   File dbSNP_vcf_index
   Array[File] known_indels_sites_VCFs
