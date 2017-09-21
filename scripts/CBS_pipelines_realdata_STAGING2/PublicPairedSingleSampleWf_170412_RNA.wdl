@@ -1373,7 +1373,7 @@ workflow PairedEndSingleSampleWorkflow {
         PICARD=picard,
         in_bam = FastqToBam_normal.out_bam,
         metrics_filename = sub(sub(FastqToBam_normal.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics"
-    }
+,   }
 
     # Map reads to reference
     call SamToFastqAndBwaMem as SamToFastqAndBwaMem_normal {
@@ -1739,7 +1739,6 @@ workflow PairedEndSingleSampleWorkflow {
 
   String final_gvcf_name_tumor = base_file_name_tumor + final_gvcf_ext
 
-
   ###### Here the workflow is adapted to .fastq files:
   # Decompress and split the files into chunks, return an array of .fastq files:
   call UnzipAndSplit as UnzipAndSplit_tumor {
@@ -1781,14 +1780,15 @@ workflow PairedEndSingleSampleWorkflow {
 #  scatter (unmapped_bam in FastqToBam.out_bam) {  
     # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
     # String base_name = sub(sub(unmapped_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
-
+    String sub_strip_path_tumor = "/home/projects/dp_00005/data/cromwell_test/.*/"
+    String sub_strip_unmapped_tumor = unmapped_bam_suffix + "$"
 
     # QC the unmapped BAM 
     call CollectQualityYieldMetrics as CollectQualityYieldMetrics_tumor {
       input:
         PICARD=picard,
         in_bam = FastqToBam_tumor.out_bam,
-        metrics_filename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics"
+        metrics_filename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".unmapped.quality_yield_metrics"
     }
 
     call STAR_Map as STAR_Map_tumor {
@@ -1805,7 +1805,7 @@ workflow PairedEndSingleSampleWorkflow {
 #        SAMTOOLS=samtools,
 #        PICARD=picard,
 #        in_bam = FastqToBam_tumor.out_bam,
-#        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmerged",
+#        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".unmerged",
 #        ref_fasta = ref_fasta,
 #        ref_fasta_index = ref_fasta_index,
 #        ref_dict = ref_dict,
@@ -1824,7 +1824,7 @@ workflow PairedEndSingleSampleWorkflow {
         PICARD=picard,
         unmapped_bam = FastqToBam_tumor.out_bam,
         aligned_bam = STAR_Map_tumor.out_bam,
-        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".aligned.unsorted",
+        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".aligned.unsorted",
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict
@@ -1836,7 +1836,7 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         PICARD=picard,
         in_bam = MergeBamAlignment_tumor.out_bam,
-        out_bam_prefix = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".readgroup"
+        out_bam_prefix = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".readgroup"
     }
 
     # Sort and fix tags in the merged BAM
@@ -1844,7 +1844,7 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         PICARD=picard,
         in_bam = MergeBamAlignment_tumor.out_bam,
-        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".sorted",
+        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".sorted",
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index
@@ -1861,7 +1861,7 @@ workflow PairedEndSingleSampleWorkflow {
         ref_dict = ref_dict,
         in_bam = SortAndFixReadGroupBam_tumor.out_bam,
         in_bam_index = SortAndFixReadGroupBam_tumor.out_bam_index,
-        report_filename = sub(sub(unmapped_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".validation_report"
+        report_filename = sub(sub(unmapped_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".validation_report"
     }
 
   }

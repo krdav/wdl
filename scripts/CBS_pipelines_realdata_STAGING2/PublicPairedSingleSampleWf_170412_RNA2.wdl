@@ -89,145 +89,6 @@ task SplitNCigarReads {
 }
 
 
-### This was written for the old RNAseq pipeline, but should be deprecated:
-task BaseRecalibrator_RNA {
-  File GATK
-  String sample_name
-  String ref_fasta
-  File in_bam
-  File in_bai
-  File dbsnp
-  String suffix="_recal"
-  Int cpu=28
-
-  command {
-    java -jar ${GATK} \
-      -T BaseRecalibrator \
-      -R ${ref_fasta}.fa \
-      -I ${in_bam} \
-      -knownSites ${dbsnp} \
-      -o ${sample_name}${suffix}.grp \
-      -nct ${cpu}
- }
-  output {
-    File out_grp = "${sample_name}${suffix}.grp"
-    String out_sample_name = "${sample_name}${suffix}"
-  }
-  runtime {
-    cpu: cpu
-  }
-}
-
-task VariantFiltration_RNA {
-  File GATK
-  String sample_name
-  String ref_fasta
-  File in_vcf
-  String suffix="_filter"
-  Int cpu=2
-
-  command {
-    java -jar ${GATK} \
-      -T VariantFiltration \
-      -R ${ref_fasta}.fa \
-      -V ${in_vcf} \
-      -window 35 \
-      -cluster 3 \
-      -filterName FS \
-      -filter "FS > 3.0" \
-      -filterName QD \
-      -filter "QD < 2.0" \
-      -o ${sample_name}${suffix}.vcf
- }
-  output {
-    File out_vcf = "${sample_name}${suffix}.vcf"
-    String out_sample_name = "${sample_name}${suffix}"
-  }
-  runtime {
-    cpu: cpu
-  }
-}
-
-task UnzipAndSplit {
-  File input_fastqR1
-  File input_fastqR2
-  File PIGZ
-  String sample_name
-  Int cpu=2
-
-  # Uncompress while splitting fastq into chuncks of 10E7 reads:
-  command {
-    ${PIGZ} -dc -p 2 ${input_fastqR1} | split -l 40000000 --additional-suffix=".fastq" - "${sample_name}_1_" &
-    ${PIGZ} -dc -p 2 ${input_fastqR2} | split -l 40000000 --additional-suffix=".fastq" - "${sample_name}_2_" &
-    wait
-  }
-  runtime {
-    cpu: cpu
-  }
-  output {
-    Array[File] R1_splits = glob("*_1_??.fastq")
-    Array[File] R2_splits = glob("*_2_??.fastq")
-  }
-}
-
-task TrimReads {
-  File input_fastqR1
-  File input_fastqR2
-  String basenameR1
-  String basenameR2
-  File TRIMMOMATIC
-  File adapters = '/services/tools/trimmomatic/0.36/adapters/TruSeq3-PE-2.fa'
-  Int cpu=4
-
-  command {
-    java -Xmx80g \
-      -jar ${TRIMMOMATIC} \
-      PE \
-      -threads ${cpu} \
-      -phred33 \
-      ${input_fastqR1} ${input_fastqR2} ${basenameR1}_trim.fastq ${basenameR1}_trim_unpaired.fastq ${basenameR2}_trim.fastq ${basenameR2}_trim_unpaired.fastq \
-      ILLUMINACLIP:${adapters}:2:30:10
-  }
-  runtime {
-    cpu: cpu
-  }
-  output {
-    File output_R1 = "${basenameR1}_trim.fastq"
-    File output_R2 = "${basenameR2}_trim.fastq"
-  }
-}
-
-task FastqToBam {
-  File input_fastqR1
-  File input_fastqR2
-  String basenameR1 = basename(input_fastqR1, ".fastq")
-  String basename = sub(basenameR1, '_1', '')
-  File PICARD
-  String sample_name
-  Int cpu=2
-
-  command {
-    java -Xmx8G \
-      -jar ${PICARD} FastqToSam \
-      FASTQ=${input_fastqR1} \
-      FASTQ2=${input_fastqR2} \
-      OUTPUT=${basename}.bam \
-      READ_GROUP_NAME=H0164.2 \
-      SAMPLE_NAME=${sample_name} \
-      LIBRARY_NAME=Solexa-272222 \
-      PLATFORM_UNIT=UNKNOWN \
-      PLATFORM=illumina \
-      SEQUENCING_CENTER=BGI \
-      RUN_DATE=`date +"%y-%m-%dT%H:%M:%S"`
-  }
-  runtime {
-    cpu: cpu
-  }
-  output {
-    File out_bam = "${basename}.bam"
-  }
-}
-
 # Collect sequencing yield quality metrics
 task CollectQualityYieldMetrics {
   File in_bam
@@ -1255,6 +1116,8 @@ command <<<
   }
 }
 
+
+import "UnzipTrimBam.wdl" as UnzipTrimBam
 # WORKFLOW DEFINITION
 workflow PairedEndSingleSampleWorkflow {
 
@@ -1315,10 +1178,7 @@ workflow PairedEndSingleSampleWorkflow {
 
   String final_gvcf_name_normal = base_file_name_normal + final_gvcf_ext
 
-
-
-  import UnzipTrimBam.wdl as UnzipTrimBam
-  call UnzipTrimBam as UnzipTrimBam_normal {
+  call UnzipTrimBam.UnzipTrimBam_wf as UnzipTrimBam_normal {
     input:
       rawdata_fastqR1 = rawdata_normal_fastqR1,
       rawdata_fastqR2 = rawdata_normal_fastqR2,
@@ -1710,7 +1570,7 @@ workflow PairedEndSingleSampleWorkflow {
 
   String final_gvcf_name_tumor = base_file_name_tumor + final_gvcf_ext
 
-  call UnzipTrimBam as UnzipTrimBam_tumor {
+  call UnzipTrimBam.UnzipTrimBam_wf as UnzipTrimBam_tumor {
     input:
       rawdata_fastqR1 = rawdata_tumor_fastqR1,
       rawdata_fastqR2 = rawdata_tumor_fastqR2,
@@ -1746,7 +1606,7 @@ workflow PairedEndSingleSampleWorkflow {
         input_fastqR2 = UnzipTrimBam_tumor.TrimReads.output_R2[i]
     }
 
-    # Merge original uBAM and BWA-aligned BAM 
+,   # Merge original uBAM and BWA-aligned BAM 
     call MergeBamAlignment as MergeBamAlignment_tumor {
       input:
         PICARD=picard,

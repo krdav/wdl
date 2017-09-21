@@ -80,7 +80,7 @@ task FastqToBam {
 }
 
 
-workflow UnzipTrimBam {
+workflow UnzipTrimBam_wf {
   File rawdata_fastqR1
   File rawdata_fastqR2
   String sample_name
@@ -116,11 +116,11 @@ workflow UnzipTrimBam {
     }
   }
 
-  output {
-    FastqToBam.out_bam,
-    TrimReads.output_R1,
-    TrimReads.output_R2
-  }
+#  output {
+#    Array[File] out_bam = FastqToBam.out_bam
+#    Array[File] output_R1 = TrimReads.output_R1
+#    Array[File] output_R2 = TrimReads.output_R2
+#  }
 
 }
 
