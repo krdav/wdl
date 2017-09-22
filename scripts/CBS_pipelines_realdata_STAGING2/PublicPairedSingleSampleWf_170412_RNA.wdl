@@ -63,6 +63,7 @@ task SplitNCigarReads {
   String sample_name
   String ref_fasta
   File in_bam
+  File in_bai
   String suffix="_splitNcigar"
   Int cpu=2
 
@@ -70,7 +71,7 @@ task SplitNCigarReads {
     # Run options are set to follow the GATK best practice for RNAseq. data.
     java -jar ${GATK} \
       -T SplitNCigarReads \
-      -R ${ref_fasta}.fa \
+      -R ${ref_fasta} \
       -I ${in_bam} \
       -o ${sample_name}${suffix}.bam \
       -rf ReassignOneMappingQuality \
@@ -643,6 +644,7 @@ task MarkDuplicates {
     cpu: cpu
   }
   output {
+    File out_bai = "${out_bam_basename}.bai"
     File out_bam = "${out_bam_basename}.bam"
     File duplicate_metrics = "${metrics_filename}"
   }
@@ -1314,7 +1316,8 @@ workflow PairedEndSingleSampleWorkflow {
   String bwa_commandline = bwa + " mem -K 100000000 -p -v 3 -t 28 -Y $bash_ref_fasta"
 
   String final_gvcf_name_normal = base_file_name_normal + final_gvcf_ext
-
+  String sub_strip_path = "/home/projects/dp_00005/data/cromwell_test/.*/"
+  String sub_strip_unmapped = unmapped_bam_suffix + "$"
 
 
 #  import UnzipTrimBam.wdl as UnzipTrimBam
@@ -1364,8 +1367,8 @@ workflow PairedEndSingleSampleWorkflow {
     # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
     # String base_name = sub(sub(FastqToBam_normal.out_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
 
-    String sub_strip_path = "/home/projects/dp_00005/data/cromwell_test/.*/"
-    String sub_strip_unmapped = unmapped_bam_suffix + "$"
+#    String sub_strip_path = "/home/projects/dp_00005/data/cromwell_test/.*/"
+#    String sub_strip_unmapped = unmapped_bam_suffix + "$"
 
     # QC the unmapped BAM 
     call CollectQualityYieldMetrics as CollectQualityYieldMetrics_normal {
@@ -1738,6 +1741,8 @@ workflow PairedEndSingleSampleWorkflow {
 
 
   String final_gvcf_name_tumor = base_file_name_tumor + final_gvcf_ext
+  String sub_strip_path_tumor = sub_strip_path
+  String sub_strip_unmapped_tumor = sub_strip_unmapped
 
   ###### Here the workflow is adapted to .fastq files:
   # Decompress and split the files into chunks, return an array of .fastq files:
@@ -1780,8 +1785,8 @@ workflow PairedEndSingleSampleWorkflow {
 #  scatter (unmapped_bam in FastqToBam.out_bam) {  
     # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
     # String base_name = sub(sub(unmapped_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
-    String sub_strip_path_tumor = "/home/projects/dp_00005/data/cromwell_test/.*/"
-    String sub_strip_unmapped_tumor = unmapped_bam_suffix + "$"
+#    String sub_strip_path_tumor = "/home/projects/dp_00005/data/cromwell_test/.*/"
+#    String sub_strip_unmapped_tumor = unmapped_bam_suffix + "$"
 
     # QC the unmapped BAM 
     call CollectQualityYieldMetrics as CollectQualityYieldMetrics_tumor {
@@ -1861,7 +1866,7 @@ workflow PairedEndSingleSampleWorkflow {
         ref_dict = ref_dict,
         in_bam = SortAndFixReadGroupBam_tumor.out_bam,
         in_bam_index = SortAndFixReadGroupBam_tumor.out_bam_index,
-        report_filename = sub(sub(unmapped_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".validation_report"
+        report_filename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".validation_report"
     }
 
   }
@@ -1882,7 +1887,8 @@ workflow PairedEndSingleSampleWorkflow {
     input: GATK=gatk,
       sample_name = sample_name + '_tumor',
       ref_fasta=ref_fasta,
-      in_bam=MarkDuplicates_tumor.out_bam
+      in_bam=MarkDuplicates_tumor.out_bam,
+      in_bai=MarkDuplicates_tumor.out_bai
   }
 
   # Sort aggregated+deduped BAM file and fix tags
