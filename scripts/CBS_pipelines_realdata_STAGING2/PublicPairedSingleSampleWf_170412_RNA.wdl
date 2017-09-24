@@ -414,7 +414,7 @@ task SortAndFixTags {
   }
   output {
     File out_bam = "${out_bam_basename}.bam"
-    File out_bam_index = "${out_bam_basename}.bai"
+    File out_bai = "${out_bam_basename}.bai"
     File out_bam_md5 = "${out_bam_basename}.bam.md5"
   }
 }
@@ -462,7 +462,7 @@ task CollectUnsortedReadgroupBamQualityMetrics {
 # Collect alignment summary and GC bias quality metrics
 task CollectReadgroupBamQualityMetrics {
   File in_bam
-  File in_bam_index
+  File in_bai
   String out_bam_prefix
   File ref_dict
   File ref_fasta
@@ -498,7 +498,7 @@ task CollectReadgroupBamQualityMetrics {
 # Collect quality metrics from the aggregated bam
 task CollectAggregationMetrics {
   File in_bam
-  File in_bam_index
+  File in_bai
   String out_bam_prefix
   File ref_dict
   File ref_fasta
@@ -549,7 +549,7 @@ task CollectAggregationMetrics {
 # Check that the fingerprints of separate readgroups all match
 task CrossCheckFingerprints {
   Array[File] in_bams
-  Array[File] in_bam_indexes
+  Array[File] in_baies
   File haplotype_database_file # if this file is empty (0-length) the workflow should not do fingerprint comparison (as there are no fingerprints for the sample)
   String metrics_filename
   Int cpu=1
@@ -581,7 +581,7 @@ task CrossCheckFingerprints {
 # Check that the fingerprint of the sample BAM matches the sample array
 task CheckFingerprint {
   File in_bam
-  File in_bam_index
+  File in_bai
   File haplotype_database_file
   File genotypes
   String output_basename
@@ -644,7 +644,6 @@ task MarkDuplicates {
     cpu: cpu
   }
   output {
-    File out_bai = "${out_bam_basename}.bai"
     File out_bam = "${out_bam_basename}.bam"
     File duplicate_metrics = "${metrics_filename}"
   }
@@ -706,7 +705,7 @@ task CreateSequenceGroupingTSV {
 # Generate Base Quality Score Recalibration (BQSR) model
 task BaseRecalibrator {
   File in_bam
-  File in_bam_index
+  File in_bai
   String recalibration_report_filename
   Array[String] sequence_group_interval
   File dbSNP_vcf
@@ -749,7 +748,7 @@ task BaseRecalibrator {
 # Apply Base Quality Score Recalibration (BQSR) model
 task ApplyBQSR {
   File in_bam
-  File in_bam_index
+  File in_bai
   String out_bam_basename
   File recalibration_report
   Array[String] sequence_group_interval
@@ -831,7 +830,7 @@ task GatherBamFiles {
   }
   output {
     File out_bam = "${out_bam_basename}.bam"
-    File out_bam_index = "${out_bam_basename}.bai"
+    File out_bai = "${out_bam_basename}.bai"
     File out_bam_md5 = "${out_bam_basename}.bam.md5"
   }
 }
@@ -839,7 +838,7 @@ task GatherBamFiles {
 # Validate the output bam file
 task ValidateSamFile {
   File in_bam
-  File in_bam_index
+  File in_bai
   String report_filename
   File ref_dict
   File ref_fasta
@@ -872,7 +871,7 @@ task ValidateSamFile {
 # Collect WGS metrics (Broad Genomics stringent QC thresholds)
 task CollectWgsMetrics {
   File in_bam
-  File in_bam_index
+  File in_bai
   String metrics_filename
   File wgs_coverage_interval_list
   File ref_fasta
@@ -901,7 +900,7 @@ task CollectWgsMetrics {
 # Collect raw WGS metrics (commonly used QC thresholds)
 task CollectRawWgsMetrics {
   File in_bam
-  File in_bam_index
+  File in_bai
   String metrics_filename
   File wgs_coverage_interval_list
   File ref_fasta
@@ -930,7 +929,7 @@ task CollectRawWgsMetrics {
 # Generate a checksum per readgroup
 task CalculateReadGroupChecksum {
   File in_bam
-  File in_bam_index
+  File in_bai
   String read_group_md5_filename
   Int cpu=1
   File PICARD
@@ -965,7 +964,7 @@ task CalculateReadGroupChecksum {
 # contamination estimate for use in variant calling
 task CheckContamination {
   File in_bam
-  File in_bam_index
+  File in_bai
   File contamination_sites_vcf
   File contamination_sites_vcf_index
   String output_prefix
@@ -1031,7 +1030,7 @@ task CheckContamination {
 # Call variants on a single sample with HaplotypeCaller to produce a GVCF
 task HaplotypeCaller {
   File in_bam
-  File in_bam_index
+  File in_bai
   File interval_list
   String gvcf_basename
   File ref_dict
@@ -1068,7 +1067,7 @@ task HaplotypeCaller {
 
 task HaplotypeCaller_RNA {
   File in_bam
-  File in_bam_index
+  File in_bai
   File interval_list
   String gvcf_basename
   File ref_dict
@@ -1253,7 +1252,7 @@ command <<<
   }
   output {
     File out_bam = "${output_basename}.bam"
-    File out_bam_index = "${output_basename}.bai"
+    File out_bai = "${output_basename}.bai"
   }
 }
 
@@ -1439,7 +1438,7 @@ workflow PairedEndSingleSampleWorkflow {
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict,
         in_bam = SortAndFixReadGroupBam_normal.out_bam,
-        in_bam_index = SortAndFixReadGroupBam_normal.out_bam_index,
+        in_bai = SortAndFixReadGroupBam_normal.out_bai,
         report_filename = sub(sub(FastqToBam_normal.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".validation_report"
     }
 
@@ -1472,7 +1471,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bams = SortAndFixSampleBam_normal.out_bam,
-      in_bam_indexes = SortAndFixSampleBam_normal.out_bam_index,
+      in_baies = SortAndFixSampleBam_normal.out_bai,
       haplotype_database_file = haplotype_database_file,
       metrics_filename = base_file_name_normal + ".crosscheck"
   }
@@ -1488,7 +1487,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       verifyBamID=verifyBamID,
       in_bam = SortAndFixSampleBam_normal.out_bam,
-      in_bam_index = SortAndFixSampleBam_normal.out_bam_index,
+      in_bai = SortAndFixSampleBam_normal.out_bai,
       contamination_sites_vcf = contamination_sites_vcf,
       contamination_sites_vcf_index = contamination_sites_vcf_index,
       output_prefix = base_file_name_normal + ".preBqsr"
@@ -1501,7 +1500,7 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         GATK=gatk,
         in_bam = SortAndFixSampleBam_normal.out_bam,
-        in_bam_index = SortAndFixSampleBam_normal.out_bam_index,
+        in_bai = SortAndFixSampleBam_normal.out_bai,
         recalibration_report_filename = base_file_name_normal + ".recal_data.csv",
         sequence_group_interval = subgroup,
         dbSNP_vcf = dbSNP_vcf,
@@ -1529,7 +1528,7 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         GATK4=gatk4,
         in_bam = SortAndFixSampleBam_normal.out_bam,
-        in_bam_index = SortAndFixSampleBam_normal.out_bam_index,
+        in_bai = SortAndFixSampleBam_normal.out_bai,
         out_bam_basename = recalibrated_bam_basename,
         recalibration_report = GatherBqsrReports_normal.output_bqsr_report,
         sequence_group_interval = subgroup,
@@ -1552,7 +1551,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_normal.out_bam,
-      in_bam_index = GatherBamFiles_normal.out_bam_index,
+      in_bai = GatherBamFiles_normal.out_bai,
       out_bam_prefix = base_file_name_normal + ".readgroup",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -1564,7 +1563,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_normal.out_bam,
-      in_bam_index = GatherBamFiles_normal.out_bam_index,
+      in_bai = GatherBamFiles_normal.out_bai,
       report_filename = base_file_name_normal + ".validation_report",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -1576,7 +1575,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_normal.out_bam,
-      in_bam_index = GatherBamFiles_normal.out_bam_index,
+      in_bai = GatherBamFiles_normal.out_bai,
       out_bam_prefix = base_file_name_normal,
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -1588,7 +1587,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_normal.out_bam,
-      in_bam_index = GatherBamFiles_normal.out_bam_index,
+      in_bai = GatherBamFiles_normal.out_bai,
       haplotype_database_file = haplotype_database_file,
       genotypes = fingerprint_genotypes_file,
       output_basename = base_file_name_normal,
@@ -1600,7 +1599,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_normal.out_bam,
-      in_bam_index = GatherBamFiles_normal.out_bam_index,
+      in_bai = GatherBamFiles_normal.out_bai,
       metrics_filename = base_file_name_normal + ".wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -1612,7 +1611,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_normal.out_bam,
-      in_bam_index = GatherBamFiles_normal.out_bam_index,
+      in_bai = GatherBamFiles_normal.out_bai,
       metrics_filename = base_file_name_normal + ".raw_wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -1624,7 +1623,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_normal.out_bam,
-      in_bam_index = GatherBamFiles_normal.out_bam_index,
+      in_bai = GatherBamFiles_normal.out_bai,
       read_group_md5_filename = recalibrated_bam_basename + ".bam.read_group_md5"
   }
   
@@ -1655,7 +1654,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = CramToBam_normal.out_bam,
-      in_bam_index = CramToBam_normal.out_bam_index,
+      in_bai = CramToBam_normal.out_bai,
       report_filename = base_file_name_normal + ".bam.roundtrip.validation_report",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -1673,7 +1672,7 @@ workflow PairedEndSingleSampleWorkflow {
         GATK=gatk,
         contamination = CheckContamination_normal.contamination,
         in_bam = GatherBamFiles_normal.out_bam,
-        in_bam_index = GatherBamFiles_normal.out_bam_index,
+        in_bai = GatherBamFiles_normal.out_bai,
         interval_list = subInterval,
         gvcf_basename = base_file_name_normal,
         ref_dict = ref_dict,
@@ -1865,7 +1864,7 @@ workflow PairedEndSingleSampleWorkflow {
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict,
         in_bam = SortAndFixReadGroupBam_tumor.out_bam,
-        in_bam_index = SortAndFixReadGroupBam_tumor.out_bam_index,
+        in_bai = SortAndFixReadGroupBam_tumor.out_bai,
         report_filename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".validation_report"
     }
 
@@ -1882,32 +1881,33 @@ workflow PairedEndSingleSampleWorkflow {
       metrics_filename = base_file_name_tumor + ".duplicate_metrics"
   }
 
-  # Use SplitNCigarReads for best practices on RNAseq data:
-  call SplitNCigarReads as SplitNCigarReads_tumor {
-    input: GATK=gatk,
-      sample_name = sample_name + '_tumor',
-      ref_fasta=ref_fasta,
-      in_bam=MarkDuplicates_tumor.out_bam,
-      in_bai=MarkDuplicates_tumor.out_bai
-  }
-
   # Sort aggregated+deduped BAM file and fix tags
   call SortAndFixTags as SortAndFixSampleBam_tumor {
     input:
       PICARD=picard,
-      in_bam = SplitNCigarReads_tumor.out_bam,
+      in_bam = MarkDuplicates_tumor.out_bam,
       out_bam_basename = base_file_name_tumor + ".aligned.duplicate_marked.sorted",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index
   }
 
+  # Use SplitNCigarReads for best practices on RNAseq data:
+  call SplitNCigarReads as SplitNCigarReads_tumor {
+    input: GATK=gatk,
+      sample_name = sample_name + '_tumor',
+      ref_fasta=ref_fasta,
+      in_bam=SortAndFixSampleBam_tumor.out_bam,
+      in_bai=SortAndFixSampleBam_tumor.out_bai
+  }
+
+
   # Check identity of fingerprints across readgroups
   call CrossCheckFingerprints as CrossCheckFingerprints_tumor {
     input:
       PICARD=picard,
-      in_bams = SortAndFixSampleBam_tumor.out_bam,
-      in_bam_indexes = SortAndFixSampleBam_tumor.out_bam_index,
+      in_bams = SplitNCigarReads_tumor.out_bam,
+      in_baies = SplitNCigarReads_tumor.out_bai,
       haplotype_database_file = haplotype_database_file,
       metrics_filename = base_file_name_tumor + ".crosscheck"
   }
@@ -1922,8 +1922,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CheckContamination as CheckContamination_tumor {
     input:
       verifyBamID=verifyBamID,
-      in_bam = SortAndFixSampleBam_tumor.out_bam,
-      in_bam_index = SortAndFixSampleBam_tumor.out_bam_index,
+      in_bam = SplitNCigarReads_tumor.out_bam,
+      in_bai = SplitNCigarReads_tumor.out_bai,
       contamination_sites_vcf = contamination_sites_vcf,
       contamination_sites_vcf_index = contamination_sites_vcf_index,
       output_prefix = base_file_name_tumor + ".preBqsr"
@@ -1935,8 +1935,8 @@ workflow PairedEndSingleSampleWorkflow {
     call BaseRecalibrator as BaseRecalibrator_tumor {
       input:
         GATK=gatk,
-        in_bam = SortAndFixSampleBam_tumor.out_bam,
-        in_bam_index = SortAndFixSampleBam_tumor.out_bam_index,
+        in_bam = SplitNCigarReads_tumor.out_bam,
+        in_bai = SplitNCigarReads_tumor.out_bai,
         recalibration_report_filename = base_file_name_tumor + ".recal_data.csv",
         sequence_group_interval = subgroup,
         dbSNP_vcf = dbSNP_vcf,
@@ -1963,8 +1963,8 @@ workflow PairedEndSingleSampleWorkflow {
     call ApplyBQSR as ApplyBQSR_tumor {
       input:
         GATK4=gatk4,
-        in_bam = SortAndFixSampleBam_tumor.out_bam,
-        in_bam_index = SortAndFixSampleBam_tumor.out_bam_index,
+        in_bam = SplitNCigarReads_tumor.out_bam,
+        in_bai = SplitNCigarReads_tumor.out_bai,
         out_bam_basename = recalibrated_bam_basename,
         recalibration_report = GatherBqsrReports_tumor.output_bqsr_report,
         sequence_group_interval = subgroup,
@@ -1987,7 +1987,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_tumor.out_bam,
-      in_bam_index = GatherBamFiles_tumor.out_bam_index,
+      in_bai = GatherBamFiles_tumor.out_bai,
       out_bam_prefix = base_file_name_tumor + ".readgroup",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -1999,7 +1999,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_tumor.out_bam,
-      in_bam_index = GatherBamFiles_tumor.out_bam_index,
+      in_bai = GatherBamFiles_tumor.out_bai,
       report_filename = base_file_name_tumor + ".validation_report",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -2011,7 +2011,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_tumor.out_bam,
-      in_bam_index = GatherBamFiles_tumor.out_bam_index,
+      in_bai = GatherBamFiles_tumor.out_bai,
       out_bam_prefix = base_file_name_tumor,
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -2023,7 +2023,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_tumor.out_bam,
-      in_bam_index = GatherBamFiles_tumor.out_bam_index,
+      in_bai = GatherBamFiles_tumor.out_bai,
       haplotype_database_file = haplotype_database_file,
       genotypes = fingerprint_genotypes_file,
       output_basename = base_file_name_tumor,
@@ -2035,7 +2035,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_tumor.out_bam,
-      in_bam_index = GatherBamFiles_tumor.out_bam_index,
+      in_bai = GatherBamFiles_tumor.out_bai,
       metrics_filename = base_file_name_tumor + ".wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -2047,7 +2047,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_tumor.out_bam,
-      in_bam_index = GatherBamFiles_tumor.out_bam_index,
+      in_bai = GatherBamFiles_tumor.out_bai,
       metrics_filename = base_file_name_tumor + ".raw_wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -2059,7 +2059,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_tumor.out_bam,
-      in_bam_index = GatherBamFiles_tumor.out_bam_index,
+      in_bai = GatherBamFiles_tumor.out_bai,
       read_group_md5_filename = recalibrated_bam_basename + ".bam.read_group_md5"
   }
   
@@ -2090,7 +2090,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       PICARD=picard,
       in_bam = CramToBam_tumor.out_bam,
-      in_bam_index = CramToBam_tumor.out_bam_index,
+      in_bai = CramToBam_tumor.out_bai,
       report_filename = base_file_name_tumor + ".bam.roundtrip.validation_report",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -2108,7 +2108,7 @@ workflow PairedEndSingleSampleWorkflow {
         GATK=gatk,
         contamination = CheckContamination_tumor.contamination,
         in_bam = GatherBamFiles_tumor.out_bam,
-        in_bam_index = GatherBamFiles_tumor.out_bam_index,
+        in_bai = GatherBamFiles_tumor.out_bai,
         interval_list = subInterval,
         gvcf_basename = base_file_name_tumor,
         ref_dict = ref_dict,
