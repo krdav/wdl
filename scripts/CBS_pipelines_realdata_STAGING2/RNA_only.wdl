@@ -87,35 +87,6 @@ task SplitNCigarReads {
 }
 
 
-### This was written for the old RNAseq pipeline, but should be deprecated:
-task BaseRecalibrator_RNA {
-  File GATK
-  String sample_name
-  String ref_fasta
-  File in_bam
-  File in_bai
-  File dbsnp
-  String suffix="_recal"
-  Int cpu=28
-
-  command {
-    java -jar ${GATK} \
-      -T BaseRecalibrator \
-      -R ${ref_fasta}.fa \
-      -I ${in_bam} \
-      -knownSites ${dbsnp} \
-      -o ${sample_name}${suffix}.grp \
-      -nct ${cpu}
- }
-  output {
-    File out_grp = "${sample_name}${suffix}.grp"
-    String out_sample_name = "${sample_name}${suffix}"
-  }
-  runtime {
-    cpu: cpu
-  }
-}
-
 task VariantFiltration_RNA {
   File GATK
   String sample_name
