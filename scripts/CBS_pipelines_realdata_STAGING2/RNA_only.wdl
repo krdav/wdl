@@ -86,36 +86,6 @@ task SplitNCigarReads {
   }
 }
 
-
-### This was written for the old RNAseq pipeline, but should be deprecated:
-task BaseRecalibrator_RNA {
-  File GATK
-  String sample_name
-  String ref_fasta
-  File in_bam
-  File in_bai
-  File dbsnp
-  String suffix="_recal"
-  Int cpu=28
-
-  command {
-    java -jar ${GATK} \
-      -T BaseRecalibrator \
-      -R ${ref_fasta}.fa \
-      -I ${in_bam} \
-      -knownSites ${dbsnp} \
-      -o ${sample_name}${suffix}.grp \
-      -nct ${cpu}
- }
-  output {
-    File out_grp = "${sample_name}${suffix}.grp"
-    String out_sample_name = "${sample_name}${suffix}"
-  }
-  runtime {
-    cpu: cpu
-  }
-}
-
 task VariantFiltration_RNA {
   File GATK
   String sample_name
@@ -714,6 +684,7 @@ task BaseRecalibrator {
   File ref_fasta_index
   Int cpu=1
   File GATK
+  String? U_option
 
   command {
     rand=`shuf -i 1-10000000 -n 1`
@@ -730,7 +701,8 @@ task BaseRecalibrator {
       -o ${recalibration_report_filename} \
       -knownSites ${dbSNP_vcf} \
       -knownSites ${sep=" -knownSites " known_indels_sites_VCFs} \
-      -L $rand.intervals
+      -L $rand.intervals \
+      ${U_option}
   }
   runtime {
     cpu: cpu
@@ -1524,8 +1496,9 @@ workflow PairedEndSingleSampleWorkflow {
         known_indels_sites_indices = known_indels_sites_indices,
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
-        ref_fasta_index = ref_fasta_index
-    }  
+        ref_fasta_index = ref_fasta_index,
+        U_option = "-U ALLOW_N_CIGAR_READS"
+    }
   }
 
   # Merge the recalibration reports resulting from by-interval recalibration
