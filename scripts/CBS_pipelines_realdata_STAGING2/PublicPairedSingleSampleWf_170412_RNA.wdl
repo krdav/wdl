@@ -59,7 +59,7 @@ task STAR_Map {
 }
 
 task SplitNCigarReads {
-  File GATK
+  File GATK4_LAUNCH
   String sample_name
   String ref_fasta
   File in_bam
@@ -69,7 +69,8 @@ task SplitNCigarReads {
 
   command {
     # Run options are set to follow the GATK best practice for RNAseq. data.
-    /home/projects/dp_00005/apps/src/gatk-4.beta.5/gatk-launch \
+    # /home/projects/dp_00005/apps/src/gatk-4.beta.5/gatk-launch \
+    ${GATK4_LAUNCH}
       SplitNCigarReads \
       -R ${ref_fasta} \
       -I ${in_bam} \
@@ -1298,6 +1299,7 @@ workflow PairedEndSingleSampleWorkflow {
   File picard
   File gatk
   File gatk4
+  File gatk4_launch
   File python2
   File python3
   File samtools
@@ -1821,7 +1823,7 @@ workflow PairedEndSingleSampleWorkflow {
     # Use SplitNCigarReads for best practices on RNAseq data.
     # It appears to be important to run this before "MergeBamAlignment". See here: https://gatkforums.broadinstitute.org/gatk/discussion/9975/splitntrim-errors
     call SplitNCigarReads as SplitNCigarReads_tumor {
-      input: GATK=gatk,
+      input: GATK4_LAUNCH=gatk4_launch,
         sample_name = sample_name + '_tumor',
         ref_fasta=ref_fasta,
         in_bam=SortAndFixReadGroupBam_tumor_pre.out_bam,

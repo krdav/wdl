@@ -22,6 +22,7 @@
   "PairedEndSingleSampleWorkflow.python3": "/services/tools/anaconda3/4.0.0/bin/python",
   "PairedEndSingleSampleWorkflow.python2": "/services/tools/anaconda2/4.0.0/bin/python",
   "PairedEndSingleSampleWorkflow.gatk4": "/home/projects/dp_00005/apps/src/gatk-4.beta.3/gatk-package-4.beta.3-local.jar",
+  "PairedEndSingleSampleWorkflow.gatk4_launch": "/home/projects/dp_00005/apps/src/gatk-4.beta.5/gatk-launch",
   "PairedEndSingleSampleWorkflow.trimmomatic": "/services/tools/trimmomatic/0.36/trimmomatic-0.36.jar",
   "PairedEndSingleSampleWorkflow.pigz": "/services/tools/pigz/2.3.4/bin/pigz",
   "PairedEndSingleSampleWorkflow.star": "/services/tools/star/2.5.3a/bin/STAR",
