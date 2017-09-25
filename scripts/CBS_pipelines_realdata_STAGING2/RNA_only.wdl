@@ -47,6 +47,7 @@ task STAR_Map {
         --outSAMtype BAM Unsorted \
         --outFileNamePrefix ${sample_name} \
         --twopassMode Basic \
+        --outSAMmapqUnique 60 \
         --runThreadN ${cpu}
   }
   output {
