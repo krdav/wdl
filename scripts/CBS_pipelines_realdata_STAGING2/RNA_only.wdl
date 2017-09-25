@@ -69,15 +69,11 @@ task SplitNCigarReads {
 
   command {
     # Run options are set to follow the GATK best practice for RNAseq. data.
-    java -jar ${GATK} \
-      -T SplitNCigarReads \
+    /home/projects/dp_00005/apps/src/gatk-4.beta.5/gatk-launch \
+      SplitNCigarReads \
       -R ${ref_fasta} \
       -I ${in_bam} \
-      -o ${sample_name}${suffix}.bam \
-      -rf ReassignOneMappingQuality \
-      -RMQF 255 \
-      -RMQT 60 \
-      -U ALLOW_N_CIGAR_READS
+      -O ${sample_name}${suffix}.bam
  }
   output {
     File out_bam = "${sample_name}${suffix}.bam"
