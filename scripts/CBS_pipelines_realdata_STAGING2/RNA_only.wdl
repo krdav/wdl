@@ -1383,13 +1383,24 @@ workflow PairedEndSingleSampleWorkflow {
         input_fastqR2 = TrimReads_tumor.output_R2
     }
 
+    # Sort and fix tags in the merged BAM
+    call SortAndFixTags as SortAndFixReadGroupBam_tumor_pre {
+      input:
+        PICARD=picard,
+        in_bam = STAR_Map_tumor.out_bam,
+        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".sorted",
+        ref_dict = ref_dict,
+        ref_fasta = ref_fasta,
+        ref_fasta_index = ref_fasta_index
+    }
+
     # Use SplitNCigarReads for best practices on RNAseq data:
     call SplitNCigarReads as SplitNCigarReads_tumor {
       input: GATK=gatk,
         sample_name = sample_name + '_tumor',
         ref_fasta=ref_fasta,
-        in_bam=STAR_Map_tumor.out_bam,
-        in_bai=STAR_Map_tumor.out_bai
+        in_bam=SortAndFixReadGroupBam_tumor_pre.out_bam,
+        in_bai=SortAndFixReadGroupBam_tumor_pre.out_bai
     }
 
     # Merge original uBAM and BWA-aligned BAM 
