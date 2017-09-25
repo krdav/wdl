@@ -1380,7 +1380,7 @@ workflow PairedEndSingleSampleWorkflow {
         input_fastqR2 = TrimReads_tumor.output_R2
     }
 
-    # Sort and fix tags in the merged BAM
+    # This step is needed to make BAM index for SplitNCigarReads:
     call SortAndFixTags as SortAndFixReadGroupBam_tumor_pre {
       input:
         PICARD=picard,
@@ -1391,7 +1391,8 @@ workflow PairedEndSingleSampleWorkflow {
         ref_fasta_index = ref_fasta_index
     }
 
-    # Use SplitNCigarReads for best practices on RNAseq data:
+    # Use SplitNCigarReads for best practices on RNAseq data.
+    # It appears to be important to run this before "MergeBamAlignment". See here: https://gatkforums.broadinstitute.org/gatk/discussion/9975/splitntrim-errors
     call SplitNCigarReads as SplitNCigarReads_tumor {
       input: GATK=gatk,
         sample_name = sample_name + '_tumor',

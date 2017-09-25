@@ -1314,6 +1314,15 @@ workflow PairedEndSingleSampleWorkflow {
 
   String bwa_commandline = bwa + " mem -K 100000000 -p -v 3 -t 28 -Y $bash_ref_fasta"
 
+
+
+
+
+#####################
+### DNA only part ###
+#####################
+
+
   String final_gvcf_name_normal = base_file_name_normal + final_gvcf_ext
   String sub_strip_path = "/home/projects/dp_00005/data/cromwell_test/.*/"
   String sub_strip_unmapped = unmapped_bam_suffix + "$"
@@ -1718,6 +1727,9 @@ workflow PairedEndSingleSampleWorkflow {
   }
 
 
+#########################
+### DNA only part end ###
+#########################
 
 
 
@@ -1730,13 +1742,9 @@ workflow PairedEndSingleSampleWorkflow {
 
 
 
-
-
-
-
-
-
-
+#####################
+### RNA only part ###
+#####################
 
 
   String final_gvcf_name_tumor = base_file_name_tumor + final_gvcf_ext
@@ -1803,31 +1811,33 @@ workflow PairedEndSingleSampleWorkflow {
         input_fastqR2 = TrimReads_tumor.output_R2
     }
 
-#    # Map reads to reference
-#    call SamToFastqAndBwaMem {
-#      input:
-#        SAMTOOLS=samtools,
-#        PICARD=picard,
-#        in_bam = FastqToBam_tumor.out_bam,
-#        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".unmerged",
-#        ref_fasta = ref_fasta,
-#        ref_fasta_index = ref_fasta_index,
-#        ref_dict = ref_dict,
-#        ref_alt = ref_alt,
-#        ref_bwt = ref_bwt,
-#        ref_amb = ref_amb,
-#        ref_ann = ref_ann,
-#        ref_pac = ref_pac,
-#        ref_sa = ref_sa
-#     }
+    # This step is needed to make BAM index for SplitNCigarReads:
+    call SortAndFixTags as SortAndFixReadGroupBam_tumor_pre {
+      input:
+        PICARD=picard,
+        in_bam = STAR_Map_tumor.out_bam,
+        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".sorted",
+        ref_dict = ref_dict,
+        ref_fasta = ref_fasta,
+        ref_fasta_index = ref_fasta_index
+    }
 
+    # Use SplitNCigarReads for best practices on RNAseq data.
+    # It appears to be important to run this before "MergeBamAlignment". See here: https://gatkforums.broadinstitute.org/gatk/discussion/9975/splitntrim-errors
+    call SplitNCigarReads as SplitNCigarReads_tumor {
+      input: GATK=gatk,
+        sample_name = sample_name + '_tumor',
+        ref_fasta=ref_fasta,
+        in_bam=SortAndFixReadGroupBam_tumor_pre.out_bam,
+        in_bai=SortAndFixReadGroupBam_tumor_pre.out_bai
+    }
 
     # Merge original uBAM and BWA-aligned BAM 
     call MergeBamAlignment as MergeBamAlignment_tumor {
       input:
         PICARD=picard,
         unmapped_bam = FastqToBam_tumor.out_bam,
-        aligned_bam = STAR_Map_tumor.out_bam,
+        aligned_bam = SplitNCigarReads_tumor.out_bam,
         out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".aligned.unsorted",
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
@@ -1893,21 +1903,21 @@ workflow PairedEndSingleSampleWorkflow {
   }
 
   # Use SplitNCigarReads for best practices on RNAseq data:
-  call SplitNCigarReads as SplitNCigarReads_tumor {
-    input: GATK=gatk,
-      sample_name = sample_name + '_tumor',
-      ref_fasta=ref_fasta,
-      in_bam=SortAndFixSampleBam_tumor.out_bam,
-      in_bai=SortAndFixSampleBam_tumor.out_bai
-  }
+#  call SplitNCigarReads as SplitNCigarReads_tumor {
+#    input: GATK=gatk,
+#      sample_name = sample_name + '_tumor',
+#      ref_fasta=ref_fasta,
+#      in_bam=SortAndFixSampleBam_tumor.out_bam,
+#      in_bai=SortAndFixSampleBam_tumor.out_bai
+#  }
 
 
   # Check identity of fingerprints across readgroups
   call CrossCheckFingerprints as CrossCheckFingerprints_tumor {
     input:
       PICARD=picard,
-      in_bams = SplitNCigarReads_tumor.out_bam,
-      in_baies = SplitNCigarReads_tumor.out_bai,
+      in_bams = SortAndFixSampleBam_tumor.out_bam,
+      in_baies = SortAndFixSampleBam_tumor.out_bai,
       haplotype_database_file = haplotype_database_file,
       metrics_filename = base_file_name_tumor + ".crosscheck"
   }
@@ -1922,8 +1932,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CheckContamination as CheckContamination_tumor {
     input:
       verifyBamID=verifyBamID,
-      in_bam = SplitNCigarReads_tumor.out_bam,
-      in_bai = SplitNCigarReads_tumor.out_bai,
+      in_bam = SortAndFixSampleBam_tumor.out_bam,
+      in_bai = SortAndFixSampleBam_tumor.out_bai,
       contamination_sites_vcf = contamination_sites_vcf,
       contamination_sites_vcf_index = contamination_sites_vcf_index,
       output_prefix = base_file_name_tumor + ".preBqsr"
@@ -1935,8 +1945,8 @@ workflow PairedEndSingleSampleWorkflow {
     call BaseRecalibrator as BaseRecalibrator_tumor {
       input:
         GATK=gatk,
-        in_bam = SplitNCigarReads_tumor.out_bam,
-        in_bai = SplitNCigarReads_tumor.out_bai,
+        in_bam = SortAndFixSampleBam_tumor.out_bam,
+        in_bai = SortAndFixSampleBam_tumor.out_bai,
         recalibration_report_filename = base_file_name_tumor + ".recal_data.csv",
         sequence_group_interval = subgroup,
         dbSNP_vcf = dbSNP_vcf,
@@ -1963,8 +1973,8 @@ workflow PairedEndSingleSampleWorkflow {
     call ApplyBQSR as ApplyBQSR_tumor {
       input:
         GATK4=gatk4,
-        in_bam = SplitNCigarReads_tumor.out_bam,
-        in_bai = SplitNCigarReads_tumor.out_bai,
+        in_bam = SortAndFixSampleBam_tumor.out_bam,
+        in_bai = SortAndFixSampleBam_tumor.out_bai,
         out_bam_basename = recalibrated_bam_basename,
         recalibration_report = GatherBqsrReports_tumor.output_bqsr_report,
         sequence_group_interval = subgroup,
@@ -2155,12 +2165,9 @@ workflow PairedEndSingleSampleWorkflow {
 
 
 
-
-
-
-
-
-
+#########################
+### RNA only part end ###
+#########################
 
 
 
