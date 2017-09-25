@@ -1745,41 +1745,23 @@ workflow PairedEndSingleSampleWorkflow {
 
   # Outputs that will be retained when execution is complete  
   output {
-    CollectQualityYieldMetrics_normal.*
     CollectQualityYieldMetrics_tumor.*
-    ValidateReadGroupSamFile_normal.*
     ValidateReadGroupSamFile_tumor.*
-    CollectReadgroupBamQualityMetrics_normal.*
     CollectReadgroupBamQualityMetrics_tumor.*
-    CollectUnsortedReadgroupBamQualityMetrics_normal.*
     CollectUnsortedReadgroupBamQualityMetrics_tumor.*
-    CrossCheckFingerprints_normal.*
     CrossCheckFingerprints_tumor.*
-    ValidateBamFromCram_normal.*
     ValidateBamFromCram_tumor.*
-    CalculateReadGroupChecksum_normal.*
     CalculateReadGroupChecksum_tumor.*
-    ValidateAggregatedSamFile_normal.*
     ValidateAggregatedSamFile_tumor.*
-    CollectAggregationMetrics_normal.*
     CollectAggregationMetrics_tumor.*
-    CheckFingerprint_normal.*
     CheckFingerprint_tumor.*
-    CollectWgsMetrics_normal.*
     CollectWgsMetrics_tumor.*
-    CollectRawWgsMetrics_normal.*
     CollectRawWgsMetrics_tumor.*
-    CheckContamination_normal.*
     CheckContamination_tumor.*
-    CollectGvcfCallingMetrics_normal.*
     CollectGvcfCallingMetrics_tumor.*
-    MarkDuplicates_normal.duplicate_metrics
     MarkDuplicates_tumor.duplicate_metrics
-    GatherBqsrReports_normal.*
     GatherBqsrReports_tumor.*
-    ConvertToCram_normal.*
     ConvertToCram_tumor.*
-    MergeVCFs_normal.*
     MergeVCFs_tumor.*
     } 
 }
