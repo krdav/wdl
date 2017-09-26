@@ -1,143 +1,28 @@
+## Based on Broad Institute germline SNP and indel discovery workflow:
+## https://github.com/broadinstitute/wdl/blob/develop/scripts/broad_pipelines/PublicPairedSingleSampleWf_170412.wdl 
 ## Copyright Broad Institute, 2017
-## 
-## This WDL pipeline implements data pre-processing and initial variant calling (GVCF 
-## generation) according to the GATK Best Practices (June 2016) for germline SNP and 
-## Indel discovery in human whole-genome sequencing (WGS) data.
 ##
-## Requirements/expectations :
-## - Human whole-genome pair-end sequencing data in unmapped BAM (uBAM) format
-## - One or more read groups, one per uBAM file, all belonging to a single sample (SM)
-## - Input uBAM files must additionally comply with the following requirements:
-## - - filenames all have the same suffix (we use ".unmapped.bam")
-## - - files must pass validation by ValidateSamFile 
-## - - reads are provided in query-sorted order
-## - - all reads must have an RG tag
-## - GVCF output names must end in ".g.vcf.gz"
-## - Reference genome must be Hg38 with ALT contigs
+## The workflow has been adapted towards calling somatic tumor variants using a pair
+## of normal/tumor sample from either WES or WGS. The WDL pipeline follows GATK's
+## Best Practices (as of June 2016).
 ##
-## Runtime parameters are optimized for Broad's Google Cloud Platform implementation. 
-## For program versions, see docker containers. 
+## Requirements/expectations:
+## - Human WES/WGS paired-end sequencing data in fastq format for both a normal
+##   and a tumor sample.
 ##
-## LICENSING : 
+## Runtime parameters are optimized for DTU's Computerome Google HPC platform.
+##
+## LICENSING:
 ## This script is released under the WDL source code license (BSD-3) (see LICENSE in 
 ## https://github.com/broadinstitute/wdl). Note however that the programs it calls may 
 ## be subject to different licenses. Users are responsible for checking that they are
-## authorized to run all programs before running this script. Please see the docker 
-## page at https://hub.docker.com/r/broadinstitute/genomes-in-the-cloud/ for detailed
-## licensing information pertaining to the included programs.
+## authorized to run all programs before running this script.
 
-# TASK DEFINITIONS
 
-task RemoveUnpairedMates {
-  File in_bam
-  String output_basename
-  Int cpu=1
-  File SAMTOOLS
-
-  command <<<
-    set -e
-    set -o pipefail
-
-    ${SAMTOOLS} view -f 2 -o ${output_basename}.bam ${in_bam}
-    ${SAMTOOLS} index -b ${output_basename}.bam
-    mv ${output_basename}.bam.bai ${output_basename}.bai 
-  >>>
-  runtime {
-    cpu: cpu
-  }
-  output {
-    File out_bam = "${output_basename}.bam"
-    File out_bai = "${output_basename}.bai"
-  }
-}
-
-task STAR_Map {
-  File STAR
-  String STARindexDir
-  String sample_name
-  File input_fastqR1
-  File input_fastqR2
-#  String suffix="Aligned.sortedByCoord.out"
-  # This is STAR's suffix and cannot change:
-  String suffix="Aligned.out"
-  Int cpu=28
-
-  command {
-    ln -s ${STARindexDir} GenomeDir
-    # Use default mode --genomeDir=./GenomeDir/
-    ${STAR} --readFilesIn ${input_fastqR1} ${input_fastqR2} \
-        --quantMode TranscriptomeSAM GeneCounts \
-        --outSAMtype BAM Unsorted \
-        --outFileNamePrefix ${sample_name} \
-        --twopassMode Basic \
-        --runThreadN ${cpu}
-  }
-  output {
-    File out_bam = "${sample_name}${suffix}.bam"
-    String out_sample_name = "${sample_name}${suffix}"
-  }
-  runtime {
-    cpu: cpu
-  }
-}
-
-task SplitNCigarReads {
-  File GATK4_LAUNCH
-  String sample_name
-  String ref_fasta
-  File in_bam
-  File in_bai
-  String suffix="_splitNcigar"
-  Int cpu=2
-
-  command {
-    # Run options are set to follow the GATK best practice for RNAseq. data.
-    # /home/projects/dp_00005/apps/src/gatk-4.beta.5/gatk-launch \
-    ${GATK4_LAUNCH} SplitNCigarReads \
-      -R ${ref_fasta} \
-      -I ${in_bam} \
-      -O ${sample_name}${suffix}.bam
- }
-  output {
-    File out_bam = "${sample_name}${suffix}.bam"
-    File out_bai = "${sample_name}${suffix}.bai"
-    String out_sample_name = "${sample_name}${suffix}"
-  }
-  runtime {
-    cpu: cpu
-  }
-}
-
-task VariantFiltration_RNA {
-  File GATK
-  String sample_name
-  String ref_fasta
-  File in_vcf
-  String suffix="_filter"
-  Int cpu=2
-
-  command {
-    java -jar ${GATK} \
-      -T VariantFiltration \
-      -R ${ref_fasta}.fa \
-      -V ${in_vcf} \
-      -window 35 \
-      -cluster 3 \
-      -filterName FS \
-      -filter "FS > 3.0" \
-      -filterName QD \
-      -filter "QD < 2.0" \
-      -o ${sample_name}${suffix}.vcf
- }
-  output {
-    File out_vcf = "${sample_name}${suffix}.vcf"
-    String out_sample_name = "${sample_name}${suffix}"
-  }
-  runtime {
-    cpu: cpu
-  }
-}
-
+########################
+### TASK DEFINITIONS ###
+########################
+# First split the fastq files into chunks of 10 million reads
 task UnzipAndSplit {
   File input_fastqR1
   File input_fastqR2
@@ -145,7 +30,7 @@ task UnzipAndSplit {
   String sample_name
   Int cpu=2
 
-  # Uncompress while splitting fastq into chuncks of 10E7 reads:
+  # Uncompress while splitting:
   command {
     ${PIGZ} -dc -p 2 ${input_fastqR1} | split -l 40000000 --additional-suffix=".fastq" - "${sample_name}_1_" &
     ${PIGZ} -dc -p 2 ${input_fastqR2} | split -l 40000000 --additional-suffix=".fastq" - "${sample_name}_2_" &
@@ -160,6 +45,7 @@ task UnzipAndSplit {
   }
 }
 
+# Read trimming (can be omitted because soft clipping by the aligner should deal with this)
 task TrimReads {
   File input_fastqR1
   File input_fastqR2
@@ -167,7 +53,7 @@ task TrimReads {
   String basenameR2
   File TRIMMOMATIC
   File adapters = '/services/tools/trimmomatic/0.36/adapters/TruSeq3-PE-2.fa'
-  Int cpu=4
+  Int cpu=4  # More CPUs will not decrease runtime substantially
 
   command {
     java -Xmx80g \
@@ -187,6 +73,7 @@ task TrimReads {
   }
 }
 
+# Convert two paired-end fastq files into a single bam file
 task FastqToBam {
   File input_fastqR1
   File input_fastqR2
@@ -240,32 +127,6 @@ task CollectQualityYieldMetrics {
     File metrics = "${metrics_filename}"
   }
 }
-
-
-## Check the assumption that the final GVCF filename that is going to be used ends with .g.vcf.gz 
-#task CheckFinalVcfExtension {
-#  String vcf_filename
-#  Int cpu=1
-#  File PYTHON2
-#
-#  command <<<
-#    ${PYTHON2} <<CODE
-#    import os
-#    import sys
-#    filename="${vcf_filename}"
-#    if not filename.endswith(".g.vcf.gz"):
-#      raise Exception("input","output GVCF filename must end with '.g.vcf.gz', found %s"%(filename))
-#      sys.exit(1) 
-#    CODE
-#  >>>
-#  runtime {
-#    cpu: cpu
-#  }
-#  output {
-#    String common_suffix=read_string(stdout())
-#  }
-#}
-
 
 # Read unmapped BAM, convert on-the-fly to FASTQ and stream to BWA MEM for alignment
 task SamToFastqAndBwaMem {
@@ -375,7 +236,7 @@ task SortAndFixTags {
   File ref_dict
   File ref_fasta
   File ref_fasta_index
-  Int cpu=1
+  Int cpu=2
   File PICARD
 
   command {
@@ -706,9 +567,10 @@ task BaseRecalibrator {
   File ref_fasta_index
   Int cpu=1
   File GATK
-  String? U_option
+  String? U_option  # In case a -U option needs to be provided
 
   command {
+    # Write the intervals to a file for better command debugging
     rand=`shuf -i 1-10000000 -n 1`
     mv ${write_lines(sequence_group_interval)} $rand.intervals
 
@@ -750,6 +612,7 @@ task ApplyBQSR {
   File GATK4
 
   command {
+    # Write the intervals to a file for better command debugging
     rand=`shuf -i 1-10000000 -n 1`
     mv ${write_lines(sequence_group_interval)} $rand.intervals
 
@@ -803,7 +666,6 @@ task GatherBqsrReports {
 task GatherBamFiles {
   Array[File] in_bams
   String out_bam_basename
-
   Int cpu=1
   File PICARD
 
@@ -961,6 +823,7 @@ task CheckContamination {
   String output_prefix
   Int cpu=1
   File verifyBamID
+  File PYTHON3
 
   # Having to do this as a 2-step command in heredoc syntax, adding a python step to read the metrics
   # This is a hack until read_object() is supported by Cromwell.
@@ -977,7 +840,7 @@ task CheckContamination {
     --bam ${in_bam} \
     1>/dev/null
 
-    python3 <<CODE
+    ${PYTHON3} <<CODE
     import csv
     import sys
     with open('${output_prefix}.selfSM') as selfSM:
@@ -1052,45 +915,6 @@ task HaplotypeCaller {
   output {
     File output_gvcf = "${gvcf_basename}.vcf.gz"
     File output_gvcf_index = "${gvcf_basename}.vcf.gz.tbi"
-  }
-}
-
-
-task HaplotypeCaller_RNA {
-  File in_bam
-  File in_bai
-  File interval_list
-  String gvcf_basename
-  File ref_dict
-  File ref_fasta
-  File ref_fasta_index
-  Float? contamination
-  Int cpu=1
-  File GATK
-
-  command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
-      -jar ${GATK} \
-      -T HaplotypeCaller \
-      -R ${ref_fasta} \
-      -o ${gvcf_basename}.vcf.gz \
-      -I ${in_bam} \
-      -ERC GVCF \
-      --max_alternate_alleles 3 \
-      -variant_index_parameter 128000 \
-      -variant_index_type LINEAR \
-      -stand_call_conf 20 \
-      -dontUseSoftClippedBases \
-      -contamination ${default=0 contamination} \
-      --read_filter OverclippedRead \
-      -L ${interval_list}
- }
-  output {
-    File output_gvcf = "${gvcf_basename}.vcf.gz"
-    File output_gvcf_index = "${gvcf_basename}.vcf.gz.tbi"
-  }
-  runtime {
-    cpu: cpu
   }
 }
 
@@ -1246,8 +1070,17 @@ command <<<
     File out_bai = "${output_basename}.bai"
   }
 }
+#############################
+### TASK DEFINITIONS ENDS ###
+#############################
 
-# WORKFLOW DEFINITION
+
+
+
+
+############################
+### WORKFLOW DEFINITIONS ###
+############################
 workflow WES_normal_tumor_somatic_SNV_wf {
 
   File contamination_sites_vcf
@@ -1261,7 +1094,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
   String base_file_name_normal
   String base_file_name_tumor
   String final_gvcf_ext
-#  Array[File] flowcell_unmapped_bams
   File rawdata_normal_fastqR1
   File rawdata_normal_fastqR2
   File rawdata_tumor_fastqR1
@@ -1287,9 +1119,12 @@ workflow WES_normal_tumor_somatic_SNV_wf {
   Array[File] known_indels_sites_VCFs
   Array[File] known_indels_sites_indices
 
-  String recalibrated_bam_basename = base_file_name_normal + ".aligned.duplicates_marked.recalibrated"
+  String recalibrated_bam_basename_normal = base_file_name_normal + ".aligned.duplicates_marked.recalibrated"
+  String recalibrated_bam_basename_tumor = base_file_name_tumor + ".aligned.duplicates_marked.recalibrated"
+  String final_gvcf_name_normal = base_file_name_normal + final_gvcf_ext
+  String final_gvcf_name_tumor = base_file_name_tumor + final_gvcf_ext
 
-  # Tools:
+  # Tools
   File picard
   File gatk
   File gatk4
@@ -1305,28 +1140,15 @@ workflow WES_normal_tumor_somatic_SNV_wf {
   File star
 
   String bwa_commandline = bwa + " mem -K 100000000 -p -v 3 -t 28 -Y $bash_ref_fasta"
-
-
-
-
-
-#####################
-### DNA only part ###
-#####################
-
-
-  String final_gvcf_name_normal = base_file_name_normal + final_gvcf_ext
-  String sub_strip_path = "/home/projects/dp_00005/data/cromwell_test/.*/"
+  String sub_strip_path = "/home/projects/cu_10098/data/.*/"
   String sub_strip_unmapped = unmapped_bam_suffix + "$"
 
 
-#  import UnzipTrimBam.wdl as UnzipTrimBam
 
-
-
-
-  ###### Here the workflow is adapted to .fastq files:
-  # Decompress and split the files into chunks, return an array of .fastq files:
+#######################
+### WES NORMAL PART ###
+#######################
+  # Decompress and split the files into chunks, return an array of .fastq files
   call UnzipAndSplit as UnzipAndSplit_normal {
       input:
         PIGZ=pigz,
@@ -1356,27 +1178,13 @@ workflow WES_normal_tumor_somatic_SNV_wf {
           input_fastqR2 = TrimReads_normal.output_R2
     }
 
-#  }
-
-  ######
-
-
-  # Align flowcell-level unmapped input bams in parallel
-#  scatter (unmapped_bam in flowcell_unmapped_bams) {
-#  scatter (unmapped_bam in FastqToBam_normal.out_bam) {  
-    # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
-    # String base_name = sub(sub(FastqToBam_normal.out_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
-
-#    String sub_strip_path = "/home/projects/dp_00005/data/cromwell_test/.*/"
-#    String sub_strip_unmapped = unmapped_bam_suffix + "$"
-
     # QC the unmapped BAM 
     call CollectQualityYieldMetrics as CollectQualityYieldMetrics_normal {
       input:
         PICARD=picard,
         in_bam = FastqToBam_normal.out_bam,
         metrics_filename = sub(sub(FastqToBam_normal.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics"
-,   }
+    }
 
     # Map reads to reference
     call SamToFastqAndBwaMem as SamToFastqAndBwaMem_normal {
@@ -1487,6 +1295,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
   call CheckContamination as CheckContamination_normal {
     input:
       verifyBamID=verifyBamID,
+      PYTHON3 = python3,
       in_bam = SortAndFixSampleBam_normal.out_bam,
       in_bai = SortAndFixSampleBam_normal.out_bai,
       contamination_sites_vcf = contamination_sites_vcf,
@@ -1530,7 +1339,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
         GATK4=gatk4,
         in_bam = SortAndFixSampleBam_normal.out_bam,
         in_bai = SortAndFixSampleBam_normal.out_bai,
-        out_bam_basename = recalibrated_bam_basename,
+        out_bam_basename = recalibrated_bam_basename_normal,
         recalibration_report = GatherBqsrReports_normal.output_bqsr_report,
         sequence_group_interval = subgroup,
         ref_dict = ref_dict,
@@ -1625,7 +1434,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       PICARD=picard,
       in_bam = GatherBamFiles_normal.out_bam,
       in_bai = GatherBamFiles_normal.out_bai,
-      read_group_md5_filename = recalibrated_bam_basename + ".bam.read_group_md5"
+      read_group_md5_filename = recalibrated_bam_basename_normal + ".bam.read_group_md5"
   }
   
   # Convert the final merged recalibrated BAM file to CRAM format
@@ -1717,34 +1526,15 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       ref_dict = ref_dict,
       wgs_evaluation_interval_list = wgs_evaluation_interval_list
   }
+############################
+### WES NORMAL PART ENDS ###
+############################
 
 
-#########################
-### DNA only part end ###
-#########################
-
-
-
-
-
-
-
-
-
-
-
-
-#####################
-### RNA only part ###
-#####################
-
-
-  String final_gvcf_name_tumor = base_file_name_tumor + final_gvcf_ext
-  String sub_strip_path_tumor = sub_strip_path
-  String sub_strip_unmapped_tumor = sub_strip_unmapped
-
-  ###### Here the workflow is adapted to .fastq files:
-  # Decompress and split the files into chunks, return an array of .fastq files:
+######################
+### WES TUMOR PART ###
+######################
+  # Decompress and split the files into chunks, return an array of .fastq files
   call UnzipAndSplit as UnzipAndSplit_tumor {
       input:
         PIGZ=pigz,
@@ -1753,10 +1543,8 @@ workflow WES_normal_tumor_somatic_SNV_wf {
         sample_name = sample_name + '_tumor'
   }
 
-
   Array[Pair[File, File]] fastqR1R2_chunks_tumor = zip(UnzipAndSplit_tumor.R1_splits, UnzipAndSplit_tumor.R2_splits)
   scatter (fastq_chunk_tumor in fastqR1R2_chunks_tumor) {
-
     call TrimReads as TrimReads_tumor {
         input:
           TRIMMOMATIC=trimmomatic,
@@ -1766,6 +1554,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
           basenameR2 = basename(fastq_chunk_tumor.right, ".fastq")
     }
 
+    # Convert to unmapped BAM file
     call FastqToBam as FastqToBam_tumor {
         input:
           PICARD=picard,
@@ -1774,63 +1563,40 @@ workflow WES_normal_tumor_somatic_SNV_wf {
           input_fastqR2 = TrimReads_tumor.output_R2
     }
 
-#  }
-
-  ######
-
-
-  # Align flowcell-level unmapped input bams in parallel
-#  scatter (unmapped_bam in flowcell_unmapped_bams) {
-#  scatter (unmapped_bam in FastqToBam.out_bam) {  
-    # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
-    # String base_name = sub(sub(unmapped_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
-#    String sub_strip_path_tumor = "/home/projects/dp_00005/data/cromwell_test/.*/"
-#    String sub_strip_unmapped_tumor = unmapped_bam_suffix + "$"
-
     # QC the unmapped BAM 
     call CollectQualityYieldMetrics as CollectQualityYieldMetrics_tumor {
       input:
         PICARD=picard,
         in_bam = FastqToBam_tumor.out_bam,
-        metrics_filename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".unmapped.quality_yield_metrics"
+        metrics_filename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmapped.quality_yield_metrics"
     }
 
-    call STAR_Map as STAR_Map_tumor {
-      input: STAR=star,
-        STARindexDir=premade_STARindexDir,
-        sample_name = sample_name + '_tumor',
-        input_fastqR1 = TrimReads_tumor.output_R1,
-        input_fastqR2 = TrimReads_tumor.output_R2
-    }
-
-    # This step is needed to make BAM index for SplitNCigarReads:
-    call SortAndFixTags as SortAndFixReadGroupBam_tumor_pre {
+    # Map reads to reference
+    call SamToFastqAndBwaMem as SamToFastqAndBwaMem_tumor {
       input:
+        SAMTOOLS=samtools,
         PICARD=picard,
-        in_bam = STAR_Map_tumor.out_bam,
-        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".sorted",
-        ref_dict = ref_dict,
+        in_bam = FastqToBam_tumor.out_bam,
+        bwa_commandline = bwa_commandline,
+        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".unmerged",
         ref_fasta = ref_fasta,
-        ref_fasta_index = ref_fasta_index
-    }
-
-    # Use SplitNCigarReads for best practices on RNAseq data.
-    # It appears to be important to run this before "MergeBamAlignment". See here: https://gatkforums.broadinstitute.org/gatk/discussion/9975/splitntrim-errors
-    call SplitNCigarReads as SplitNCigarReads_tumor {
-      input: GATK4_LAUNCH=gatk4_launch,
-        sample_name = sample_name + '_tumor',
-        ref_fasta=ref_fasta,
-        in_bam=SortAndFixReadGroupBam_tumor_pre.out_bam,
-        in_bai=SortAndFixReadGroupBam_tumor_pre.out_bai
-    }
+        ref_fasta_index = ref_fasta_index,
+        ref_dict = ref_dict,
+        ref_alt = ref_alt,
+        ref_bwt = ref_bwt,
+        ref_amb = ref_amb,
+        ref_ann = ref_ann,
+        ref_pac = ref_pac,
+        ref_sa = ref_sa
+     }
 
     # Merge original uBAM and BWA-aligned BAM 
     call MergeBamAlignment as MergeBamAlignment_tumor {
       input:
         PICARD=picard,
         unmapped_bam = FastqToBam_tumor.out_bam,
-        aligned_bam = SplitNCigarReads_tumor.out_bam,
-        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".aligned.unsorted",
+        aligned_bam = SamToFastqAndBwaMem_tumor.out_bam,
+        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".aligned.unsorted",
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict
@@ -1842,7 +1608,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       input:
         PICARD=picard,
         in_bam = MergeBamAlignment_tumor.out_bam,
-        out_bam_prefix = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".readgroup"
+        out_bam_prefix = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".readgroup"
     }
 
     # Sort and fix tags in the merged BAM
@@ -1850,12 +1616,12 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       input:
         PICARD=picard,
         in_bam = MergeBamAlignment_tumor.out_bam,
-        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".sorted",
+        out_bam_basename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".sorted",
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index
     }
-    
+
     # Validate the aligned and sorted readgroup BAM
     # This is called to help in finding problems early.
     # If considered too time consuming and not helpful, can be removed.
@@ -1867,9 +1633,8 @@ workflow WES_normal_tumor_somatic_SNV_wf {
         ref_dict = ref_dict,
         in_bam = SortAndFixReadGroupBam_tumor.out_bam,
         in_bai = SortAndFixReadGroupBam_tumor.out_bai,
-        report_filename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path_tumor, ""), sub_strip_unmapped_tumor, "") + ".validation_report"
+        report_filename = sub(sub(FastqToBam_tumor.out_bam, sub_strip_path, ""), sub_strip_unmapped, "") + ".validation_report"
     }
-
   }
 
   # Aggregate aligned+merged flowcell BAM files and mark duplicates
@@ -1894,16 +1659,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       ref_fasta_index = ref_fasta_index
   }
 
-  # Use SplitNCigarReads for best practices on RNAseq data:
-#  call SplitNCigarReads as SplitNCigarReads_tumor {
-#    input: GATK=gatk,
-#      sample_name = sample_name + '_tumor',
-#      ref_fasta=ref_fasta,
-#      in_bam=SortAndFixSampleBam_tumor.out_bam,
-#      in_bai=SortAndFixSampleBam_tumor.out_bai
-#  }
-
-
   # Check identity of fingerprints across readgroups
   call CrossCheckFingerprints as CrossCheckFingerprints_tumor {
     input:
@@ -1919,18 +1674,19 @@ workflow WES_normal_tumor_somatic_SNV_wf {
     input:
       ref_dict = ref_dict
   }
-  
+
   # Estimate level of cross-sample contamination
   call CheckContamination as CheckContamination_tumor {
     input:
       verifyBamID=verifyBamID,
+      PYTHON3 = python3,
       in_bam = SortAndFixSampleBam_tumor.out_bam,
       in_bai = SortAndFixSampleBam_tumor.out_bai,
       contamination_sites_vcf = contamination_sites_vcf,
       contamination_sites_vcf_index = contamination_sites_vcf_index,
       output_prefix = base_file_name_tumor + ".preBqsr"
   }
-  
+
   # Perform Base Quality Score Recalibration (BQSR) on the sorted BAM in parallel
   scatter (subgroup in CreateSequenceGroupingTSV_tumor.sequence_grouping) {
     # Generate the recalibration model by interval
@@ -1947,9 +1703,8 @@ workflow WES_normal_tumor_somatic_SNV_wf {
         known_indels_sites_indices = known_indels_sites_indices,
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
-        ref_fasta_index = ref_fasta_index,
-        U_option = "-U ALLOW_N_CIGAR_READS"
-    }  
+        ref_fasta_index = ref_fasta_index
+    }
   }
 
   # Merge the recalibration reports resulting from by-interval recalibration
@@ -1968,14 +1723,14 @@ workflow WES_normal_tumor_somatic_SNV_wf {
         GATK4=gatk4,
         in_bam = SortAndFixSampleBam_tumor.out_bam,
         in_bai = SortAndFixSampleBam_tumor.out_bai,
-        out_bam_basename = recalibrated_bam_basename,
+        out_bam_basename = recalibrated_bam_basename_tumor,
         recalibration_report = GatherBqsrReports_tumor.output_bqsr_report,
         sequence_group_interval = subgroup,
         ref_dict = ref_dict,
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index
     }
-  } 
+  }
 
   # Merge the recalibrated BAM files resulting from by-interval recalibration
   call GatherBamFiles as GatherBamFiles_tumor {
@@ -1984,15 +1739,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       in_bams = ApplyBQSR_tumor.recalibrated_bam,
       out_bam_basename = base_file_name_tumor
   }
-
-#### This seems to add nothing the same number of reads are missing mates...
-  # Remove unpaired mate reads and regenerate the bam index (this an RNAseq specific problem introduced because of SplitNCigar and ALLOW_N_CIGAR_READS)
-#  call RemoveUnpairedMates as RemoveUnpairedMates_tumor {
-#    input:
-#      SAMTOOLS = samtools,
-#      in_bam = GatherBamFiles_tumor.out_bam,
-#      output_basename = base_file_name_tumor
-#  }
 
   # QC the final BAM (consolidated after scattered BQSR)
   call CollectReadgroupBamQualityMetrics as CollectReadgroupBamQualityMetrics_tumor {
@@ -2016,7 +1762,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
-      ignore = ["MATE_NOT_FOUND"]
+      ignore = ["null"]
   }
 
   # QC the final BAM some more (no such thing as too much QC)
@@ -2054,7 +1800,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       ref_fasta_index = ref_fasta_index,
       wgs_coverage_interval_list = wgs_coverage_interval_list
   }
-  
+
   # QC the sample raw WGS metrics (common thresholds)
   call CollectRawWgsMetrics as CollectRawWgsMetrics_tumor {
     input:
@@ -2066,16 +1812,16 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       ref_fasta_index = ref_fasta_index,
       wgs_coverage_interval_list = wgs_coverage_interval_list
   }
-  
+
   # Generate a checksum per readgroup in the final BAM
   call CalculateReadGroupChecksum as CalculateReadGroupChecksum_tumor {
     input:
       PICARD=picard,
       in_bam = GatherBamFiles_tumor.out_bam,
       in_bai = GatherBamFiles_tumor.out_bai,
-      read_group_md5_filename = recalibrated_bam_basename + ".bam.read_group_md5"
+      read_group_md5_filename = recalibrated_bam_basename_tumor + ".bam.read_group_md5"
   }
-  
+
   # Convert the final merged recalibrated BAM file to CRAM format
   call ConvertToCram as ConvertToCram_tumor {
     input:
@@ -2109,14 +1855,14 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
       max_output = 1000000000,
-      ignore = ["MATE_NOT_FOUND"]
+      ignore = ["null"]
   }
-  
+
   # Call variants in parallel over WGS calling intervals
   scatter (subInterval in scattered_calling_intervals) {
   
     # Generate GVCF by interval
-    call HaplotypeCaller_RNA as HaplotypeCaller_tumor {
+    call HaplotypeCaller as HaplotypeCaller_tumor {
       input:
         GATK=gatk,
         contamination = CheckContamination_tumor.contamination,
@@ -2129,7 +1875,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
         ref_fasta_index = ref_fasta_index
      }
   }
-  
+
   # Combine by-interval GVCFs into a single sample GVCF file
   call MergeVCFs as MergeVCFs_tumor {
     input:
@@ -2138,7 +1884,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       input_vcfs_indexes = HaplotypeCaller_tumor.output_gvcf_index,
       output_vcf_name = final_gvcf_name_tumor
   }
-  
+
   # Validate the GVCF output of HaplotypeCaller
   call ValidateGVCF as ValidateGVCF_tumor {
     input:
@@ -2166,21 +1912,9 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       wgs_evaluation_interval_list = wgs_evaluation_interval_list
   }
 
-
-
-#########################
-### RNA only part end ###
-#########################
-
-
-
-
-
-
-
-
-
-
+###########################
+### WES TUMOR PART ENDS ###
+###########################
 
 
   # Outputs that will be retained when execution is complete  
@@ -2221,5 +1955,8 @@ workflow WES_normal_tumor_somatic_SNV_wf {
     ConvertToCram_tumor.*
     MergeVCFs_normal.*
     MergeVCFs_tumor.*
-    } 
+    }
 }
+#################################
+### WORKFLOW DEFINITIONS ENDS ###
+#################################
