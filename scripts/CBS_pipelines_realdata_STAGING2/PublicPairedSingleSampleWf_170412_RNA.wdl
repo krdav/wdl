@@ -28,6 +28,29 @@
 
 # TASK DEFINITIONS
 
+task RemoveUnpairedMates {
+  File in_bam
+  String output_basename
+  Int cpu=1
+  File SAMTOOLS
+
+  command <<<
+    set -e
+    set -o pipefail
+
+    ${SAMTOOLS} view -f 2 -o ${output_basename}.bam ${in_bam}
+    ${SAMTOOLS} index -b ${output_basename}.bam
+    mv ${output_basename}.bam.bai ${output_basename}.bai 
+  >>>
+  runtime {
+    cpu: cpu
+  }
+  output {
+    File out_bam = "${output_basename}.bam"
+    File out_bai = "${output_basename}.bai"
+  }
+}
+
 task STAR_Map {
   File STAR
   String STARindexDir
@@ -1961,13 +1984,21 @@ workflow PairedEndSingleSampleWorkflow {
       in_bams = ApplyBQSR_tumor.recalibrated_bam,
       out_bam_basename = base_file_name_tumor
   }
-  
+
+  # Remove unpaired mate reads and regenerate the bam index (this an RNAseq specific problem introduced because of SplitNCigar and ALLOW_N_CIGAR_READS)
+  call RemoveUnpairedMates as RemoveUnpairedMates_tumor {
+    input:
+      SAMTOOLS = samtools,
+      in_bam = GatherBamFiles_tumor.out_bam,
+      output_basename = base_file_name_tumor
+  }
+
   # QC the final BAM (consolidated after scattered BQSR)
   call CollectReadgroupBamQualityMetrics as CollectReadgroupBamQualityMetrics_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles_tumor.out_bam,
-      in_bai = GatherBamFiles_tumor.out_bai,
+      in_bam = RemoveUnpairedMates_tumor.out_bam,
+      in_bai = RemoveUnpairedMates_tumor.out_bai,
       out_bam_prefix = base_file_name_tumor + ".readgroup",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
@@ -1978,44 +2009,44 @@ workflow PairedEndSingleSampleWorkflow {
   call ValidateSamFile as ValidateAggregatedSamFile_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles_tumor.out_bam,
-      in_bai = GatherBamFiles_tumor.out_bai,
+      in_bam = RemoveUnpairedMates_tumor.out_bam,
+      in_bai = RemoveUnpairedMates_tumor.out_bai,
       report_filename = base_file_name_tumor + ".validation_report",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index
   }
-  
+
   # QC the final BAM some more (no such thing as too much QC)
   call CollectAggregationMetrics as CollectAggregationMetrics_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles_tumor.out_bam,
-      in_bai = GatherBamFiles_tumor.out_bai,
+      in_bam = RemoveUnpairedMates_tumor.out_bam,
+      in_bai = RemoveUnpairedMates_tumor.out_bai,
       out_bam_prefix = base_file_name_tumor,
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index
   }
-  
+
   # Check the sample BAM fingerprint against the sample array 
   call CheckFingerprint as CheckFingerprint_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles_tumor.out_bam,
-      in_bai = GatherBamFiles_tumor.out_bai,
+      in_bam = RemoveUnpairedMates_tumor.out_bam,
+      in_bai = RemoveUnpairedMates_tumor.out_bai,
       haplotype_database_file = haplotype_database_file,
       genotypes = fingerprint_genotypes_file,
       output_basename = base_file_name_tumor,
       sample = sample_name + '_tumor'
   }
-  
+
   # QC the sample WGS metrics (stringent thresholds)
   call CollectWgsMetrics as CollectWgsMetrics_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles_tumor.out_bam,
-      in_bai = GatherBamFiles_tumor.out_bai,
+      in_bam = RemoveUnpairedMates_tumor.out_bam,
+      in_bai = RemoveUnpairedMates_tumor.out_bai,
       metrics_filename = base_file_name_tumor + ".wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -2026,8 +2057,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CollectRawWgsMetrics as CollectRawWgsMetrics_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles_tumor.out_bam,
-      in_bai = GatherBamFiles_tumor.out_bai,
+      in_bam = RemoveUnpairedMates_tumor.out_bam,
+      in_bai = RemoveUnpairedMates_tumor.out_bai,
       metrics_filename = base_file_name_tumor + ".raw_wgs_metrics",
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
@@ -2038,8 +2069,8 @@ workflow PairedEndSingleSampleWorkflow {
   call CalculateReadGroupChecksum as CalculateReadGroupChecksum_tumor {
     input:
       PICARD=picard,
-      in_bam = GatherBamFiles_tumor.out_bam,
-      in_bai = GatherBamFiles_tumor.out_bai,
+      in_bam = RemoveUnpairedMates_tumor.out_bam,
+      in_bai = RemoveUnpairedMates_tumor.out_bai,
       read_group_md5_filename = recalibrated_bam_basename + ".bam.read_group_md5"
   }
   
@@ -2048,7 +2079,7 @@ workflow PairedEndSingleSampleWorkflow {
     input:
       seq_cache_populate=seq_cache_populate,
       SAMTOOLS=samtools,
-      in_bam = GatherBamFiles_tumor.out_bam,
+      in_bam = RemoveUnpairedMates_tumor.out_bam,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
       output_basename = base_file_name_tumor
@@ -2087,8 +2118,8 @@ workflow PairedEndSingleSampleWorkflow {
       input:
         GATK=gatk,
         contamination = CheckContamination_tumor.contamination,
-        in_bam = GatherBamFiles_tumor.out_bam,
-        in_bai = GatherBamFiles_tumor.out_bai,
+        in_bam = RemoveUnpairedMates_tumor.out_bam,
+        in_bai = RemoveUnpairedMates_tumor.out_bai,
         interval_list = subInterval,
         gvcf_basename = base_file_name_tumor,
         ref_dict = ref_dict,
