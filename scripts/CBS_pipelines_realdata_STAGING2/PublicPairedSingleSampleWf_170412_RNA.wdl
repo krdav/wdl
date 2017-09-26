@@ -2014,7 +2014,8 @@ workflow PairedEndSingleSampleWorkflow {
       report_filename = base_file_name_tumor + ".validation_report",
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index
+      ref_fasta_index = ref_fasta_index,
+      ignore = ["MATE_NOT_FOUND"]
   }
 
   # QC the final BAM some more (no such thing as too much QC)
@@ -2107,7 +2108,7 @@ workflow PairedEndSingleSampleWorkflow {
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index,
       max_output = 1000000000,
-      ignore = ["null"]
+      ignore = ["MATE_NOT_FOUND"]
   }
   
   # Call variants in parallel over WGS calling intervals
