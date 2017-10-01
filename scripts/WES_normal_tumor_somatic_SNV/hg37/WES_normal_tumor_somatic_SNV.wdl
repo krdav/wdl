@@ -138,7 +138,6 @@ task SamToFastqAndBwaMem {
   File ref_dict
   # This is the .alt file from bwa-kit (https://github.com/lh3/bwa/tree/master/bwakit), 
   # listing the reference contigs that are "alternative". 
-  File ref_alt
   File ref_amb
   File ref_ann
   File ref_bwt
@@ -155,8 +154,8 @@ task SamToFastqAndBwaMem {
 
     # set the bash variable needed for the command-line
     bash_ref_fasta=${ref_fasta}
-    # if ref_alt has data in it, we proceed
-    if [ -s ${ref_alt} ]; then
+    # if ref_amb has data in it, we proceed
+    if [ -s ${ref_amb} ]; then
       java -Xmx3000m \
         -jar ${PICARD} \
         SamToFastq \
@@ -167,10 +166,10 @@ task SamToFastqAndBwaMem {
       ${bwa_commandline} /dev/stdin -  2> >(tee ${out_bam_basename}.bwa.stderr.log >&2) | \
       ${SAMTOOLS} view -1 - > ${out_bam_basename}.bam
 
-      grep -m1 "read .* ALT contigs" ${out_bam_basename}.bwa.stderr.log | \
-      grep -v "read 0 ALT contigs"
+      grep -m1 "read .* ALT contigs" ${out_bam_basename}.bwa.stderr.log #| \
+      # grep -v "read 0 ALT contigs"
 
-    # else ref_alt is empty or could not be found, so we bail out
+    # else ref_amb is empty or could not be found, so we bail out
     else
       exit 1;
     fi
@@ -393,77 +392,6 @@ task CollectAggregationMetrics {
     File pre_adapter_summary_metrics = "${out_bam_prefix}.pre_adapter_summary_metrics"
     File quality_distribution_pdf = "${out_bam_prefix}.quality_distribution.pdf"
     File quality_distribution_metrics = "${out_bam_prefix}.quality_distribution_metrics"
-  }
-}
-
-# Check that the fingerprints of separate readgroups all match
-task CrossCheckFingerprints {
-  Array[File] in_bams
-  Array[File] in_baies
-  File haplotype_database_file # if this file is empty (0-length) the workflow should not do fingerprint comparison (as there are no fingerprints for the sample)
-  String metrics_filename
-  Int cpu=1
-  File PICARD
-
-  command <<<
-    if [ -s ${haplotype_database_file} ]; then
-      java -Dsamjdk.buffer_size=131072 -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx2000m \
-       -jar ${PICARD} \
-       CrosscheckReadGroupFingerprints \
-       OUTPUT=${metrics_filename} \
-       HAPLOTYPE_MAP=${haplotype_database_file} \
-       EXPECT_ALL_READ_GROUPS_TO_MATCH=true \
-       INPUT=${sep=' INPUT=' in_bams} \
-       LOD_THRESHOLD=-20.0
-    else
-      echo "No haplotype_database_file. Skipping Fingerprint check."
-      touch ${metrics_filename}
-    fi
-  >>>
-  runtime {
-    cpu: cpu
-  }
-  output {
-    File metrics = "${metrics_filename}"
-  }
-}
-
-# Check that the fingerprint of the sample BAM matches the sample array
-task CheckFingerprint {
-  File in_bam
-  File in_bai
-  File haplotype_database_file
-  File genotypes
-  String output_basename
-  String sample
-  Int cpu=1
-  File PICARD
-
-  command <<<
-  if [ -s ${genotypes} ]; then
-    java -Dsamjdk.buffer_size=131072 -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx1024m  \
-    -jar ${PICARD} \
-    CheckFingerprint \
-    INPUT=${in_bam} \
-    OUTPUT=${output_basename} \
-    GENOTYPES=${genotypes} \
-    HAPLOTYPE_MAP=${haplotype_database_file} \
-    SAMPLE_ALIAS="${sample}" \
-    IGNORE_READ_GROUPS=true
-  else
-    echo "No fingerprint found. Skipping Fingerprint check."
-    # We touch the outputs here in order to create 0 length files.  
-    # Otherwise the task will fail since the expected outputs are not to be found.
-    touch ${output_basename}.fingerprinting_summary_metrics
-    touch ${output_basename}.fingerprinting_detail_metrics
-  fi
-  >>>
-  runtime {
-    cpu: cpu
-  }
-  output {
-    File summary_metrics = "${output_basename}.fingerprinting_summary_metrics"
-    File detail_metrics = "${output_basename}.fingerprinting_detail_metrics"
   }
 }
 
@@ -726,7 +654,6 @@ task CollectWgsMetrics {
   File in_bam
   File in_bai
   String metrics_filename
-  File wgs_coverage_interval_list
   File ref_fasta
   File ref_fasta_index
   Int cpu=1
@@ -739,7 +666,6 @@ task CollectWgsMetrics {
       INPUT=${in_bam} \
       VALIDATION_STRINGENCY=SILENT \
       REFERENCE_SEQUENCE=${ref_fasta} \
-      INTERVALS=${wgs_coverage_interval_list} \
       OUTPUT=${metrics_filename}
   }
   runtime {
@@ -755,7 +681,6 @@ task CollectRawWgsMetrics {
   File in_bam
   File in_bai
   String metrics_filename
-  File wgs_coverage_interval_list
   File ref_fasta
   File ref_fasta_index
   Int cpu=1
@@ -768,7 +693,6 @@ task CollectRawWgsMetrics {
       INPUT=${in_bam} \
       VALIDATION_STRINGENCY=SILENT \
       REFERENCE_SEQUENCE=${ref_fasta} \
-      INTERVALS=${wgs_coverage_interval_list} \
       OUTPUT=${metrics_filename}
   }
   runtime {
@@ -891,7 +815,7 @@ task HaplotypeCaller {
   File ref_fasta
   File ref_fasta_index
   Float? contamination
-  Int cpu=1
+  Int cpu=28
   File GATK
 
   command {
@@ -907,6 +831,7 @@ task HaplotypeCaller {
       -variant_index_type LINEAR \
       -contamination ${default=0 contamination} \
       --read_filter OverclippedRead \
+      -nct ${cpu} \
       -L ${interval_list}
   }
   runtime {
@@ -982,7 +907,6 @@ task CollectGvcfCallingMetrics {
   File dbSNP_vcf
   File dbSNP_vcf_index
   File ref_dict
-  File wgs_evaluation_interval_list
   Int cpu=1
   File PICARD
 
@@ -994,7 +918,6 @@ task CollectGvcfCallingMetrics {
       OUTPUT=${metrics_basename} \
       DBSNP=${dbSNP_vcf} \
       SEQUENCE_DICTIONARY=${ref_dict} \
-      TARGET_INTERVALS=${wgs_evaluation_interval_list} \
       GVCF_INPUT=true
   }
   runtime {
@@ -1085,10 +1008,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
 
   File contamination_sites_vcf
   File contamination_sites_vcf_index
-  File fingerprint_genotypes_file # if this file is empty (0-length) the workflow should not do fingerprint comparison (as there are no fingerprints for the sample)
-  File haplotype_database_file  
-  File wgs_evaluation_interval_list
-  File wgs_coverage_interval_list
   
   String sample_name
   String base_file_name_normal
@@ -1106,13 +1025,11 @@ workflow WES_normal_tumor_somatic_SNV_wf {
   File ref_fasta
   File ref_fasta_index
   File ref_dict
-  File ref_alt
   File ref_bwt
   File ref_sa
   File ref_amb
   File ref_ann
   File ref_pac
-  String premade_STARindexDir
 
   File dbSNP_vcf
   File dbSNP_vcf_index
@@ -1197,7 +1114,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict,
-        ref_alt = ref_alt,
         ref_bwt = ref_bwt,
         ref_amb = ref_amb,
         ref_ann = ref_ann,
@@ -1273,16 +1189,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       ref_dict = ref_dict,
       ref_fasta = ref_fasta,
       ref_fasta_index = ref_fasta_index
-  }
-
-  # Check identity of fingerprints across readgroups
-  call CrossCheckFingerprints as CrossCheckFingerprints_normal {
-    input:
-      PICARD=picard,
-      in_bams = SortAndFixSampleBam_normal.out_bam,
-      in_baies = SortAndFixSampleBam_normal.out_bai,
-      haplotype_database_file = haplotype_database_file,
-      metrics_filename = base_file_name_normal + ".crosscheck"
   }
 
   # Create list of sequences for scatter-gather parallelization 
@@ -1392,18 +1298,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       ref_fasta_index = ref_fasta_index
   }
   
-  # Check the sample BAM fingerprint against the sample array 
-  call CheckFingerprint as CheckFingerprint_normal {
-    input:
-      PICARD=picard,
-      in_bam = GatherBamFiles_normal.out_bam,
-      in_bai = GatherBamFiles_normal.out_bai,
-      haplotype_database_file = haplotype_database_file,
-      genotypes = fingerprint_genotypes_file,
-      output_basename = base_file_name_normal,
-      sample = sample_name + '_normal'
-  }
-  
   # QC the sample WGS metrics (stringent thresholds)
   call CollectWgsMetrics as CollectWgsMetrics_normal {
     input:
@@ -1412,8 +1306,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       in_bai = GatherBamFiles_normal.out_bai,
       metrics_filename = base_file_name_normal + ".wgs_metrics",
       ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      wgs_coverage_interval_list = wgs_coverage_interval_list
+      ref_fasta_index = ref_fasta_index
   }
   
   # QC the sample raw WGS metrics (common thresholds)
@@ -1424,8 +1317,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       in_bai = GatherBamFiles_normal.out_bai,
       metrics_filename = base_file_name_normal + ".raw_wgs_metrics",
       ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      wgs_coverage_interval_list = wgs_coverage_interval_list
+      ref_fasta_index = ref_fasta_index
   }
   
   # Generate a checksum per readgroup in the final BAM
@@ -1523,8 +1415,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       metrics_basename = base_file_name_normal,
       dbSNP_vcf = dbSNP_vcf,
       dbSNP_vcf_index = dbSNP_vcf_index,
-      ref_dict = ref_dict,
-      wgs_evaluation_interval_list = wgs_evaluation_interval_list
+      ref_dict = ref_dict
   }
 ############################
 ### WES NORMAL PART ENDS ###
@@ -1582,7 +1473,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
         ref_dict = ref_dict,
-        ref_alt = ref_alt,
         ref_bwt = ref_bwt,
         ref_amb = ref_amb,
         ref_ann = ref_ann,
@@ -1659,17 +1549,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       ref_fasta_index = ref_fasta_index
   }
 
-  # Check identity of fingerprints across readgroups
-  call CrossCheckFingerprints as CrossCheckFingerprints_tumor {
-    input:
-      PICARD=picard,
-      in_bams = SortAndFixSampleBam_tumor.out_bam,
-      in_baies = SortAndFixSampleBam_tumor.out_bai,
-      haplotype_database_file = haplotype_database_file,
-      metrics_filename = base_file_name_tumor + ".crosscheck"
-  }
-
-  # Create list of sequences for scatter-gather parallelization 
   call CreateSequenceGroupingTSV as CreateSequenceGroupingTSV_tumor {
     input:
       ref_dict = ref_dict
@@ -1777,18 +1656,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       ref_fasta_index = ref_fasta_index
   }
 
-  # Check the sample BAM fingerprint against the sample array 
-  call CheckFingerprint as CheckFingerprint_tumor {
-    input:
-      PICARD=picard,
-      in_bam = GatherBamFiles_tumor.out_bam,
-      in_bai = GatherBamFiles_tumor.out_bai,
-      haplotype_database_file = haplotype_database_file,
-      genotypes = fingerprint_genotypes_file,
-      output_basename = base_file_name_tumor,
-      sample = sample_name + '_tumor'
-  }
-
   # QC the sample WGS metrics (stringent thresholds)
   call CollectWgsMetrics as CollectWgsMetrics_tumor {
     input:
@@ -1797,8 +1664,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       in_bai = GatherBamFiles_tumor.out_bai,
       metrics_filename = base_file_name_tumor + ".wgs_metrics",
       ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      wgs_coverage_interval_list = wgs_coverage_interval_list
+      ref_fasta_index = ref_fasta_index
   }
 
   # QC the sample raw WGS metrics (common thresholds)
@@ -1809,8 +1675,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       in_bai = GatherBamFiles_tumor.out_bai,
       metrics_filename = base_file_name_tumor + ".raw_wgs_metrics",
       ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      wgs_coverage_interval_list = wgs_coverage_interval_list
+      ref_fasta_index = ref_fasta_index
   }
 
   # Generate a checksum per readgroup in the final BAM
@@ -1909,7 +1774,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       dbSNP_vcf = dbSNP_vcf,
       dbSNP_vcf_index = dbSNP_vcf_index,
       ref_dict = ref_dict,
-      wgs_evaluation_interval_list = wgs_evaluation_interval_list
   }
 
 ###########################
@@ -1927,8 +1791,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
     CollectReadgroupBamQualityMetrics_tumor.*
     CollectUnsortedReadgroupBamQualityMetrics_normal.*
     CollectUnsortedReadgroupBamQualityMetrics_tumor.*
-    CrossCheckFingerprints_normal.*
-    CrossCheckFingerprints_tumor.*
     ValidateBamFromCram_normal.*
     ValidateBamFromCram_tumor.*
     CalculateReadGroupChecksum_normal.*
@@ -1937,8 +1799,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
     ValidateAggregatedSamFile_tumor.*
     CollectAggregationMetrics_normal.*
     CollectAggregationMetrics_tumor.*
-    CheckFingerprint_normal.*
-    CheckFingerprint_tumor.*
     CollectWgsMetrics_normal.*
     CollectWgsMetrics_tumor.*
     CollectRawWgsMetrics_normal.*
