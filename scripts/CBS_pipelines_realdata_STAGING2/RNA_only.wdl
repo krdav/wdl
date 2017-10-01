@@ -962,6 +962,7 @@ task CheckContamination {
   String output_prefix
   Int cpu=1
   File verifyBamID
+  File PYTHON3
 
   # Having to do this as a 2-step command in heredoc syntax, adding a python step to read the metrics
   # This is a hack until read_object() is supported by Cromwell.
@@ -978,7 +979,7 @@ task CheckContamination {
     --bam ${in_bam} \
     1>/dev/null
 
-    python3 <<CODE
+    ${PYTHON3} <<CODE
     import csv
     import sys
     with open('${output_prefix}.selfSM') as selfSM:
@@ -1485,7 +1486,8 @@ workflow PairedEndSingleSampleWorkflow {
   # Estimate level of cross-sample contamination
   call CheckContamination as CheckContamination_tumor {
     input:
-      verifyBamID=verifyBamID,
+      verifyBamID = verifyBamID,
+      PYTHON3 = python3,
       in_bam = SortAndFixSampleBam_tumor.out_bam,
       in_bai = SortAndFixSampleBam_tumor.out_bai,
       contamination_sites_vcf = contamination_sites_vcf,
