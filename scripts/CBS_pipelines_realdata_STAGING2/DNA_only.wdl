@@ -1037,11 +1037,11 @@ task HaplotypeCaller {
   File ref_fasta
   File ref_fasta_index
   Float? contamination
-  Int cpu=1
+  Int cpu=28
   File GATK
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx20000m \
       -jar ${GATK} \
       -T HaplotypeCaller \
       -R ${ref_fasta} \
@@ -1053,6 +1053,7 @@ task HaplotypeCaller {
       -variant_index_type LINEAR \
       -contamination ${default=0 contamination} \
       --read_filter OverclippedRead \
+      -nct 5 \
       -L ${interval_list}
   }
   runtime {
@@ -1061,45 +1062,6 @@ task HaplotypeCaller {
   output {
     File output_gvcf = "${gvcf_basename}.vcf.gz"
     File output_gvcf_index = "${gvcf_basename}.vcf.gz.tbi"
-  }
-}
-
-
-task HaplotypeCaller_RNA {
-  File in_bam
-  File in_bai
-  File interval_list
-  String gvcf_basename
-  File ref_dict
-  File ref_fasta
-  File ref_fasta_index
-  Float? contamination
-  Int cpu=1
-  File GATK
-
-  command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
-      -jar ${GATK} \
-      -T HaplotypeCaller \
-      -R ${ref_fasta} \
-      -o ${gvcf_basename}.vcf.gz \
-      -I ${in_bam} \
-      -ERC GVCF \
-      --max_alternate_alleles 3 \
-      -variant_index_parameter 128000 \
-      -variant_index_type LINEAR \
-      -stand_call_conf 20 \
-      -dontUseSoftClippedBases \
-      -contamination ${default=0 contamination} \
-      --read_filter OverclippedRead \
-      -L ${interval_list}
- }
-  output {
-    File output_gvcf = "${gvcf_basename}.vcf.gz"
-    File output_gvcf_index = "${gvcf_basename}.vcf.gz.tbi"
-  }
-  runtime {
-    cpu: cpu
   }
 }
 
