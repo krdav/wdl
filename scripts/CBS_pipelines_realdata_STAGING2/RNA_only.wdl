@@ -27,7 +27,6 @@
 ## licensing information pertaining to the included programs.
 
 # TASK DEFINITIONS
-
 task RemoveUnpairedMates {
   File in_bam
   String output_basename
@@ -241,32 +240,6 @@ task CollectQualityYieldMetrics {
     File metrics = "${metrics_filename}"
   }
 }
-
-
-## Check the assumption that the final GVCF filename that is going to be used ends with .g.vcf.gz 
-#task CheckFinalVcfExtension {
-#  String vcf_filename
-#  Int cpu=1
-#  File PYTHON2
-#
-#  command <<<
-#    ${PYTHON2} <<CODE
-#    import os
-#    import sys
-#    filename="${vcf_filename}"
-#    if not filename.endswith(".g.vcf.gz"):
-#      raise Exception("input","output GVCF filename must end with '.g.vcf.gz', found %s"%(filename))
-#      sys.exit(1) 
-#    CODE
-#  >>>
-#  runtime {
-#    cpu: cpu
-#  }
-#  output {
-#    String common_suffix=read_string(stdout())
-#  }
-#}
-
 
 # Read unmapped BAM, convert on-the-fly to FASTQ and stream to BWA MEM for alignment
 task SamToFastqAndBwaMem {
@@ -1551,15 +1524,6 @@ workflow PairedEndSingleSampleWorkflow {
       out_bam_basename = base_file_name_tumor
   }
 
-#### This seems to add nothing the same number of reads are missing mates...
-  # Remove unpaired mate reads and regenerate the bam index (this an RNAseq specific problem introduced because of SplitNCigar and ALLOW_N_CIGAR_READS)
-#  call RemoveUnpairedMates as RemoveUnpairedMates_tumor {
-#    input:
-#      SAMTOOLS = samtools,
-#      in_bam = GatherBamFiles_tumor.out_bam,
-#      output_basename = base_file_name_tumor
-#  }
-
   # QC the final BAM (consolidated after scattered BQSR)
   call CollectReadgroupBamQualityMetrics as CollectReadgroupBamQualityMetrics_tumor {
     input:
@@ -1731,20 +1695,6 @@ workflow PairedEndSingleSampleWorkflow {
       ref_dict = ref_dict,
       wgs_evaluation_interval_list = wgs_evaluation_interval_list
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

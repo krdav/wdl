@@ -27,7 +27,6 @@
 ## licensing information pertaining to the included programs.
 
 # TASK DEFINITIONS
-
 task RemoveUnpairedMates {
   File in_bam
   String output_basename
@@ -240,32 +239,6 @@ task CollectQualityYieldMetrics {
     File metrics = "${metrics_filename}"
   }
 }
-
-
-## Check the assumption that the final GVCF filename that is going to be used ends with .g.vcf.gz 
-#task CheckFinalVcfExtension {
-#  String vcf_filename
-#  Int cpu=1
-#  File PYTHON2
-#
-#  command <<<
-#    ${PYTHON2} <<CODE
-#    import os
-#    import sys
-#    filename="${vcf_filename}"
-#    if not filename.endswith(".g.vcf.gz"):
-#      raise Exception("input","output GVCF filename must end with '.g.vcf.gz', found %s"%(filename))
-#      sys.exit(1) 
-#    CODE
-#  >>>
-#  runtime {
-#    cpu: cpu
-#  }
-#  output {
-#    String common_suffix=read_string(stdout())
-#  }
-#}
-
 
 # Read unmapped BAM, convert on-the-fly to FASTQ and stream to BWA MEM for alignment
 task SamToFastqAndBwaMem {
@@ -1315,19 +1288,10 @@ workflow PairedEndSingleSampleWorkflow {
 ### DNA only part ###
 #####################
 
-
   String final_gvcf_name_normal = base_file_name_normal + final_gvcf_ext
   String sub_strip_path = "/home/projects/dp_00005/data/cromwell_test/.*/"
   String sub_strip_unmapped = unmapped_bam_suffix + "$"
 
-
-#  import UnzipTrimBam.wdl as UnzipTrimBam
-
-
-
-
-  ###### Here the workflow is adapted to .fastq files:
-  # Decompress and split the files into chunks, return an array of .fastq files:
   call UnzipAndSplit as UnzipAndSplit_normal {
       input:
         PIGZ=pigz,
@@ -1356,20 +1320,6 @@ workflow PairedEndSingleSampleWorkflow {
           input_fastqR1 = TrimReads_normal.output_R1,
           input_fastqR2 = TrimReads_normal.output_R2
     }
-
-#  }
-
-  ######
-
-
-  # Align flowcell-level unmapped input bams in parallel
-#  scatter (unmapped_bam in flowcell_unmapped_bams) {
-#  scatter (unmapped_bam in FastqToBam_normal.out_bam) {  
-    # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
-    # String base_name = sub(sub(FastqToBam_normal.out_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
-
-#    String sub_strip_path = "/home/projects/dp_00005/data/cromwell_test/.*/"
-#    String sub_strip_unmapped = unmapped_bam_suffix + "$"
 
     # QC the unmapped BAM 
     call CollectQualityYieldMetrics as CollectQualityYieldMetrics_normal {
@@ -1488,7 +1438,6 @@ workflow PairedEndSingleSampleWorkflow {
   call CheckContamination as CheckContamination_normal {
     input:
       verifyBamID=verifyBamID,
-      PYTHON3 = python3,
       in_bam = SortAndFixSampleBam_normal.out_bam,
       in_bai = SortAndFixSampleBam_normal.out_bai,
       contamination_sites_vcf = contamination_sites_vcf,
@@ -1721,6 +1670,8 @@ workflow PairedEndSingleSampleWorkflow {
   }
 
 
+
+
 #########################
 ### DNA only part end ###
 #########################
@@ -1740,13 +1691,10 @@ workflow PairedEndSingleSampleWorkflow {
 ### RNA only part ###
 #####################
 
-
   String final_gvcf_name_tumor = base_file_name_tumor + final_gvcf_ext
   String sub_strip_path_tumor = sub_strip_path
   String sub_strip_unmapped_tumor = sub_strip_unmapped
 
-  ###### Here the workflow is adapted to .fastq files:
-  # Decompress and split the files into chunks, return an array of .fastq files:
   call UnzipAndSplit as UnzipAndSplit_tumor {
       input:
         PIGZ=pigz,
@@ -1775,19 +1723,6 @@ workflow PairedEndSingleSampleWorkflow {
           input_fastqR1 = TrimReads_tumor.output_R1,
           input_fastqR2 = TrimReads_tumor.output_R2
     }
-
-#  }
-
-  ######
-
-
-  # Align flowcell-level unmapped input bams in parallel
-#  scatter (unmapped_bam in flowcell_unmapped_bams) {
-#  scatter (unmapped_bam in FastqToBam.out_bam) {  
-    # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
-    # String base_name = sub(sub(unmapped_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
-#    String sub_strip_path_tumor = "/home/projects/dp_00005/data/cromwell_test/.*/"
-#    String sub_strip_unmapped_tumor = unmapped_bam_suffix + "$"
 
     # QC the unmapped BAM 
     call CollectQualityYieldMetrics as CollectQualityYieldMetrics_tumor {
@@ -1819,7 +1754,7 @@ workflow PairedEndSingleSampleWorkflow {
     # Use SplitNCigarReads for best practices on RNAseq data.
     # It appears to be important to run this before "MergeBamAlignment". See here: https://gatkforums.broadinstitute.org/gatk/discussion/9975/splitntrim-errors
     call SplitNCigarReads as SplitNCigarReads_tumor {
-      input: GATK4_LAUNCH=gatk4_launch,
+      input: GATK=gatk,
         sample_name = sample_name + '_tumor',
         ref_fasta=ref_fasta,
         in_bam=SortAndFixReadGroupBam_tumor_pre.out_bam,
@@ -1896,16 +1831,6 @@ workflow PairedEndSingleSampleWorkflow {
       ref_fasta_index = ref_fasta_index
   }
 
-  # Use SplitNCigarReads for best practices on RNAseq data:
-#  call SplitNCigarReads as SplitNCigarReads_tumor {
-#    input: GATK=gatk,
-#      sample_name = sample_name + '_tumor',
-#      ref_fasta=ref_fasta,
-#      in_bam=SortAndFixSampleBam_tumor.out_bam,
-#      in_bai=SortAndFixSampleBam_tumor.out_bai
-#  }
-
-
   # Check identity of fingerprints across readgroups
   call CrossCheckFingerprints as CrossCheckFingerprints_tumor {
     input:
@@ -1925,7 +1850,7 @@ workflow PairedEndSingleSampleWorkflow {
   # Estimate level of cross-sample contamination
   call CheckContamination as CheckContamination_tumor {
     input:
-      verifyBamID=verifyBamID,
+      verifyBamID = verifyBamID,
       PYTHON3 = python3,
       in_bam = SortAndFixSampleBam_tumor.out_bam,
       in_bai = SortAndFixSampleBam_tumor.out_bai,
@@ -1952,7 +1877,7 @@ workflow PairedEndSingleSampleWorkflow {
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index,
         U_option = "-U ALLOW_N_CIGAR_READS"
-    }  
+    }
   }
 
   # Merge the recalibration reports resulting from by-interval recalibration
@@ -1978,7 +1903,7 @@ workflow PairedEndSingleSampleWorkflow {
         ref_fasta = ref_fasta,
         ref_fasta_index = ref_fasta_index
     }
-  } 
+  }
 
   # Merge the recalibrated BAM files resulting from by-interval recalibration
   call GatherBamFiles as GatherBamFiles_tumor {
@@ -1987,15 +1912,6 @@ workflow PairedEndSingleSampleWorkflow {
       in_bams = ApplyBQSR_tumor.recalibrated_bam,
       out_bam_basename = base_file_name_tumor
   }
-
-#### This seems to add nothing the same number of reads are missing mates...
-  # Remove unpaired mate reads and regenerate the bam index (this an RNAseq specific problem introduced because of SplitNCigar and ALLOW_N_CIGAR_READS)
-#  call RemoveUnpairedMates as RemoveUnpairedMates_tumor {
-#    input:
-#      SAMTOOLS = samtools,
-#      in_bam = GatherBamFiles_tumor.out_bam,
-#      output_basename = base_file_name_tumor
-#  }
 
   # QC the final BAM (consolidated after scattered BQSR)
   call CollectReadgroupBamQualityMetrics as CollectReadgroupBamQualityMetrics_tumor {
@@ -2168,7 +2084,6 @@ workflow PairedEndSingleSampleWorkflow {
       ref_dict = ref_dict,
       wgs_evaluation_interval_list = wgs_evaluation_interval_list
   }
-
 
 
 #########################

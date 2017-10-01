@@ -27,7 +27,6 @@
 ## licensing information pertaining to the included programs.
 
 # TASK DEFINITIONS
-
 task STAR_Map {
   File STAR
   String STARindexDir
@@ -254,29 +253,6 @@ task CollectQualityYieldMetrics {
 
 
 ## Check the assumption that the final GVCF filename that is going to be used ends with .g.vcf.gz 
-#task CheckFinalVcfExtension {
-#  String vcf_filename
-#  Int cpu=1
-#  File PYTHON2
-#
-#  command <<<
-#    ${PYTHON2} <<CODE
-#    import os
-#    import sys
-#    filename="${vcf_filename}"
-#    if not filename.endswith(".g.vcf.gz"):
-#      raise Exception("input","output GVCF filename must end with '.g.vcf.gz', found %s"%(filename))
-#      sys.exit(1) 
-#    CODE
-#  >>>
-#  runtime {
-#    cpu: cpu
-#  }
-#  output {
-#    String common_suffix=read_string(stdout())
-#  }
-#}
-
 
 # Read unmapped BAM, convert on-the-fly to FASTQ and stream to BWA MEM for alignment
 task SamToFastqAndBwaMem {
