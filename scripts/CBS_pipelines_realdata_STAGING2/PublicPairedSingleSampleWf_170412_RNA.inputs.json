@@ -107,12 +107,12 @@
   ],
 
   "##_COMMENT4": "QUALITY CONTROL RESOURCES",
-  "PairedEndSingleSampleWorkflow.contamination_sites_vcf": "/home/databases/gatk-test-data/qc/WholeGenomeShotgunContam.vcf",
-  "PairedEndSingleSampleWorkflow.contamination_sites_vcf_index": "/home/databases/gatk-test-data/qc/WholeGenomeShotgunContam.vcf.idx",
-  "PairedEndSingleSampleWorkflow.haplotype_database_file": "/home/databases/gatk-test-data/qc/empty.haplotype_map.txt",
-  "PairedEndSingleSampleWorkflow.fingerprint_genotypes_file": "/home/databases/gatk-test-data/qc/empty.fingerprint.vcf",  
-  "PairedEndSingleSampleWorkflow.wgs_coverage_interval_list": "/home/databases/gatk-test-data/intervals/wgs_coverage_regions.hg38.interval_list",
-  "PairedEndSingleSampleWorkflow.wgs_evaluation_interval_list": "/home/databases/gatk-test-data/intervals/wgs_evaluation_regions.hg38.interval_list",
+  "PairedEndSingleSampleWorkflow.contamination_sites_vcf": "/home/projects/dp_00005/data/cromwell_test/gatk-test-data/qc/WholeGenomeShotgunContam.vcf",
+  "PairedEndSingleSampleWorkflow.contamination_sites_vcf_index": "/home/projects/dp_00005/data/cromwell_test/gatk-test-data/qc/WholeGenomeShotgunContam.vcf.idx",
+  "PairedEndSingleSampleWorkflow.haplotype_database_file": "/home/projects/dp_00005/data/cromwell_test/gatk-test-data/qc/empty.haplotype_map.txt",
+  "PairedEndSingleSampleWorkflow.fingerprint_genotypes_file": "/home/projects/dp_00005/data/cromwell_test/gatk-test-data/qc/empty.fingerprint.vcf",  
+  "PairedEndSingleSampleWorkflow.wgs_coverage_interval_list": "/home/projects/dp_00005/data/cromwell_test/gatk-test-data/intervals/wgs_coverage_regions.hg38.interval_list",
+  "PairedEndSingleSampleWorkflow.wgs_evaluation_interval_list": "/home/projects/dp_00005/data/cromwell_test/gatk-test-data/intervals/wgs_evaluation_regions.hg38.interval_list",
 
   "##_COMMENT5": "QUALITY CONTROL SETTINGS (to override defaults)",
   "PairedEndSingleSampleWorkflow.ValidateReadGroupSamFile.ignore": ["null"],
