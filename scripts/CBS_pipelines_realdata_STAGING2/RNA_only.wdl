@@ -27,29 +27,6 @@
 ## licensing information pertaining to the included programs.
 
 # TASK DEFINITIONS
-task RemoveUnpairedMates {
-  File in_bam
-  String output_basename
-  Int cpu=1
-  File SAMTOOLS
-
-  command <<<
-    set -e
-    set -o pipefail
-
-    ${SAMTOOLS} view -f 2 -o ${output_basename}.bam ${in_bam}
-    ${SAMTOOLS} index -b ${output_basename}.bam
-    mv ${output_basename}.bam.bai ${output_basename}.bai 
-  >>>
-  runtime {
-    cpu: cpu
-  }
-  output {
-    File out_bam = "${output_basename}.bam"
-    File out_bai = "${output_basename}.bai"
-  }
-}
-
 task STAR_Map {
   File STAR
   String STARindexDir
@@ -1321,19 +1298,6 @@ workflow PairedEndSingleSampleWorkflow {
           input_fastqR1 = TrimReads_tumor.output_R1,
           input_fastqR2 = TrimReads_tumor.output_R2
     }
-
-#  }
-
-  ######
-
-
-  # Align flowcell-level unmapped input bams in parallel
-#  scatter (unmapped_bam in flowcell_unmapped_bams) {
-#  scatter (unmapped_bam in FastqToBam.out_bam) {  
-    # Because of a wdl/cromwell bug this is not currently valid so we have to sub(sub()) in each task
-    # String base_name = sub(sub(unmapped_bam, "gs://.*/", ""), unmapped_bam_suffix + "$", "")
-#    String sub_strip_path_tumor = "/home/projects/dp_00005/data/cromwell_test/.*/"
-#    String sub_strip_unmapped_tumor = unmapped_bam_suffix + "$"
 
     # QC the unmapped BAM 
     call CollectQualityYieldMetrics as CollectQualityYieldMetrics_tumor {

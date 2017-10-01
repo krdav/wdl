@@ -27,29 +27,6 @@
 ## licensing information pertaining to the included programs.
 
 # TASK DEFINITIONS
-task RemoveUnpairedMates {
-  File in_bam
-  String output_basename
-  Int cpu=1
-  File SAMTOOLS
-
-  command <<<
-    set -e
-    set -o pipefail
-
-    ${SAMTOOLS} view -f 2 -o ${output_basename}.bam ${in_bam}
-    ${SAMTOOLS} index -b ${output_basename}.bam
-    mv ${output_basename}.bam.bai ${output_basename}.bai 
-  >>>
-  runtime {
-    cpu: cpu
-  }
-  output {
-    File out_bam = "${output_basename}.bam"
-    File out_bai = "${output_basename}.bai"
-  }
-}
-
 task STAR_Map {
   File STAR
   String STARindexDir
@@ -69,6 +46,7 @@ task STAR_Map {
         --outSAMtype BAM Unsorted \
         --outFileNamePrefix ${sample_name} \
         --twopassMode Basic \
+        --outSAMmapqUnique 60 \
         --runThreadN ${cpu}
   }
   output {
@@ -81,7 +59,7 @@ task STAR_Map {
 }
 
 task SplitNCigarReads {
-  File GATK4_LAUNCH
+  File GATK
   String sample_name
   String ref_fasta
   File in_bam
@@ -91,8 +69,8 @@ task SplitNCigarReads {
 
   command {
     # Run options are set to follow the GATK best practice for RNAseq. data.
-    # /home/projects/dp_00005/apps/src/gatk-4.beta.5/gatk-launch \
-    ${GATK4_LAUNCH} SplitNCigarReads \
+    /home/projects/dp_00005/apps/src/gatk-4.beta.5/gatk-launch \
+      SplitNCigarReads \
       -R ${ref_fasta} \
       -I ${in_bam} \
       -O ${sample_name}${suffix}.bam
@@ -1002,7 +980,7 @@ task HaplotypeCaller {
   File ref_fasta
   File ref_fasta_index
   Float? contamination
-  Int cpu=1
+  Int cpu=28
   File GATK
 
   command {
@@ -1018,6 +996,7 @@ task HaplotypeCaller {
       -variant_index_type LINEAR \
       -contamination ${default=0 contamination} \
       --read_filter OverclippedRead \
+      -nct ${cpu} \
       -L ${interval_list}
   }
   runtime {
@@ -1039,11 +1018,11 @@ task HaplotypeCaller_RNA {
   File ref_fasta
   File ref_fasta_index
   Float? contamination
-  Int cpu=1
+  Int cpu=28
   File GATK
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx20000m \
       -jar ${GATK} \
       -T HaplotypeCaller \
       -R ${ref_fasta} \
@@ -1057,6 +1036,7 @@ task HaplotypeCaller_RNA {
       -dontUseSoftClippedBases \
       -contamination ${default=0 contamination} \
       --read_filter OverclippedRead \
+      -nct 5 \
       -L ${interval_list}
  }
   output {
