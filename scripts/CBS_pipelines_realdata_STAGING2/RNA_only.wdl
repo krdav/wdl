@@ -1029,7 +1029,7 @@ task HaplotypeCaller {
   File ref_fasta
   File ref_fasta_index
   Float? contamination
-  Int cpu=1
+  Int cpu=28
   File GATK
 
   command {
@@ -1045,6 +1045,7 @@ task HaplotypeCaller {
       -variant_index_type LINEAR \
       -contamination ${default=0 contamination} \
       --read_filter OverclippedRead \
+      -nct ${cpu} \
       -L ${interval_list}
   }
   runtime {
@@ -1066,11 +1067,11 @@ task HaplotypeCaller_RNA {
   File ref_fasta
   File ref_fasta_index
   Float? contamination
-  Int cpu=1
+  Int cpu=28
   File GATK
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx20000m \
       -jar ${GATK} \
       -T HaplotypeCaller \
       -R ${ref_fasta} \
@@ -1084,6 +1085,7 @@ task HaplotypeCaller_RNA {
       -dontUseSoftClippedBases \
       -contamination ${default=0 contamination} \
       --read_filter OverclippedRead \
+      -nct 5 \
       -L ${interval_list}
  }
   output {
