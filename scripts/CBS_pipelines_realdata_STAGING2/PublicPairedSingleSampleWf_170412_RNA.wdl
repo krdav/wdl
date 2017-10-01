@@ -591,6 +591,7 @@ task MarkDuplicates {
 
 # Generate sets of intervals for scatter-gathering over chromosomes
 task CreateSequenceGroupingTSV {
+  File PYTHON2
   File ref_dict
   Int cpu=1
 
@@ -598,7 +599,7 @@ task CreateSequenceGroupingTSV {
   # It outputs to stdout where it is parsed into a wdl Array[Array[String]]
   # e.g. [["1"], ["2"], ["3", "4"], ["5"], ["6", "7", "8"]]
   command <<<
-    python <<CODE
+    ${PYTHON2} <<CODE
     with open("${ref_dict}", "r") as ref_dict_file:
         sequence_tuple_list = []
         longest_sequence = 0
@@ -1411,13 +1412,15 @@ workflow PairedEndSingleSampleWorkflow {
   # Create list of sequences for scatter-gather parallelization 
   call CreateSequenceGroupingTSV as CreateSequenceGroupingTSV_normal {
     input:
-      ref_dict = ref_dict
+      ref_dict = ref_dict,
+      PYTHON2 = python2
   }
   
   # Estimate level of cross-sample contamination
   call CheckContamination as CheckContamination_normal {
     input:
       verifyBamID=verifyBamID,
+      PYTHON3 = python3,
       in_bam = SortAndFixSampleBam_normal.out_bam,
       in_bai = SortAndFixSampleBam_normal.out_bai,
       contamination_sites_vcf = contamination_sites_vcf,
@@ -1824,7 +1827,8 @@ workflow PairedEndSingleSampleWorkflow {
   # Create list of sequences for scatter-gather parallelization 
   call CreateSequenceGroupingTSV as CreateSequenceGroupingTSV_tumor {
     input:
-      ref_dict = ref_dict
+      ref_dict = ref_dict,
+      PYTHON2 = python2
   }
   
   # Estimate level of cross-sample contamination
