@@ -23,7 +23,7 @@
 ### TASK DEFINITIONS ###
 ########################
 task MuTect2 {
-  String sample_name 
+  String sample_name
   File in_bam_tumor
   File in_bai_tumor
   File in_bam_normal
@@ -43,7 +43,7 @@ task MuTect2 {
   File dbSNP_vcf_index
 
   command {
-    ${GATK4_LAUNCH} --javaOptions "-Xmx100g" Mutect2 \
+    ${GATK4_LAUNCH} --javaOptions "-Xmx10g" Mutect2 \
      -R ${ref_fasta} \
      -I ${in_bam_tumor} \
      -tumor ${sample_name_tumor} \

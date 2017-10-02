@@ -27,6 +27,46 @@
 ## licensing information pertaining to the included programs.
 
 # TASK DEFINITIONS
+task MuTect2 {
+  String sample_name
+  File in_bam_tumor
+  File in_bai_tumor
+  File in_bam_normal
+  File in_bai_normal
+  String sample_name_tumor
+  String sample_name_normal
+  File ref_dict
+  File ref_fasta
+  File ref_fasta_index
+  File transcript_intervals
+  Float? contamination
+  Int cpu=28
+  File GATK4_LAUNCH
+  File dbSNP_vcf
+  File dbSNP_vcf_index
+
+  command {
+    ${GATK4_LAUNCH} --javaOptions "-Xmx10g" Mutect2 \
+     -R ${ref_fasta} \
+     -I ${in_bam_tumor} \
+     -tumor ${sample_name_tumor} \
+     -I ${in_bam_normal} \
+     -normal ${sample_name_tumor} \
+     --dbsnp ${dbSNP_vcf} \
+     --dontUseSoftClippedBases \
+     -L ${transcript_intervals} \
+     -O ${sample_name}_MuTect2.vcf.gz \
+     --contamination_fraction_to_filter ${default=0 contamination}
+  }
+  runtime {
+    cpu: cpu
+  }
+  output {
+    File output_vcf = "${sample_name}_MuTect2.vcf.gz"
+    File output_vcf_index = "${sample_name}_MuTect2.vcf.gz.tbi"
+  }
+}
+
 task STAR_Map {
   File STAR
   String STARindexDir
@@ -1241,6 +1281,8 @@ workflow PairedEndSingleSampleWorkflow {
   File dbSNP_vcf_index
   Array[File] known_indels_sites_VCFs
   Array[File] known_indels_sites_indices
+  File transcript_intervals
+  File transcript_intervals
 
   String recalibrated_bam_basename = base_file_name_normal + ".aligned.duplicates_marked.recalibrated"
 
@@ -2076,6 +2118,35 @@ workflow PairedEndSingleSampleWorkflow {
 
 
 
+########################
+### SOMATIC VARIANTS ###
+########################
+
+  # Somatic variant calling with MuTect2
+  call MuTect2 {
+    input:
+      GATK4_LAUNCH=gatk4_launch,
+      contamination = CheckContamination_tumor.contamination,
+      in_bam_tumor = GatherBamFiles_tumor.out_bam,
+      in_bai_tumor = GatherBamFiles_tumor.out_bai,
+      in_bam_normal = GatherBamFiles_normal.out_bam,
+      in_bai_normal = GatherBamFiles_normal.out_bai,
+      sample_name = sample_name,
+      sample_name_tumor = sample_name+'_tumor',
+      sample_name_normal = sample_name+'_normal',
+      ref_dict = ref_dict,
+      ref_fasta = ref_fasta,
+      ref_fasta_index = ref_fasta_index,
+      transcript_intervals = transcript_intervals,
+      dbSNP_vcf = dbSNP_vcf,
+      dbSNP_vcf_index = dbSNP_vcf_index
+   }
+
+
+
+#############################
+### SOMATIC VARIANTS ENDS ###
+#############################
 
 
 
