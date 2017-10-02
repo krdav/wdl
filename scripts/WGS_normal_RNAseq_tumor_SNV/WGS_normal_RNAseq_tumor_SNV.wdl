@@ -1282,7 +1282,6 @@ workflow PairedEndSingleSampleWorkflow {
   Array[File] known_indels_sites_VCFs
   Array[File] known_indels_sites_indices
   File transcript_intervals
-  File transcript_intervals
 
   String recalibrated_bam_basename = base_file_name_normal + ".aligned.duplicates_marked.recalibrated"
 
