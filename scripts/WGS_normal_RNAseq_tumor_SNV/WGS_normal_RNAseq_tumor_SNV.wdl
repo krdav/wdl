@@ -1243,7 +1243,7 @@ command <<<
 }
 
 # WORKFLOW DEFINITION
-workflow PairedEndSingleSampleWorkflow {
+workflow WGS_normal_RNAseq_tumor_SNV_wf {
 
   File contamination_sites_vcf
   File contamination_sites_vcf_index
