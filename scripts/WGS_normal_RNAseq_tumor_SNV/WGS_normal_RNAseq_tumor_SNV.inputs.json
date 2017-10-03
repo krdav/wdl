@@ -11,7 +11,7 @@
   "WGS_normal_RNAseq_tumor_SNV_wf.rawdata_tumor_fastqR2": "/home/projects/dp_00005/data/RNAseq/Staging10_RNA_S4_R2_0209.fastq.gz",
   "WGS_normal_RNAseq_tumor_SNV_wf.tumor_sample_type": "rnaseq",
   "WGS_normal_RNAseq_tumor_SNV_wf.premade_STARindexDir": "/home/projects/dp_00005/data/references/hg38/STAR_index_overhang100",
-  "WES_normal_tumor_somatic_SNV_wf.transcript_intervals": "/home/projects/dp_00005/data/references/hg38/RefGene_transcript.bed",
+  "WGS_normal_RNAseq_tumor_SNV_wf.transcript_intervals": "/home/projects/dp_00005/data/references/hg38/RefGene_transcript.bed",
 
   "KRISTIAN_COMMENT:": "TOOL_PATHS",
   "WGS_normal_RNAseq_tumor_SNV_wf.seq_cache_populate": "/home/projects/dp_00005/apps/src/samtools-1.5/misc/seq_cache_populate.pl",
