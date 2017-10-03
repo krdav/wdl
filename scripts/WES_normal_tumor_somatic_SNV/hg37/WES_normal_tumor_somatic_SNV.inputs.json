@@ -11,7 +11,7 @@
   "WES_normal_tumor_somatic_SNV_wf.rawdata_tumor_fastqR2": "/home/projects/cu_10098/data/public_data/case_001/TCRBOA1-T-WEX.read2.fastq.gz",
   "WES_normal_tumor_somatic_SNV_wf.tumor_sample_type": "wes",
   "WES_normal_tumor_somatic_SNV_wf.gnomad_exome_vcf": "/home/databases/gnomad_data/vcf/exomes/gnomad.exomes.r2.0.1.sites.vcf.gz",
-  "WES_normal_tumor_somatic_SNV_wf.gnomad_exome_vcf_index": "/home/databases/gnomad_data/vcf/exomes/gnomad.exomes.r2.0.1.sites.vcf.gz.tbi",
+  "WES_normal_tumor_somatic_SNV_wf.gnomad_exome_vcf_idx": "/home/databases/gnomad_data/vcf/exomes/gnomad.exomes.r2.0.1.sites.vcf.gz.tbi",
   "WES_normal_tumor_somatic_SNV_wf.transcript_intervals": "/home/projects/cu_10098/data/references/hg37/RefGene_transcript.bed",
 
   "##_KRISTIAN_COMMENT:": "TOOL_PATHS",
@@ -87,8 +87,8 @@
   
   "##_COMMENT2": "REFERENCE FILES", 
   "WES_normal_tumor_somatic_SNV_wf.ref_dict": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.dict",
-  "WES_normal_tumor_somatic_SNV_wf.ref_fasta": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta",
-  "WES_normal_tumor_somatic_SNV_wf.ref_fasta_index": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.fai",
+  "WES_normal_tumor_somatic_SNV_wf.ref_fa": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta",
+  "WES_normal_tumor_somatic_SNV_wf.ref_idx": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.fai",
   "WES_normal_tumor_somatic_SNV_wf.ref_sa": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.sa",
   "WES_normal_tumor_somatic_SNV_wf.ref_amb": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.amb",
   "WES_normal_tumor_somatic_SNV_wf.ref_bwt": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.bwt",
@@ -98,7 +98,7 @@
 
   "##_COMMENT3": "KNOWN SITES RESOURCES", 
   "WES_normal_tumor_somatic_SNV_wf.dbSNP_vcf": "/home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf",
-  "WES_normal_tumor_somatic_SNV_wf.dbSNP_vcf_index": "/home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf.idx",
+  "WES_normal_tumor_somatic_SNV_wf.dbSNP_vcf_idx": "/home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf.idx",
   "WES_normal_tumor_somatic_SNV_wf.known_indels_sites_VCFs": [
     "/home/projects/cu_10098/data/references/hg37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz",
     "/home/projects/cu_10098/data/references/hg37/1000G_phase1.indels.b37.vcf.gz"
@@ -119,7 +119,7 @@
 
   "##_COMMENT4": "QUALITY CONTROL RESOURCES",
   "WES_normal_tumor_somatic_SNV_wf.contamination_sites_vcf": "/home/databases/gatk-legacy-bundles/b37/hapmap_3.3.b37.vcf",
-  "WES_normal_tumor_somatic_SNV_wf.contamination_sites_vcf_index": "/home/databases/gatk-legacy-bundles/b37/hapmap_3.3.b37.vcf.idx",
+  "WES_normal_tumor_somatic_SNV_wf.contamination_sites_vcf_idx": "/home/databases/gatk-legacy-bundles/b37/hapmap_3.3.b37.vcf.idx",
 
   "##_COMMENT5": "QUALITY CONTROL SETTINGS (to override defaults)",
   "WES_normal_tumor_somatic_SNV_wf.ValidateReadGroupSamFile.ignore": ["null"],
