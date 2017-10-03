@@ -12,7 +12,7 @@
   "WES_normal_tumor_somatic_SNV_wf.tumor_sample_type": "wes",
   "WES_normal_tumor_somatic_SNV_wf.gnomad_exome_vcf": "/home/databases/gnomad_data/vcf/exomes/gnomad.exomes.r2.0.1.sites.vcf.gz",
   "WES_normal_tumor_somatic_SNV_wf.gnomad_exome_vcf_index": "/home/databases/gnomad_data/vcf/exomes/gnomad.exomes.r2.0.1.sites.vcf.gz.tbi",
-  "WES_normal_tumor_somatic_SNV_wf.transcript_intervals": "/home/projects/cu_10098/data/references/hg37/RefGene_transcript.intervals",
+  "WES_normal_tumor_somatic_SNV_wf.transcript_intervals": "/home/projects/cu_10098/data/references/hg37/RefGene_transcript.bed",
 
   "##_KRISTIAN_COMMENT:": "TOOL_PATHS",
   "WES_normal_tumor_somatic_SNV_wf.seq_cache_populate": "/home/projects/cu_10098/apps/src/samtools-1.5/misc/seq_cache_populate.pl",
