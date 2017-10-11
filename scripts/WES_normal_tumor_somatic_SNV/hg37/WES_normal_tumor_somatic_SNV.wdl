@@ -32,11 +32,16 @@ task FilterByOrientationBias {
   Int cpu=1
   File GATK4_LAUNCH
   File pre_adapter_detail_metrics_tumor
+  String pre_adapter_detail_metrics_tumor_base = basename(pre_adapter_detail_metrics_tumor)
 
   command {
+    # Nasty sed replacing hack because of: https://github.com/broadinstitute/gatk/issues/3030
+    sed -r "s/picard\.analysis\.artifacts\.SequencingArtifactMetrics\\\$PreAdapterDetailMetrics/org\.broadinstitute\.hellbender\.tools\.picard\.analysis\.artifacts\.SequencingArtifactMetrics\$PreAdapterDetailMetrics/g" "${pre_adapter_detail_metrics_tumor}" > "gatk_${pre_adapter_detail_metrics_tumor_base}"
+
     ${GATK4_LAUNCH} --javaOptions "-Xmx10g" FilterByOrientationBias \
       -V ${in_vcf} \
       -O ${sample_name}_MuTect2_filtered2.vcf.gz \
+      -P "gatk_${pre_adapter_detail_metrics_tumor_base}" \
       -A 'G/T' -A 'C/T'
   }
   runtime {
