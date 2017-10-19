@@ -15,7 +15,7 @@
   "WES_normal_tumor_somatic_SNV_wf.transcript_intervals": "/home/projects/cu_10098/data/references/hg37/RefGene_transcript.bed",
 
   "##_KRISTIAN_COMMENT:": "TOOL_PATHS",
-  "WES_normal_tumor_somatic_SNV_wf.seq_cache_populate": "/home/projects/cu_10098/apps/src/samtools-1.5/misc/seq_cache_populate.pl",
+  "WES_normal_tumor_somatic_SNV_wf.seq_cache_populate": "/home/projects/cu_10098/apps/src/samtools-1.6/misc/seq_cache_populate.pl",
   "WES_normal_tumor_somatic_SNV_wf.gatk": "/home/projects/cu_10098/apps/src/GenomeAnalysisTK-3.8-0-ge9d806836/GenomeAnalysisTK.jar",
   "WES_normal_tumor_somatic_SNV_wf.picard": "/home/projects/cu_10098/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar",
   "WES_normal_tumor_somatic_SNV_wf.samtools": "/home/projects/cu_10098/apps/src/samtools-1.3.1/samtools",
