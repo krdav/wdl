@@ -1982,7 +1982,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
     ConvertToCram_tumor.*
     MergeVCFs_normal.*
     MergeVCFs_tumor.*
-    FilterByOrientationBias.out_vcf,
+    FilterByOrientationBias.out_vcf
     FilterByOrientationBias.out_vcf_idx
   }
 }
