@@ -23,95 +23,94 @@
 ### TASK DEFINITIONS ###
 ########################
 
-# Build VQSR model
+# Build VQSR model:
 task BuildVQSRModel {
-    File ref_dict
-    File ref_fasta 
-    File ref_fasta_index
-    File cohort_vcf
-    File cohort_vcf_index
-    File interval_list
-    String output_basename
-    String mode
-    Array[String] annotations
-    Array[Float] tranches
-    Array[String] resources
-    Array[File] resource_files
-    Array[File] resource_indices
-    Int disk_size
-    String mem_size
+  File ref_dict
+  File ref_fa 
+  File ref_idx
+  Int cpu=1
+  File GATK
+  File in_vcf
+  File in_vcf_idx
+  File wgs_calling_interval_list
+  String out_basename
+  String mode
+  Array[String] annotations
+  Array[Float] tranches
+  Array[String] resources
+  Array[File] resource_files
+  Array[File] resource_indices
 
-    command {
-        java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
-            -jar /usr/gitc/GATK36.jar \
-            -T VariantRecalibrator \
-            -R ${ref_fasta} \
-            -input ${cohort_vcf} \
-            -L ${interval_list} \
-            -resource:${sep=' -resource:' resources} \
-            -an ${sep=' -an ' annotations} \
-            -mode ${mode} \
-            -tranche ${sep=' -tranche ' tranches} \
-            -recalFile ${output_basename}.${mode}.recal \
-            -tranchesFile ${output_basename}.${mode}.tranches \
-            -rscriptFile ${output_basename}.${mode}.plots.R
-    }
+  command {
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
+      -jar ${GATK} \
+      -T VariantRecalibrator \
+      -R ${ref_fa} \
+      -input ${in_vcf} \
+      -L ${interval_list} \
+      -resource:${sep=' -resource:' resources} \
+      -an ${sep=' -an ' annotations} \
+      -mode ${mode} \
+      -tranche ${sep=' -tranche ' tranches} \
+      -recalFile ${output_basename}.${mode}.recal \
+      -tranchesFile ${output_basename}.${mode}.tranches \
+      -rscriptFile ${output_basename}.${mode}.plots.R
+  }
 
-    runtime {
-        docker: "broadinstitute/genomes-in-the-cloud:2.2.4-1469632282"
-        memory: mem_size
-        disks: "local-disk " + disk_size + " HDD"
-    }
+  runtime {
+    cpu: cpu
+  }
 
-    output {
-        File recal_file = "${output_basename}.${mode}.recal"
-        File recal_file_index = "${output_basename}.${mode}.recal.idx"
-        File tranches_file = "${output_basename}.${mode}.tranches"
-        File rscript_file = "${output_basename}.${mode}.plots.R"
-    }
+  output {
+    File recal_file = "${output_basename}.${mode}.recal"
+    File recal_file_idx = "${output_basename}.${mode}.recal.idx"
+    File tranches_file = "${output_basename}.${mode}.tranches"
+    File rscript_file = "${output_basename}.${mode}.plots.R"
+  }
 }
 
-# Apply recalibration
+
+
+
+# Apply recalibration:
 task ApplyRecalibrationFilter {
-    File ref_dict
-    File ref_fasta 
-    File ref_fasta_index
-    File cohort_vcf
-    File cohort_vcf_index
-    File recal_file
-    File recal_file_index
-    File interval_list
-    String output_basename
-    String mode
-    File tranches_file
-    Float filter_level
-    Int disk_size
-    String mem_size
+  File ref_dict
+  File ref_fa 
+  File ref_idx
+  Int cpu=1
+  File GATK
+  File in_vcf
+  File in_vcf_idx
+  File out_vcf_name
+  File wgs_calling_interval_list
+  File recal_file
+  File recal_file_idx
+  String mode
+  File tranches_file
+  Float filter_level
 
-    command {
-        java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
-            -jar /usr/gitc/GATK36.jar \
-            -T ApplyRecalibration \
-            -R ${ref_fasta} \
-            -input ${cohort_vcf} \
-            -L ${interval_list} \
-            -mode ${mode} \
-            --ts_filter_level ${filter_level} \
-            -recalFile ${recal_file} \
-            -tranchesFile ${tranches_file} \
-            -o ${output_basename}.vcf.gz
-    }
+  command {
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
+      -jar ${GATK} \
+      -T ApplyRecalibration \
+      -R ${ref_fa} \
+      -input ${in_vcf} \
+      -L ${interval_list} \
+      -mode ${mode} \
+      --ts_filter_level ${filter_level} \
+      -recalFile ${recal_file} \
+      -tranchesFile ${tranches_file} \
+      -o ${out_vcf_name}
+  }
 
-    runtime {
-        docker: "broadinstitute/genomes-in-the-cloud:2.2.4-1469632282"
-        memory: mem_size
-        disks: "local-disk " + disk_size + " HDD"
-    }
+  runtime {
+    cpu: cpu
+  }
 
-    output {
-        File recalibrated_vcf = "${output_basename}.vcf.gz"
-        File recalibrated_vcf_index = "${output_basename}.vcf.gz.tbi"
-    }
+  output {
+    File out_vcf = "${output_basename}.vcf.gz"
+    File out_vcf_idx = "${output_basename}.vcf.gz.tbi"
+  }
 }
 
 
@@ -1082,7 +1081,7 @@ task HaplotypeCaller {
 # Combine multiple VCFs or GVCFs from scattered HaplotypeCaller runs
 task MergeVCFs {
   Array[File] in_vcfs
-  Array[File] in_vcfs_indexes
+  Array[File] in_vcfs_idxes
   String out_vcf_name
   Int cpu=1
   File PICARD
@@ -1197,7 +1196,7 @@ task ConvertToCram {
   }
   output {
     File out_cram = "${out_basename}.cram"
-    File out_cram_index = "${out_basename}.crai"
+    File out_cram_idx = "${out_basename}.crai"
     File out_cram_md5 = "${out_basename}.cram.md5"
   }
 }
@@ -1277,8 +1276,10 @@ workflow WES_normal_tumor_somatic_SNV_wf {
 
   String recalibrated_bam_basename_normal = base_file_name_normal + ".aligned.duplicates_marked.recalibrated"
   String recalibrated_bam_basename_tumor = base_file_name_tumor + ".aligned.duplicates_marked.recalibrated"
-  String final_gvcf_name_normal = base_file_name_normal + final_gvcf_ext
-  String final_gvcf_name_tumor = base_file_name_tumor + final_gvcf_ext
+  String gvcf_name_normal = base_file_name_normal + final_gvcf_ext
+  String gvcf_name_tumor = base_file_name_tumor + final_gvcf_ext
+  String final_gvcf_name_normal = base_file_name_normal + "_recall" + final_gvcf_ext
+  String final_gvcf_name_tumor = base_file_name_tumor + "_recall" + final_gvcf_ext
 
   # Tools
   File picard
@@ -1295,10 +1296,22 @@ workflow WES_normal_tumor_somatic_SNV_wf {
   File trimmomatic
   File star
 
+  # Variant recalibration:
+  Array[String] SNP_annotations
+  Array[String] INDEL_annotations
+  Array[Float] SNP_tranches
+  Array[Float] INDEL_tranches
+  Array[String] SNP_resources
+  Array[String] INDEL_resources
+  Array[File] resource_files
+  Array[File] resource_indices
+  Float SNP_filter_level
+  Float INDEL_filter_level
+
+  # Custom hacks:
   String bwa_commandline = bwa + " mem -K 100000000 -p -v 3 -t 28 -Y $bash_ref_fa"
   String sub_strip_path = "/.*/"
   String sub_strip_unmapped = unmapped_bam_suffix + "$"
-
 
 
 #######################
@@ -1627,8 +1640,8 @@ workflow WES_normal_tumor_somatic_SNV_wf {
     input:
       PICARD=picard,
       in_vcfs = HaplotypeCaller_normal.out_gvcf,
-      in_vcfs_indexes = HaplotypeCaller_normal.out_gvcf_idx,
-      out_vcf_name = final_gvcf_name_normal
+      in_vcfs_idxes = HaplotypeCaller_normal.out_gvcf_idx,
+      out_vcf_name = gvcf_name_normal
   }
 
   # Validate the GVCF output of HaplotypeCaller
@@ -1656,9 +1669,96 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       dbSNP_vcf_idx = dbSNP_vcf_idx,
       ref_dict = ref_dict
   }
+
+
+
+#######################
+# Experiemental VQSR
+############################
+
+  # Build SNP model:
+  call BuildVQSRModel as BuildVQSRModelForSNPs_normal {
+    input:
+      ref_dict = ref_dict,
+      ref_fa = ref_fa,
+      ref_idx = ref_idx,
+      in_vcf = MergeVCFs_normal.out_vcf,
+      in_vcf_idx = MergeVCFs_normal.out_vcf_idx,
+      wgs_calling_interval_list = wgs_calling_interval_list,
+      out_basename = base_file_name_normal,
+      annotations = SNP_annotations,
+      mode = "SNP",
+      tranches = SNP_tranches,
+      resources = SNP_resources,
+      resource_files = resource_files,
+      resource_indices = resource_indices
+  }
+
+  # Build INDEL model:
+  call BuildVQSRModel as BuildVQSRModelForINDELs_normal {
+    input:
+      ref_dict = ref_dict,
+      ref_fa = ref_fa,
+      ref_idx = ref_idx,
+      in_vcf = MergeVCFs_normal.out_vcf,
+      in_vcf_idx = MergeVCFs_normal.out_vcf_idx,
+      wgs_calling_interval_list = wgs_calling_interval_list,
+      out_basename = base_file_name_normal,
+      annotations = INDEL_annotations,
+      mode = "INDEL",
+      tranches = INDEL_tranches,
+      resources = INDEL_resources,
+      resource_files = resource_files,
+      resource_indices = resource_indices
+  }
+
+  # Apply INDEL filter (first because INDEL model is usually done sooner):
+  call ApplyRecalibrationFilter as ApplyRecalibrationFilterForINDELs_normal {
+    input:
+      ref_dict = ref_dict,
+      ref_fa = ref_fa,
+      ref_idx = ref_idx,
+      in_vcf = MergeVCFs_normal.out_vcf,
+      in_vcf_idx = MergeVCFs_normal.out_vcf_idx,
+      wgs_calling_interval_list = wgs_calling_interval_list,
+      out_vcf_name = base_file_name_normal + ".recal.INDEL.g.vcf.gz",
+      mode = "INDEL",
+      recal_file = BuildVQSRModelForINDELs.recal_file,
+      recal_file_idx = BuildVQSRModelForINDELs.recal_file_idx,
+      tranches_file = BuildVQSRModelForINDELs.tranches_file,
+      filter_level = INDEL_filter_level
+  }
+
+  # Apply SNP filter:
+  call ApplyRecalibrationFilter as ApplyRecalibrationFilterForSNPs_normal {
+    input:
+      ref_dict = ref_dict,
+      ref_fa = ref_fa,
+      ref_idx = ref_idx,
+      in_vcf = ApplyRecalibrationFilterForINDELs.out_vcf,
+      in_vcf_idx = ApplyRecalibrationFilterForINDELs.out_vcf_idx,
+      wgs_calling_interval_list = wgs_calling_interval_list,
+      out_vcf_name = final_gvcf_name_normal,
+      mode = "SNP",
+      recal_file = BuildVQSRModelForSNPs.recal_file,
+      recal_file_idx = BuildVQSRModelForSNPs.recal_file_idx,
+      tranches_file = BuildVQSRModelForSNPs.tranches_file,
+      filter_level = SNP_filter_level
+  }
+
+
+##############################################################################
+
+
+
 ############################
 ### WES NORMAL PART ENDS ###
 ############################
+
+
+
+
+
 
 
 ######################
@@ -1985,8 +2085,8 @@ workflow WES_normal_tumor_somatic_SNV_wf {
     input:
       PICARD=picard,
       in_vcfs = HaplotypeCaller_tumor.out_gvcf,
-      in_vcfs_indexes = HaplotypeCaller_tumor.out_gvcf_idx,
-      out_vcf_name = final_gvcf_name_tumor
+      in_vcfs_idxes = HaplotypeCaller_tumor.out_gvcf_idx,
+      out_vcf_name = gvcf_name_tumor
   }
 
   # Validate the GVCF output of HaplotypeCaller
@@ -2111,8 +2211,10 @@ workflow WES_normal_tumor_somatic_SNV_wf {
     ConvertToCram_tumor.*
     MergeVCFs_normal.*
     MergeVCFs_tumor.*
-    FilterByOrientationBias.out_vcf
-    FilterByOrientationBias.out_vcf_idx
+    FilterByOrientationBias.*
+    BuildVQSRModelForSNPs_normal.*
+    BuildVQSRModelForINDELs_normal.*
+    ApplyRecalibrationFilterForINDELs_normal.*
   }
 }
 #################################
