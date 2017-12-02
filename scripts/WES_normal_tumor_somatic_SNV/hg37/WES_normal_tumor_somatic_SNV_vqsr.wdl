@@ -1723,9 +1723,9 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       wgs_calling_interval_list = wgs_calling_interval_list,
       out_basename = base_file_name_normal + ".recal.INDEL",
       mode = "INDEL",
-      recal_file = BuildVQSRModelForINDELs.recal_file,
-      recal_file_idx = BuildVQSRModelForINDELs.recal_file_idx,
-      tranches_file = BuildVQSRModelForINDELs.tranches_file,
+      recal_file = BuildVQSRModelForINDELs_normal.recal_file,
+      recal_file_idx = BuildVQSRModelForINDELs_normal.recal_file_idx,
+      tranches_file = BuildVQSRModelForINDELs_normal.tranches_file,
       filter_level = INDEL_filter_level
   }
 
@@ -1740,9 +1740,9 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       wgs_calling_interval_list = wgs_calling_interval_list,
       out_basename = base_file_name_normal + ".recal.final",
       mode = "SNP",
-      recal_file = BuildVQSRModelForSNPs.recal_file,
-      recal_file_idx = BuildVQSRModelForSNPs.recal_file_idx,
-      tranches_file = BuildVQSRModelForSNPs.tranches_file,
+      recal_file = BuildVQSRModelForSNPs_normal.recal_file,
+      recal_file_idx = BuildVQSRModelForSNPs_normal.recal_file_idx,
+      tranches_file = BuildVQSRModelForSNPs_normal.tranches_file,
       filter_level = SNP_filter_level
   }
 
