@@ -519,6 +519,10 @@ task MarkDuplicates {
  # This works because the output of BWA is query-grouped and therefore, so is the output of MergeBamAlignment.
  # While query-grouped isn't actually query-sorted, it's good enough for MarkDuplicates with ASSUME_SORT_ORDER="queryname"
   command {
+    # If the queue system fails to move the stderr/stdout there must be something to cache:
+    touch stderr
+    touch stdout
+
     java -Xmx4000m \
       -jar ${PICARD} \
       MarkDuplicates \
@@ -1172,7 +1176,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
   File star
 
   String bwa_commandline = bwa + " mem -K 100000000 -p -v 3 -t 28 -Y $bash_ref_fa"
-  String sub_strip_path = "/home/projects/cu_10098/data/.*/"
+  String sub_strip_path = "/.*/"
   String sub_strip_unmapped = unmapped_bam_suffix + "$"
 
 
