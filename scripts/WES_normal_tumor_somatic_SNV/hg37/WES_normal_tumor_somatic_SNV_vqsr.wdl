@@ -47,7 +47,7 @@ task BuildVQSRModel {
       -T VariantRecalibrator \
       -R ${ref_fa} \
       -input ${in_vcf} \
-      -L ${interval_list} \
+      -L ${wgs_calling_interval_list} \
       -resource:${sep=' -resource:' resources} \
       -an ${sep=' -an ' annotations} \
       -mode ${mode} \
@@ -95,12 +95,12 @@ task ApplyRecalibrationFilter {
       -T ApplyRecalibration \
       -R ${ref_fa} \
       -input ${in_vcf} \
-      -L ${interval_list} \
+      -L ${wgs_calling_interval_list} \
       -mode ${mode} \
       --ts_filter_level ${filter_level} \
       -recalFile ${recal_file} \
       -tranchesFile ${tranches_file} \
-      -o ${out_vcf_name}
+      -o "${out_basename}.g.vcf.gz"
   }
 
   runtime {
@@ -1679,6 +1679,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
   # Build SNP model:
   call BuildVQSRModel as BuildVQSRModelForSNPs_normal {
     input:
+      GATK=gatk,
       ref_dict = ref_dict,
       ref_fa = ref_fa,
       ref_idx = ref_idx,
@@ -1697,6 +1698,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
   # Build INDEL model:
   call BuildVQSRModel as BuildVQSRModelForINDELs_normal {
     input:
+      GATK=gatk,
       ref_dict = ref_dict,
       ref_fa = ref_fa,
       ref_idx = ref_idx,
@@ -1715,6 +1717,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
   # Apply INDEL filter (first because INDEL model is usually done sooner):
   call ApplyRecalibrationFilter as ApplyRecalibrationFilterForINDELs_normal {
     input:
+      GATK=gatk,
       ref_dict = ref_dict,
       ref_fa = ref_fa,
       ref_idx = ref_idx,
@@ -1732,11 +1735,12 @@ workflow WES_normal_tumor_somatic_SNV_wf {
   # Apply SNP filter:
   call ApplyRecalibrationFilter as ApplyRecalibrationFilterForSNPs_normal {
     input:
+      GATK=gatk,
       ref_dict = ref_dict,
       ref_fa = ref_fa,
       ref_idx = ref_idx,
-      in_vcf = ApplyRecalibrationFilterForINDELs.out_vcf,
-      in_vcf_idx = ApplyRecalibrationFilterForINDELs.out_vcf_idx,
+      in_vcf = ApplyRecalibrationFilterForINDELs_normal.out_vcf,
+      in_vcf_idx = ApplyRecalibrationFilterForINDELs_normal.out_vcf_idx,
       wgs_calling_interval_list = wgs_calling_interval_list,
       out_basename = base_file_name_normal + ".recal.final",
       mode = "SNP",
