@@ -52,9 +52,9 @@ task BuildVQSRModel {
       -an ${sep=' -an ' annotations} \
       -mode ${mode} \
       -tranche ${sep=' -tranche ' tranches} \
-      -recalFile ${output_basename}.${mode}.recal \
-      -tranchesFile ${output_basename}.${mode}.tranches \
-      -rscriptFile ${output_basename}.${mode}.plots.R
+      -recalFile ${out_basename}.${mode}.recal \
+      -tranchesFile ${out_basename}.${mode}.tranches \
+      -rscriptFile ${out_basename}.${mode}.plots.R
   }
 
   runtime {
@@ -62,10 +62,10 @@ task BuildVQSRModel {
   }
 
   output {
-    File recal_file = "${output_basename}.${mode}.recal"
-    File recal_file_idx = "${output_basename}.${mode}.recal.idx"
-    File tranches_file = "${output_basename}.${mode}.tranches"
-    File rscript_file = "${output_basename}.${mode}.plots.R"
+    File recal_file = "${out_basename}.${mode}.recal"
+    File recal_file_idx = "${out_basename}.${mode}.recal.idx"
+    File tranches_file = "${out_basename}.${mode}.tranches"
+    File rscript_file = "${out_basename}.${mode}.plots.R"
   }
 }
 
@@ -81,7 +81,7 @@ task ApplyRecalibrationFilter {
   File GATK
   File in_vcf
   File in_vcf_idx
-  File out_vcf_name
+  String out_basename
   File wgs_calling_interval_list
   File recal_file
   File recal_file_idx
@@ -108,8 +108,8 @@ task ApplyRecalibrationFilter {
   }
 
   output {
-    File out_vcf = "${output_basename}.vcf.gz"
-    File out_vcf_idx = "${output_basename}.vcf.gz.tbi"
+    File out_vcf = "${out_basename}.g.vcf.gz"
+    File out_vcf_idx = "${out_basename}.g.vcf.gz.tbi"
   }
 }
 
@@ -1278,8 +1278,8 @@ workflow WES_normal_tumor_somatic_SNV_wf {
   String recalibrated_bam_basename_tumor = base_file_name_tumor + ".aligned.duplicates_marked.recalibrated"
   String gvcf_name_normal = base_file_name_normal + final_gvcf_ext
   String gvcf_name_tumor = base_file_name_tumor + final_gvcf_ext
-  String final_gvcf_name_normal = base_file_name_normal + "_recall" + final_gvcf_ext
-  String final_gvcf_name_tumor = base_file_name_tumor + "_recall" + final_gvcf_ext
+#  String final_gvcf_name_normal = base_file_name_normal + "_recall" + final_gvcf_ext
+#  String final_gvcf_name_tumor = base_file_name_tumor + "_recall" + final_gvcf_ext
 
   # Tools
   File picard
@@ -1721,7 +1721,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       in_vcf = MergeVCFs_normal.out_vcf,
       in_vcf_idx = MergeVCFs_normal.out_vcf_idx,
       wgs_calling_interval_list = wgs_calling_interval_list,
-      out_vcf_name = base_file_name_normal + ".recal.INDEL.g.vcf.gz",
+      out_basename = base_file_name_normal + ".recal.INDEL",
       mode = "INDEL",
       recal_file = BuildVQSRModelForINDELs.recal_file,
       recal_file_idx = BuildVQSRModelForINDELs.recal_file_idx,
@@ -1738,7 +1738,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
       in_vcf = ApplyRecalibrationFilterForINDELs.out_vcf,
       in_vcf_idx = ApplyRecalibrationFilterForINDELs.out_vcf_idx,
       wgs_calling_interval_list = wgs_calling_interval_list,
-      out_vcf_name = final_gvcf_name_normal,
+      out_basename = base_file_name_normal + ".recal.final",
       mode = "SNP",
       recal_file = BuildVQSRModelForSNPs.recal_file,
       recal_file_idx = BuildVQSRModelForSNPs.recal_file_idx,
