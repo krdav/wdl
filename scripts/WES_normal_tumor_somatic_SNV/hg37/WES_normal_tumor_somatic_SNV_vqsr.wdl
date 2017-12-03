@@ -1052,7 +1052,6 @@ task HaplotypeCaller {
   Float? contamination
   Int cpu=28
   File GATK
-  Array[String] annotations
 
   command {
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
@@ -1068,7 +1067,6 @@ task HaplotypeCaller {
       --read_filter OverclippedRead \
       -stand_call_conf 30 \
       -nct ${cpu} \
-      -A ${sep=' -A ' annotations} \
       -L ${interval_list}
   }
   runtime {
@@ -1631,7 +1629,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
         ref_dict = ref_dict,
         ref_fa = ref_fa,
         ref_idx = ref_idx,
-        annotations = SNP_annotations
      }
   }
 
@@ -2081,7 +2078,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
         ref_dict = ref_dict,
         ref_fa = ref_fa,
         ref_idx = ref_idx,
-        annotations = SNP_annotations
      }
   }
 
