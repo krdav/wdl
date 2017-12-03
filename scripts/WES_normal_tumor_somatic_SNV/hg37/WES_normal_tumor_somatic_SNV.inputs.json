@@ -3,7 +3,7 @@
   "WES_normal_tumor_somatic_SNV_wf.sample_name": "normal_vs_tumor_test",
   "WES_normal_tumor_somatic_SNV_wf.base_file_name_normal": "normal_vs_tumor_test_n",
   "WES_normal_tumor_somatic_SNV_wf.base_file_name_tumor": "normal_vs_tumor_test_t",
-  "WES_normal_tumor_somatic_SNV_wf.final_gvcf_ext": ".g.vcf.gz",
+  "WES_normal_tumor_somatic_SNV_wf.final_vcf_ext": ".vcf.gz",
   "WES_normal_tumor_somatic_SNV_wf.unmapped_bam_suffix": ".bam",
   "WES_normal_tumor_somatic_SNV_wf.rawdata_normal_fastqR1": "/home/projects/cu_10098/data/public_data/case_004/TCRBOA4-N-WEX.read1.fastq.gz",
   "WES_normal_tumor_somatic_SNV_wf.rawdata_normal_fastqR2": "/home/projects/cu_10098/data/public_data/case_004/TCRBOA4-N-WEX.read2.fastq.gz",
@@ -144,17 +144,18 @@
   ],
 
   "WES_normal_tumor_somatic_SNV_wf.SNP_resources": [
-    "hapmap,known=false,training=true,truth=true,prior=15.0 gatk-legacy-bundles/b37/hapmap_3.3.b37.vcf",
-    "omni,known=false,training=true,truth=true,prior=12.0 gatk-legacy-bundles/b37/1000G_omni2.5.b37.vcf",
-    "1000G,known=false,training=true,truth=false,prior=10.0 gatk-legacy-bundles/b37/1000G_phase1.snps.high_confidence.b37.vcf",
-    "dbsnp,known=true,training=false,truth=false,prior=2.0 gatk-legacy-bundles/b37/dbsnp_138.b37.vcf"
+    "hapmap,known=false,training=true,truth=true,prior=15.0 /home/databases/gatk-legacy-bundles/b37/hapmap_3.3.b37.vcf",
+    "omni,known=false,training=true,truth=true,prior=12.0 /home/databases/gatk-legacy-bundles/b37/1000G_omni2.5.b37.vcf",
+    "1000G,known=false,training=true,truth=false,prior=10.0 /home/databases/gatk-legacy-bundles/b37/1000G_phase1.snps.high_confidence.b37.vcf",
+    "dbsnp,known=true,training=false,truth=false,prior=2.0 /home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf"
   ],
   "WES_normal_tumor_somatic_SNV_wf.INDEL_resources": [
-    "mills,known=false,training=true,truth=true,prior=12.0 gatk-legacy-bundles/b37/Mills_and_1000G_gold_standard.indels.b37.vcf",
-    "dbsnp,known=true,training=false,truth=false,prior=2.0 gatk-legacy-bundles/b37/dbsnp_138.b37.vcf"
+    "mills,known=false,training=true,truth=true,prior=12.0 /home/databases/gatk-legacy-bundles/b37/Mills_and_1000G_gold_standard.indels.b37.vcf",
+    "dbsnp,known=true,training=false,truth=false,prior=2.0 /home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf"
   ],
 
-  "WES_normal_tumor_somatic_SNV_wf.SNP_annotations": ["DP", "QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum"],
+  "###USE_THIS_FOR_WGS___WES_normal_tumor_somatic_SNV_wf.SNP_annotations": ["DP", "QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum"],
+  "WES_normal_tumor_somatic_SNV_wf.SNP_annotations": ["QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum"],
   "WES_normal_tumor_somatic_SNV_wf.INDEL_annotations": ["QD", "FS", "SOR", "MQRankSum", "ReadPosRankSum"],
 
   "WES_normal_tumor_somatic_SNV_wf.SNP_filter_level": 99.7,
