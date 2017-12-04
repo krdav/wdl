@@ -346,7 +346,7 @@ task TrimReads {
   String basenameR2
   File TRIMMOMATIC
   File adapters
-  Int cpu=4  # More CPUs will not decrease runtime substantially
+  Int cpu=28  # Actually more than 4 wont decrease runtime substantially, but some mysterious bug makes it crash if too many trimmomatic jobs share the same node
 
   command {
     java -Xmx80g \
@@ -540,7 +540,7 @@ task SortAndFixTags {
       CREATE_MD5_FILE=false | \
     java -Xmx500m \
       -jar ${PICARD} \
-      SetNmAndUqTags \
+      SetNmMdAndUqTags \
       INPUT=/dev/stdin \
       OUTPUT=${out_bam_basename}.bam \
       CREATE_INDEX=true \
