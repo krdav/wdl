@@ -1,0 +1,166 @@
+{
+  "##_COMMENT1": "SAMPLE NAME AND UNMAPPED BAMS",
+  "WGS_normal_RNAseq_tumor_SNV_wf.sample_name": "normal_vs_tumor_test",
+  "WGS_normal_RNAseq_tumor_SNV_wf.base_file_name_normal": "normal_vs_tumor_test_n",
+  "WGS_normal_RNAseq_tumor_SNV_wf.base_file_name_tumor": "normal_vs_tumor_test_t",
+  "WGS_normal_RNAseq_tumor_SNV_wf.unmapped_bam_suffix": ".bam",
+  "WGS_normal_RNAseq_tumor_SNV_wf.rawdata_normal_fastqR1": "/home/projects/dp_00005/data/161108_E00401.A.Project_Wadt-DNA1-2016-09-14/Sample_7-007PGF/7-007PGF_S7_L007_R1_001.fastq.gz",
+  "WGS_normal_RNAseq_tumor_SNV_wf.rawdata_normal_fastqR2": "/home/projects/dp_00005/data/161108_E00401.A.Project_Wadt-DNA1-2016-09-14/Sample_7-007PGF/7-007PGF_S7_L007_R2_001.fastq.gz",
+  "WGS_normal_RNAseq_tumor_SNV_wf.rawdata_tumor_fastqR1": "/home/projects/dp_00005/data/RNAseq/Staging10_RNA_S4_R1_0209.fastq.gz",
+  "WGS_normal_RNAseq_tumor_SNV_wf.rawdata_tumor_fastqR2": "/home/projects/dp_00005/data/RNAseq/Staging10_RNA_S4_R2_0209.fastq.gz",
+  "WGS_normal_RNAseq_tumor_SNV_wf.tumor_sample_type": "rnaseq",
+  "WGS_normal_RNAseq_tumor_SNV_wf.premade_STARindexDir": "/home/projects/dp_00005/data/references/hg38/STAR_index_overhang100",
+  "WGS_normal_RNAseq_tumor_SNV_wf.transcript_intervals": "/home/projects/dp_00005/data/references/hg38/RefGene_transcript.bed",
+
+  "##_KRISTIAN_COMMENT:": "TOOL_PATHS",
+  "WGS_normal_RNAseq_tumor_SNV_wf.seq_cache_populate": "/home/projects/dp_00005/apps/src/samtools-1.6/misc/seq_cache_populate.pl",
+  "WGS_normal_RNAseq_tumor_SNV_wf.gatk": "/home/projects/dp_00005/apps/src/GenomeAnalysisTK-3.8-0-ge9d806836/GenomeAnalysisTK.jar",
+  "WGS_normal_RNAseq_tumor_SNV_wf.picard": "/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar",
+  "WGS_normal_RNAseq_tumor_SNV_wf.samtools": "/home/projects/dp_00005/apps/src/samtools-1.3.1/samtools",
+  "WGS_normal_RNAseq_tumor_SNV_wf.verifyBamID": "/home/projects/dp_00005/apps/src/verifyBamID/verifyBamID",
+  "WGS_normal_RNAseq_tumor_SNV_wf.bwa": "/services/tools/bwa/0.7.15/bwa",
+  "WGS_normal_RNAseq_tumor_SNV_wf.python3": "/services/tools/anaconda3/4.0.0/bin/python",
+  "WGS_normal_RNAseq_tumor_SNV_wf.python2": "/services/tools/anaconda2/4.0.0/bin/python",
+  "WGS_normal_RNAseq_tumor_SNV_wf.gatk4": "/home/projects/dp_00005/apps/src/gatk-4.beta.3/gatk-package-4.beta.3-local.jar",
+  "WGS_normal_RNAseq_tumor_SNV_wf.gatk4_launch": "/home/projects/dp_00005/apps/src/gatk-4.beta.5/gatk-launch",
+  "WGS_normal_RNAseq_tumor_SNV_wf.trimmomatic": "/services/tools/trimmomatic/0.36/trimmomatic-0.36.jar",
+  "WGS_normal_RNAseq_tumor_SNV_wf.trimmomatic_adapters": "/services/tools/trimmomatic/0.36/adapters/TruSeq3-PE-2.fa",  
+  "WGS_normal_RNAseq_tumor_SNV_wf.pigz": "/services/tools/pigz/2.3.4/bin/pigz",
+  "WGS_normal_RNAseq_tumor_SNV_wf.star": "/services/tools/star/2.5.3a/bin/STAR",
+
+
+  "##_COMMENT2": "INTERVALS",  
+  "WGS_normal_RNAseq_tumor_SNV_wf.scattered_calling_intervals": [
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0001_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0002_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0003_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0004_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0005_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0006_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0007_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0008_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0009_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0010_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0011_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0012_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0013_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0014_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0015_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0016_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0017_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0018_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0019_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0020_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0021_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0022_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0023_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0024_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0025_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0026_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0027_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0028_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0029_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0030_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0031_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0032_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0033_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0034_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0035_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0036_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0037_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0038_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0039_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0040_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0041_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0042_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0043_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0044_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0045_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0046_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0047_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0048_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0049_of_50/scattered.interval_list", 
+    "/home/databases/gatk-legacy-bundles/b37/scattered_wgs_intervals/scatter-50/temp_0050_of_50/scattered.interval_list"
+  ],
+  "WGS_normal_RNAseq_tumor_SNV_wf.wgs_calling_interval_list": "/home/databases/gatk-legacy-bundles/b37/wgs_calling_regions.v1.interval_list",
+  
+  "##_COMMENT2": "REFERENCE FILES", 
+  "WGS_normal_RNAseq_tumor_SNV_wf.ref_dict": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.dict",
+  "WGS_normal_RNAseq_tumor_SNV_wf.ref_fa": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta",
+  "WGS_normal_RNAseq_tumor_SNV_wf.ref_idx": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.fai",
+  "WGS_normal_RNAseq_tumor_SNV_wf.ref_sa": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.sa",
+  "WGS_normal_RNAseq_tumor_SNV_wf.ref_amb": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.amb",
+  "WGS_normal_RNAseq_tumor_SNV_wf.ref_bwt": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.bwt",
+  "WGS_normal_RNAseq_tumor_SNV_wf.ref_ann": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.ann",
+  "WGS_normal_RNAseq_tumor_SNV_wf.ref_pac": "/home/databases/gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.pac",
+
+
+  "##_COMMENT3": "KNOWN SITES RESOURCES", 
+  "WGS_normal_RNAseq_tumor_SNV_wf.dbSNP_vcf": "/home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf",
+  "WGS_normal_RNAseq_tumor_SNV_wf.dbSNP_vcf_idx": "/home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf.idx",
+  "WGS_normal_RNAseq_tumor_SNV_wf.known_indels_sites_VCFs": [
+    "/home/projects/cu_10098/data/references/hg37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz",
+    "/home/projects/cu_10098/data/references/hg37/1000G_phase1.indels.b37.vcf.gz"
+  ],
+  "WGS_normal_RNAseq_tumor_SNV_wf.known_indels_sites_indices": [
+    "/home/projects/cu_10098/data/references/hg37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz.tbi",
+    "/home/projects/cu_10098/data/references/hg37/1000G_phase1.indels.b37.vcf.gz.tbi"
+  ],
+
+  "####WGS_normal_RNAseq_tumor_SNV_wf.known_indels_sites_VCFs": [
+    "/home/databases/gatk-legacy-bundles/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz",
+    "/home/databases/gatk-legacy-bundles/b37/1000G_phase1.indels.b37.vcf.gz"
+  ],
+  "####WGS_normal_RNAseq_tumor_SNV_wf.known_indels_sites_indices": [
+    "/home/databases/gatk-legacy-bundles/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.idx.gz",
+    "/home/databases/gatk-legacy-bundles/b37/1000G_phase1.indels.b37.vcf.idx.gz"
+  ],
+
+  "##_COMMENT4": "QUALITY CONTROL RESOURCES",
+  "WGS_normal_RNAseq_tumor_SNV_wf.contamination_sites_vcf": "/home/databases/gatk-legacy-bundles/b37/hapmap_3.3.b37.vcf",
+  "WGS_normal_RNAseq_tumor_SNV_wf.contamination_sites_vcf_idx": "/home/databases/gatk-legacy-bundles/b37/hapmap_3.3.b37.vcf.idx",
+
+  "##_COMMENT5": "QUALITY CONTROL SETTINGS (to override defaults)",
+  "WGS_normal_RNAseq_tumor_SNV_wf.ValidateReadGroupSamFile.ignore": ["null"],
+  "WGS_normal_RNAseq_tumor_SNV_wf.ValidateReadGroupSamFile.max_output": 1000000000,
+  "WGS_normal_RNAseq_tumor_SNV_wf.ValidateAggregatedSamFile.ignore": ["null"],
+  "WGS_normal_RNAseq_tumor_SNV_wf.ValidateAggregatedSamFile.max_output": 1000000000,
+
+  "##_COMMENT6": "Variant Recalibration settings", 
+  "WGS_normal_RNAseq_tumor_SNV_wf.resource_files": [
+    "/home/databases/gatk-legacy-bundles/b37/hapmap_3.3.b37.vcf",
+    "/home/databases/gatk-legacy-bundles/b37/1000G_omni2.5.b37.vcf",
+    "/home/databases/gatk-legacy-bundles/b37/1000G_phase1.snps.high_confidence.b37.vcf",
+    "/home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf",
+    "/home/databases/gatk-legacy-bundles/b37/Mills_and_1000G_gold_standard.indels.b37.vcf"
+  ],
+  "WGS_normal_RNAseq_tumor_SNV_wf.resource_indices": [
+    "/home/databases/gatk-legacy-bundles/b37/hapmap_3.3.b37.vcf.idx",
+    "/home/databases/gatk-legacy-bundles/b37/1000G_omni2.5.b37.vcf.idx",
+    "/home/databases/gatk-legacy-bundles/b37/1000G_phase1.snps.high_confidence.b37.vcf.idx",
+    "/home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf.idx",
+    "/home/databases/gatk-legacy-bundles/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.idx"
+  ],
+
+  "WGS_normal_RNAseq_tumor_SNV_wf.SNP_resources": [
+    "hapmap,known=false,training=true,truth=true,prior=15.0 /home/databases/gatk-legacy-bundles/b37/hapmap_3.3.b37.vcf",
+    "omni,known=false,training=true,truth=true,prior=12.0 /home/databases/gatk-legacy-bundles/b37/1000G_omni2.5.b37.vcf",
+    "1000G,known=false,training=true,truth=false,prior=10.0 /home/databases/gatk-legacy-bundles/b37/1000G_phase1.snps.high_confidence.b37.vcf",
+    "dbsnp,known=true,training=false,truth=false,prior=2.0 /home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf"
+  ],
+  "WGS_normal_RNAseq_tumor_SNV_wf.INDEL_resources": [
+    "mills,known=false,training=true,truth=true,prior=12.0 /home/databases/gatk-legacy-bundles/b37/Mills_and_1000G_gold_standard.indels.b37.vcf",
+    "dbsnp,known=true,training=false,truth=false,prior=2.0 /home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf"
+  ],
+
+  "WGS_normal_RNAseq_tumor_SNV_wf.SNP_annotations": ["DP", "QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum"],
+  "WGS_normal_RNAseq_tumor_SNV_wf.INDEL_annotations": ["QD", "FS", "SOR", "MQRankSum", "ReadPosRankSum"],
+
+  "WGS_normal_RNAseq_tumor_SNV_wf.SNP_filter_level": 99.7,
+  "WGS_normal_RNAseq_tumor_SNV_wf.INDEL_filter_level": 99.7,
+
+  "WGS_normal_RNAseq_tumor_SNV_wf.SNP_tranches": [100.0, 99.99, 99.95, 99.9, 99.8, 99.7, 99.6, 99.5, 99.4, 99.3, 99.2, 99.1, 99.0, 98.0, 97.0, 96.0, 95.0, 90.0],
+  "WGS_normal_RNAseq_tumor_SNV_wf.INDEL_tranches": [100.0, 99.99, 99.95, 99.9, 99.8, 99.7, 99.6, 99.5, 99.0, 98.0, 97.0, 96.0, 95.0, 94.0, 93.0, 92.0, 91.0, 90.0]
+
+
+}
