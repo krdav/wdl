@@ -1051,42 +1051,37 @@ task HaplotypeCaller {
   File ref_idx
   Float? contamination
   Int cpu=28
-  File GATK
+  File GATK4_LAUNCH
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
-      -jar ${GATK} \
-      -T HaplotypeCaller \
+    ${GATK4_LAUNCH} --javaOptions "-Xms5g -Xmx100g" HaplotypeCaller \
       -R ${ref_fa} \
-      -o ${vcf_basename}.vcf.gz \
+      -O ${vcf_basename}.vcf.gz \
       -I ${in_bam} \
       --max_alternate_alleles 3 \
-      -variant_index_parameter 128000 \
-      -variant_index_type LINEAR \
-      -contamination ${default=0 contamination} \
-      --read_filter OverclippedRead \
       -stand_call_conf 30 \
-      -nct ${cpu} \
+      -threads ${cpu} \
       -L ${interval_list}
+
+  # A current bug in GATK4 HaplotypeCaller make the -contamination flag fail:
+  # -contamination ${default=0 contamination} \
   }
   runtime {
     cpu: cpu
   }
   output {
     File out_vcf = "${vcf_basename}.vcf.gz"
-    File out_vcf_idx = "${vcf_basename}.vcf.gz.tbi"
   }
 }
 
-# Combine multiple VCFs or VCFs from scattered HaplotypeCaller runs
+# Combine multiple VCFs or VCFs from scattered HaplotypeCaller runs:
 task MergeVCFs {
   Array[File] in_vcfs
-  Array[File] in_vcfs_idxes
   String out_vcf_name
   Int cpu=1
   File PICARD
 
-  # Using MergeVcfs instead of GatherVcfs so we can create indices
+  # Using MergeVcfs instead of GatherVcfs so we can create indices:
   # See https://github.com/broadinstitute/picard/issues/789 for relevant GatherVcfs ticket
   command {
     java -Xmx2g \
@@ -1620,7 +1615,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
     # Generate VCF by interval
     call HaplotypeCaller as HaplotypeCaller_normal {
       input:
-        GATK=gatk,
+        GATK4_LAUNCH=gatk4_launch,
         contamination = CheckContamination_normal.contamination,
         in_bam = GatherBamFiles_normal.out_bam,
         in_bai = GatherBamFiles_normal.out_bai,
@@ -1637,7 +1632,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
     input:
       PICARD=picard,
       in_vcfs = HaplotypeCaller_normal.out_vcf,
-      in_vcfs_idxes = HaplotypeCaller_normal.out_vcf_idx,
       out_vcf_name = vcf_name_normal
   }
 
@@ -2069,7 +2063,7 @@ workflow WES_normal_tumor_somatic_SNV_wf {
     # Generate VCF by interval:
     call HaplotypeCaller as HaplotypeCaller_tumor {
       input:
-        GATK=gatk,
+        GATK4_LAUNCH=gatk4_launch,
         contamination = CheckContamination_tumor.contamination,
         in_bam = GatherBamFiles_tumor.out_bam,
         in_bai = GatherBamFiles_tumor.out_bai,
@@ -2086,7 +2080,6 @@ workflow WES_normal_tumor_somatic_SNV_wf {
     input:
       PICARD=picard,
       in_vcfs = HaplotypeCaller_tumor.out_vcf,
-      in_vcfs_idxes = HaplotypeCaller_tumor.out_vcf_idx,
       out_vcf_name = vcf_name_tumor
   }
 

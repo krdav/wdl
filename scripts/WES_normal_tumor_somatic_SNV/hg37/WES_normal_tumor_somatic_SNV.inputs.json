@@ -15,16 +15,16 @@
   "WES_normal_tumor_somatic_SNV_wf.transcript_intervals": "/home/projects/cu_10098/data/references/hg37/RefGene_transcript.bed",
 
   "##_KRISTIAN_COMMENT:": "TOOL_PATHS",
-  "WES_normal_tumor_somatic_SNV_wf.seq_cache_populate": "/home/projects/cu_10098/apps/src/samtools-1.6/misc/seq_cache_populate.pl",
-  "WES_normal_tumor_somatic_SNV_wf.gatk": "/home/projects/cu_10098/apps/src/GenomeAnalysisTK-3.8-0-ge9d806836/GenomeAnalysisTK.jar",
-  "WES_normal_tumor_somatic_SNV_wf.picard": "/home/projects/cu_10098/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar",
-  "WES_normal_tumor_somatic_SNV_wf.samtools": "/home/projects/cu_10098/apps/src/samtools-1.3.1/samtools",
-  "WES_normal_tumor_somatic_SNV_wf.verifyBamID": "/home/projects/cu_10098/apps/src/verifyBamID/verifyBamID",
+  "WES_normal_tumor_somatic_SNV_wf.seq_cache_populate": "/home/projects/dp_00005/apps/src/samtools-1.6/misc/seq_cache_populate.pl",
+  "WES_normal_tumor_somatic_SNV_wf.gatk": "/home/projects/dp_00005/apps/src/GenomeAnalysisTK-3.8-0-ge9d806836/GenomeAnalysisTK.jar",
+  "WES_normal_tumor_somatic_SNV_wf.picard": "/home/projects/dp_00005/apps/src/picard/build/libs/picard-2.11.0-2-g2206c08-SNAPSHOT-all.jar",
+  "WES_normal_tumor_somatic_SNV_wf.samtools": "/home/projects/dp_00005/apps/src/samtools-1.3.1/samtools",
+  "WES_normal_tumor_somatic_SNV_wf.verifyBamID": "/home/projects/dp_00005/apps/src/verifyBamID/verifyBamID",
   "WES_normal_tumor_somatic_SNV_wf.bwa": "/services/tools/bwa/0.7.15/bwa",
   "WES_normal_tumor_somatic_SNV_wf.python3": "/services/tools/anaconda3/4.0.0/bin/python",
   "WES_normal_tumor_somatic_SNV_wf.python2": "/services/tools/anaconda2/4.0.0/bin/python",
-  "WES_normal_tumor_somatic_SNV_wf.gatk4": "/home/projects/cu_10098/apps/src/gatk-4.beta.3/gatk-package-4.beta.3-local.jar",
-  "WES_normal_tumor_somatic_SNV_wf.gatk4_launch": "/home/projects/cu_10098/apps/src/gatk-4.beta.5/gatk-launch",
+  "WES_normal_tumor_somatic_SNV_wf.gatk4": "/home/projects/dp_00005/apps/src/gatk-4.beta.3/gatk-package-4.beta.3-local.jar",
+  "WES_normal_tumor_somatic_SNV_wf.gatk4_launch": "/home/projects/dp_00005/apps/src/gatk-4.beta.5/gatk-launch",
   "WES_normal_tumor_somatic_SNV_wf.trimmomatic": "/services/tools/trimmomatic/0.36/trimmomatic-0.36.jar",
   "WES_normal_tumor_somatic_SNV_wf.pigz": "/services/tools/pigz/2.3.4/bin/pigz",
   "WES_normal_tumor_somatic_SNV_wf.star": "/services/tools/star/2.5.3a/bin/STAR",
@@ -100,12 +100,12 @@
   "WES_normal_tumor_somatic_SNV_wf.dbSNP_vcf": "/home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf",
   "WES_normal_tumor_somatic_SNV_wf.dbSNP_vcf_idx": "/home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf.idx",
   "WES_normal_tumor_somatic_SNV_wf.known_indels_sites_VCFs": [
-    "/home/projects/cu_10098/data/references/hg37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz",
-    "/home/projects/cu_10098/data/references/hg37/1000G_phase1.indels.b37.vcf.gz"
+    "/home/projects/dp_00005/data/references/hg37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz",
+    "/home/projects/dp_00005/data/references/hg37/1000G_phase1.indels.b37.vcf.gz"
   ],
   "WES_normal_tumor_somatic_SNV_wf.known_indels_sites_indices": [
-    "/home/projects/cu_10098/data/references/hg37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz.tbi",
-    "/home/projects/cu_10098/data/references/hg37/1000G_phase1.indels.b37.vcf.gz.tbi"
+    "/home/projects/dp_00005/data/references/hg37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz.tbi",
+    "/home/projects/dp_00005/data/references/hg37/1000G_phase1.indels.b37.vcf.gz.tbi"
   ],
 
   "####WES_normal_tumor_somatic_SNV_wf.known_indels_sites_VCFs": [

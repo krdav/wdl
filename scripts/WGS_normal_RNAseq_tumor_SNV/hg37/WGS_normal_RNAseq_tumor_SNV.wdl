@@ -2252,7 +2252,7 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
       GATK=gatk,
       in_vcf = MergeVCFs_tumor.out_vcf,
       in_vcf_idx = MergeVCFs_tumor.out_vcf_idx,
-      out_vcf_name = base_file_name_tumor + "_filtered.vcf.gz"
+      out_vcf_name = base_file_name_tumor + "_filtered.vcf.gz",
       ref_dict = ref_dict,
       ref_fa = ref_fa,
       ref_idx = ref_idx

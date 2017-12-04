@@ -11,6 +11,8 @@
   "WGS_normal_RNAseq_tumor_SNV_wf.tumor_sample_type": "rnaseq",
   "WGS_normal_RNAseq_tumor_SNV_wf.premade_STARindexDir": "/home/projects/dp_00005/data/references/hg38/STAR_index_overhang100",
   "WGS_normal_RNAseq_tumor_SNV_wf.transcript_intervals": "/home/projects/dp_00005/data/references/hg38/RefGene_transcript.bed",
+  "WGS_normal_RNAseq_tumor_SNV_wf.gnomad_exome_vcf": "/home/databases/gnomad_data/vcf/exomes/gnomad.exomes.r2.0.1.sites.vcf.gz",
+  "WGS_normal_RNAseq_tumor_SNV_wf.gnomad_exome_vcf_idx": "/home/databases/gnomad_data/vcf/exomes/gnomad.exomes.r2.0.1.sites.vcf.gz.tbi",
 
   "##_KRISTIAN_COMMENT:": "TOOL_PATHS",
   "WGS_normal_RNAseq_tumor_SNV_wf.seq_cache_populate": "/home/projects/dp_00005/apps/src/samtools-1.6/misc/seq_cache_populate.pl",
@@ -99,12 +101,12 @@
   "WGS_normal_RNAseq_tumor_SNV_wf.dbSNP_vcf": "/home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf",
   "WGS_normal_RNAseq_tumor_SNV_wf.dbSNP_vcf_idx": "/home/databases/gatk-legacy-bundles/b37/dbsnp_138.b37.vcf.idx",
   "WGS_normal_RNAseq_tumor_SNV_wf.known_indels_sites_VCFs": [
-    "/home/projects/cu_10098/data/references/hg37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz",
-    "/home/projects/cu_10098/data/references/hg37/1000G_phase1.indels.b37.vcf.gz"
+    "/home/projects/dp_00005/data/references/hg37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz",
+    "/home/projects/dp_00005/data/references/hg37/1000G_phase1.indels.b37.vcf.gz"
   ],
   "WGS_normal_RNAseq_tumor_SNV_wf.known_indels_sites_indices": [
-    "/home/projects/cu_10098/data/references/hg37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz.tbi",
-    "/home/projects/cu_10098/data/references/hg37/1000G_phase1.indels.b37.vcf.gz.tbi"
+    "/home/projects/dp_00005/data/references/hg37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz.tbi",
+    "/home/projects/dp_00005/data/references/hg37/1000G_phase1.indels.b37.vcf.gz.tbi"
   ],
 
   "####WGS_normal_RNAseq_tumor_SNV_wf.known_indels_sites_VCFs": [
