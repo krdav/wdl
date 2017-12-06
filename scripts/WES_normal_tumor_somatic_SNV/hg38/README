@@ -1,0 +1,6 @@
+Suggested workflow for somatic variant calling on paired normal/tumor samples using the hg38 reference genome.
+
+This workflow is experimental in the way that it is not updated to same extent as its hg37 counterpart.
+This is due to reference datasets (such as gnomad and exac) are not yet available for hg38.
+
+

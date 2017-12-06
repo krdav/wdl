@@ -1,0 +1,5 @@
+Workflow for somatic variant calling on paired normal/tumor whole exome samples using hg37 reference genome.
+Suggested VQSR steps are out-commented because single sample exome VQSR is not possible.
+Hard-filtering could be used but needs to be implemented.
+
+
