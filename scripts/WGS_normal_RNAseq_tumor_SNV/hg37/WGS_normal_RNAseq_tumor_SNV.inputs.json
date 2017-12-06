@@ -9,8 +9,8 @@
   "WGS_normal_RNAseq_tumor_SNV_wf.rawdata_tumor_fastqR1": "/home/projects/dp_00005/data/RNAseq/Staging10_RNA_S4_R1_0209.fastq.gz",
   "WGS_normal_RNAseq_tumor_SNV_wf.rawdata_tumor_fastqR2": "/home/projects/dp_00005/data/RNAseq/Staging10_RNA_S4_R2_0209.fastq.gz",
   "WGS_normal_RNAseq_tumor_SNV_wf.tumor_sample_type": "rnaseq",
-  "WGS_normal_RNAseq_tumor_SNV_wf.premade_STARindexDir": "/home/projects/dp_00005/data/references/hg38/STAR_index_overhang100",
-  "WGS_normal_RNAseq_tumor_SNV_wf.transcript_intervals": "/home/projects/dp_00005/data/references/hg38/RefGene_transcript.bed",
+  "WGS_normal_RNAseq_tumor_SNV_wf.premade_STARindexDir": "/home/projects/dp_00005/data/references/hg37/STAR_index_hg37_overhang100",
+  "WGS_normal_RNAseq_tumor_SNV_wf.transcript_intervals": "/home/projects/dp_00005/data/references/hg37/RefGene_transcript.bed",
   "WGS_normal_RNAseq_tumor_SNV_wf.gnomad_exome_vcf": "/home/databases/gnomad_data/vcf/exomes/gnomad.exomes.r2.0.1.sites.vcf.gz",
   "WGS_normal_RNAseq_tumor_SNV_wf.gnomad_exome_vcf_idx": "/home/databases/gnomad_data/vcf/exomes/gnomad.exomes.r2.0.1.sites.vcf.gz.tbi",
 

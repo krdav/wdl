@@ -297,7 +297,7 @@ task VariantFiltration_RNA {
   command {
     java -jar ${GATK} \
       -T VariantFiltration \
-      -R ${ref_fa}.fa \
+      -R ${ref_fa} \
       -V ${in_vcf} \
       -window 35 \
       -cluster 3 \
@@ -374,7 +374,7 @@ task FastqToBam {
   String basename = sub(basenameR1, '_1', '')
   File PICARD
   String sample_name
-  Int cpu=2
+  Int cpu=28
 
   command {
     java -Xmx8G \
@@ -1137,8 +1137,8 @@ task HaplotypeCaller {
   }
 }
 
-
-task HaplotypeCaller_RNA {
+# This is soon to be deleted:
+task HaplotypeCaller_RNA_old {
   File in_bam
   File in_bai
   File interval_list
@@ -1176,10 +1176,47 @@ task HaplotypeCaller_RNA {
   }
 }
 
+# Call variants on a single RNAseq sample with HaplotypeCaller to produce a VCF:
+task HaplotypeCaller_RNA {
+  File in_bam
+  File in_bai
+  File interval_list
+  String vcf_basename
+  File ref_dict
+  File ref_fa
+  File ref_idx
+  Float? contamination
+  Int cpu=28
+  File GATK4_LAUNCH
+
+  command {
+    ${GATK4_LAUNCH} --javaOptions "-Xms5g -Xmx100g" HaplotypeCaller \
+      -R ${ref_fa} \
+      -O ${vcf_basename}.vcf.gz \
+      -I ${in_bam} \
+      --max_alternate_alleles 3 \
+      -dontUseSoftClippedBases \
+      -stand_call_conf 20 \
+      -threads ${cpu} \
+      -L ${interval_list}
+
+  # A current bug in GATK4 HaplotypeCaller make the -contamination flag fail:
+  # -contamination ${default=0 contamination} \
+  # OverclippedRead filter is not implemented yet:
+  # --readFilter OverclippedRead \
+  }
+  runtime {
+    cpu: cpu
+  }
+  output {
+    File out_vcf = "${vcf_basename}.vcf.gz"
+  }
+}
+
 # Combine multiple VCFs from scattered HaplotypeCaller runs:
 task MergeVCFs {
   Array[File] in_vcfs
-  Array[File] in_vcfs_idx
+#  Array[File] in_vcfs_idx
   String out_vcf_name
   Int cpu=1
   File PICARD
@@ -1726,23 +1763,23 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
     input:
       PICARD=picard,
       in_vcfs = HaplotypeCaller_normal.out_vcf,
-      in_vcfs_idx = HaplotypeCaller_normal.out_vcf_idx,
+#      in_vcfs_idx = HaplotypeCaller_normal.out_vcf_idx,
       out_vcf_name = base_file_name_normal + "_mergedVCF.vcf.gz"
   }
 
   # Validate the VCF output of HaplotypeCaller:
-  call ValidateVCF as ValidateVCF_normal {
-    input:
-      GATK=gatk,
-      in_vcf = MergeVCFs_normal.out_vcf,
-      in_vcf_idx = MergeVCFs_normal.out_vcf_idx,
-      dbSNP_vcf = dbSNP_vcf,
-      dbSNP_vcf_idx = dbSNP_vcf_idx,
-      ref_fa = ref_fa,
-      ref_idx = ref_idx,
-      ref_dict = ref_dict,
-      wgs_calling_interval_list = wgs_calling_interval_list
-  }
+#  call ValidateVCF as ValidateVCF_normal {
+#    input:
+#      GATK=gatk,
+#      in_vcf = MergeVCFs_normal.out_vcf,
+#      in_vcf_idx = MergeVCFs_normal.out_vcf_idx,
+#      dbSNP_vcf = dbSNP_vcf,
+#      dbSNP_vcf_idx = dbSNP_vcf_idx,
+#      ref_fa = ref_fa,
+#      ref_idx = ref_idx,
+#      ref_dict = ref_dict,
+#      wgs_calling_interval_list = wgs_calling_interval_list
+#  }
 
   # QC the VCF:
   call CollectVcfCallingMetrics as CollectVcfCallingMetrics_normal {
@@ -1846,6 +1883,24 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
 
 
 ##############################################################################
+
+
+
+
+  # Validate the VCF output of HaplotypeCaller:
+  call ValidateVCF as ValidateVCF_normal {
+    input:
+      GATK=gatk,
+      in_vcf = ApplyRecalibrationFilterForSNPs_normal.out_vcf,
+      in_vcf_idx = ApplyRecalibrationFilterForSNPs_normal.out_vcf_idx,
+      dbSNP_vcf = dbSNP_vcf,
+      dbSNP_vcf_idx = dbSNP_vcf_idx,
+      ref_fa = ref_fa,
+      ref_idx = ref_idx,
+      ref_dict = ref_dict,
+      wgs_calling_interval_list = wgs_calling_interval_list
+  }
+
 
 
 
@@ -2192,7 +2247,7 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
     # Generate VCF by interval
     call HaplotypeCaller_RNA as HaplotypeCaller_tumor {
       input:
-        GATK=gatk,
+        GATK4_LAUNCH=gatk4_launch,
         contamination = CheckContamination_tumor.contamination,
         in_bam = GatherBamFiles_tumor.out_bam,
         in_bai = GatherBamFiles_tumor.out_bai,
@@ -2209,23 +2264,23 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
     input:
       PICARD=picard,
       in_vcfs = HaplotypeCaller_tumor.out_vcf,
-      in_vcfs_idx = HaplotypeCaller_tumor.out_vcf_idx,
+#      in_vcfs_idx = HaplotypeCaller_tumor.out_vcf_idx,
       out_vcf_name = base_file_name_tumor + "_mergedVCF.vcf.gz"
   }
 
   # Validate the VCF output of HaplotypeCaller:
-  call ValidateVCF as ValidateVCF_tumor {
-    input:
-      GATK=gatk,
-      in_vcf = MergeVCFs_tumor.out_vcf,
-      in_vcf_idx = MergeVCFs_tumor.out_vcf_idx,
-      dbSNP_vcf = dbSNP_vcf,
-      dbSNP_vcf_idx = dbSNP_vcf_idx,
-      ref_fa = ref_fa,
-      ref_idx = ref_idx,
-      ref_dict = ref_dict,
-      wgs_calling_interval_list = wgs_calling_interval_list
-  }
+#  call ValidateVCF as ValidateVCF_tumor {
+#    input:
+#      GATK=gatk,
+#      in_vcf = MergeVCFs_tumor.out_vcf,
+#      in_vcf_idx = MergeVCFs_tumor.out_vcf_idx,
+#      dbSNP_vcf = dbSNP_vcf,
+#      dbSNP_vcf_idx = dbSNP_vcf_idx,
+#      ref_fa = ref_fa,
+#      ref_idx = ref_idx,
+#      ref_dict = ref_dict,
+#      wgs_calling_interval_list = wgs_calling_interval_list
+#  }
 
   # QC the VCF:
   call CollectVcfCallingMetrics as CollectVcfCallingMetrics_tumor {
@@ -2258,8 +2313,22 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
       ref_idx = ref_idx
    }
 
-
 ##########################################################################################
+
+  # Validate the VCF output of HaplotypeCaller:
+  call ValidateVCF as ValidateVCF_tumor {
+    input:
+      GATK=gatk,
+      in_vcf = VariantFiltration_RNA.out_vcf,
+      in_vcf_idx = VariantFiltration_RNA.out_vcf_idx,
+      dbSNP_vcf = dbSNP_vcf,
+      dbSNP_vcf_idx = dbSNP_vcf_idx,
+      ref_fa = ref_fa,
+      ref_idx = ref_idx,
+      ref_dict = ref_dict,
+      wgs_calling_interval_list = wgs_calling_interval_list
+  }
+
 
 
 
@@ -2366,6 +2435,7 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
     BuildVQSRModelForSNPs_normal.*
     BuildVQSRModelForINDELs_normal.*
     ApplyRecalibrationFilterForINDELs_normal.*
+    ApplyRecalibrationFilterForSNPs_normal.*
     VariantFiltration_RNA.*
     FilterByOrientationBias.*
     }
