@@ -210,7 +210,8 @@ task MuTect2 {
       --dontUseSoftClippedBases \
       -O ${sample_name}_MuTect2.vcf.gz \
       --germline_resource ${gnomad_exome_vcf} \
-       -L ${transcript_intervals} \
+      -L ${transcript_intervals} \
+      -threads ${cpu} \
       --contamination_fraction_to_filter ${default=0 contamination}
   }
   runtime {
