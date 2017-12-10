@@ -208,9 +208,9 @@ task MuTect2 {
       -normal ${sample_name_normal} \
       --dbsnp ${dbSNP_vcf} \
       --dontUseSoftClippedBases \
-      -L ${transcript_intervals} \
       -O ${sample_name}_MuTect2.vcf.gz \
       --germline_resource ${gnomad_exome_vcf} \
+       -L ${transcript_intervals} \
       --contamination_fraction_to_filter ${default=0 contamination}
   }
   runtime {
@@ -1261,7 +1261,8 @@ task ValidateVCF {
       --validationTypeToExclude ALLELES \
       --reference_window_stop 208 -U  \
       --dbsnp ${dbSNP_vcf} \
-      -L ${wgs_calling_interval_list}
+      -L ${wgs_calling_interval_list} \
+      --validationTypeToExclude CHR_COUNTS  ## At the moment this validation is excluded because of known problems e.g. https://gatkforums.broadinstitute.org/gatk/discussion/10808/validatevariants-error-on-low-coverage-wgs-variant-calling and https://gatkforums.broadinstitute.org/gatk/discussion/9087/haplotype-caller-generated-vcf-cannot-be-validated
   }
   runtime {
     cpu: cpu
@@ -1410,6 +1411,18 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
 
   String recalibrated_bam_basename_normal = base_file_name_normal + ".aligned.duplicates_marked.recalibrated"
   String recalibrated_bam_basename_tumor = base_file_name_tumor + ".aligned.duplicates_marked.recalibrated"
+
+  # VQSR:
+  Array[String] SNP_annotations
+  Array[String] INDEL_annotations
+  Array[Float] SNP_tranches
+  Array[Float] INDEL_tranches
+  Array[String] SNP_resources
+  Array[String] INDEL_resources
+  Float SNP_filter_level
+  Float INDEL_filter_level
+  Array[File] resource_files
+  Array[File] resource_indices
 
   # Tools:
   File picard
@@ -1767,20 +1780,6 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
       out_vcf_name = base_file_name_normal + "_mergedVCF.vcf.gz"
   }
 
-  # Validate the VCF output of HaplotypeCaller:
-#  call ValidateVCF as ValidateVCF_normal {
-#    input:
-#      GATK=gatk,
-#      in_vcf = MergeVCFs_normal.out_vcf,
-#      in_vcf_idx = MergeVCFs_normal.out_vcf_idx,
-#      dbSNP_vcf = dbSNP_vcf,
-#      dbSNP_vcf_idx = dbSNP_vcf_idx,
-#      ref_fa = ref_fa,
-#      ref_idx = ref_idx,
-#      ref_dict = ref_dict,
-#      wgs_calling_interval_list = wgs_calling_interval_list
-#  }
-
   # QC the VCF:
   call CollectVcfCallingMetrics as CollectVcfCallingMetrics_normal {
     input:
@@ -1792,20 +1791,6 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
       dbSNP_vcf_idx = dbSNP_vcf_idx,
       ref_dict = ref_dict
   }
-
-
-
-
-
-
-
-
-
-
-
-#######################
-# Experiemental VQSR
-############################
 
   # Build SNP model:
   call BuildVQSRModel as BuildVQSRModelForSNPs_normal {
@@ -1881,12 +1866,6 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
       filter_level = SNP_filter_level
   }
 
-
-##############################################################################
-
-
-
-
   # Validate the VCF output of HaplotypeCaller:
   call ValidateVCF as ValidateVCF_normal {
     input:
@@ -1901,22 +1880,9 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
       wgs_calling_interval_list = wgs_calling_interval_list
   }
 
-
-
-
-
-
 #########################
 ### DNA only part end ###
 #########################
-
-
-
-
-
-
-
-
 
 
 
@@ -2268,20 +2234,6 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
       out_vcf_name = base_file_name_tumor + "_mergedVCF.vcf.gz"
   }
 
-  # Validate the VCF output of HaplotypeCaller:
-#  call ValidateVCF as ValidateVCF_tumor {
-#    input:
-#      GATK=gatk,
-#      in_vcf = MergeVCFs_tumor.out_vcf,
-#      in_vcf_idx = MergeVCFs_tumor.out_vcf_idx,
-#      dbSNP_vcf = dbSNP_vcf,
-#      dbSNP_vcf_idx = dbSNP_vcf_idx,
-#      ref_fa = ref_fa,
-#      ref_idx = ref_idx,
-#      ref_dict = ref_dict,
-#      wgs_calling_interval_list = wgs_calling_interval_list
-#  }
-
   # QC the VCF:
   call CollectVcfCallingMetrics as CollectVcfCallingMetrics_tumor {
     input:
@@ -2294,13 +2246,6 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
       ref_dict = ref_dict
   }
 
-
-
-#########
-### Experimental VariantFiltration
-#########################
-
-
   # Hard filter RNAseq variants:
   call VariantFiltration_RNA {
     input:
@@ -2312,8 +2257,6 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
       ref_fa = ref_fa,
       ref_idx = ref_idx
    }
-
-##########################################################################################
 
   # Validate the VCF output of HaplotypeCaller:
   call ValidateVCF as ValidateVCF_tumor {
@@ -2328,9 +2271,6 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
       ref_dict = ref_dict,
       wgs_calling_interval_list = wgs_calling_interval_list
   }
-
-
-
 
 #########################
 ### RNA only part end ###
@@ -2388,11 +2328,6 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
 #############################
 ### SOMATIC VARIANTS ENDS ###
 #############################
-
-
-
-
-
 
 
 
