@@ -1,8 +1,8 @@
 {
   "##_COMMENT1": "SAMPLE NAME AND UNMAPPED BAMS",
-  "WGS_normal_RNAseq_tumor_SNV_wf.sample_name": "normal_vs_tumor_test",
-  "WGS_normal_RNAseq_tumor_SNV_wf.base_file_name_normal": "normal_vs_tumor_test_n",
-  "WGS_normal_RNAseq_tumor_SNV_wf.base_file_name_tumor": "normal_vs_tumor_test_t",
+  "WGS_normal_RNAseq_tumor_SNV_wf.sample_name": "Sample_7-007PGF",
+  "WGS_normal_RNAseq_tumor_SNV_wf.base_file_name_normal": "Sample_7-007PGF_normal",
+  "WGS_normal_RNAseq_tumor_SNV_wf.base_file_name_tumor": "Staging10_RNA_tumor",
   "WGS_normal_RNAseq_tumor_SNV_wf.unmapped_bam_suffix": ".bam",
   "WGS_normal_RNAseq_tumor_SNV_wf.rawdata_normal_fastqR1": "/home/projects/dp_00005/data/161108_E00401.A.Project_Wadt-DNA1-2016-09-14/Sample_7-007PGF/7-007PGF_S7_L007_R1_001.fastq.gz",
   "WGS_normal_RNAseq_tumor_SNV_wf.rawdata_normal_fastqR2": "/home/projects/dp_00005/data/161108_E00401.A.Project_Wadt-DNA1-2016-09-14/Sample_7-007PGF/7-007PGF_S7_L007_R2_001.fastq.gz",

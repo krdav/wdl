@@ -201,6 +201,8 @@ task MuTect2 {
 
   command {
     ${GATK4_LAUNCH} --javaOptions "-Xms5g -Xmx100g" Mutect2 \
+      -jdk_deflater \
+      -jdk_inflater \
       -R ${ref_fa} \
       -I ${in_bam_tumor} \
       -tumor ${sample_name_tumor} \
@@ -263,7 +265,7 @@ task SplitNCigarReads {
   File in_bam
   File in_bai
   String suffix="_splitNcigar"
-  Int cpu=2
+  Int cpu=28  # Should only need 2, but Computerome....
 
   command {
     # Run options are set to follow the GATK best practice for RNAseq. data.
@@ -525,7 +527,7 @@ task SortAndFixTags {
   File ref_dict
   File ref_fa
   File ref_idx
-  Int cpu=2
+  Int cpu=28  # Only 2 is necessary but Computerome has a tendency to fail when running many of these jobs on the same node
   File PICARD
 
   command {
@@ -922,7 +924,7 @@ task ValidateSamFile {
   File ref_idx
   Int? max_output
   Array[String]? ignore
-  Int cpu=1
+  Int cpu=28  # One should be enough, but Computerome...
   File PICARD
 
   command {
