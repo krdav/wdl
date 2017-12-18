@@ -42,6 +42,7 @@ task BuildVQSRModel {
   Array[String] resources
   Array[File] resource_files
   Array[File] resource_indices
+  Int maxgauss
 
   command {
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx8000m \
@@ -53,6 +54,7 @@ task BuildVQSRModel {
       -resource:${sep=' -resource:' resources} \
       -an ${sep=' -an ' annotations} \
       -mode ${mode} \
+      --maxGaussians ${maxgauss} \
       -tranche ${sep=' -tranche ' tranches} \
       -recalFile ${out_basename}.${mode}.recal \
       -tranchesFile ${out_basename}.${mode}.tranches \
@@ -158,8 +160,8 @@ task FilterMutectCalls {
       -O ${sample_name}_MuTect2_filtered.vcf.gz \
       --dbsnp ${dbSNP_vcf} \
       --contamination_fraction_to_filter ${default=0 contamination} \
-      --normal_artifact_lod 4.0 \
-      --tumor_lod 4.0 \
+      --normal_artifact_lod 0.0 \
+      --tumor_lod 6.0 \
       --base_quality_score_threshold 20 \
       --min_base_quality_score 20 \
       --max_germline_posterior 0.001 \
@@ -928,7 +930,7 @@ task ValidateSamFile {
   File PICARD
 
   command {
-    java -Xmx4000m \
+    java -Xmx40000m \
       -jar ${PICARD} \
       ValidateSamFile \
       INPUT=${in_bam} \
@@ -1808,6 +1810,7 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
       out_basename = base_file_name_normal,
       annotations = SNP_annotations,
       mode = "SNP",
+      maxgauss = 8,
       tranches = SNP_tranches,
       resources = SNP_resources,
       resource_files = resource_files,
@@ -1827,6 +1830,7 @@ workflow WGS_normal_RNAseq_tumor_SNV_wf {
       out_basename = base_file_name_normal,
       annotations = INDEL_annotations,
       mode = "INDEL",
+      maxgauss = 4,
       tranches = INDEL_tranches,
       resources = INDEL_resources,
       resource_files = resource_files,
